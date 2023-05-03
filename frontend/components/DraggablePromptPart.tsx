@@ -78,6 +78,9 @@ const DraggablePromptPart: React.FC<DraggablePromptPartProps> = ({
 	const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		onCheckboxChange(event, promptPart);
 	};
+	const handleCheckboxClick = (event: React.MouseEvent<HTMLInputElement>) => {
+		event.stopPropagation();
+	};
 	const handleOnClick = () => {
 		onClick(promptPart);
 	};
@@ -92,7 +95,7 @@ const DraggablePromptPart: React.FC<DraggablePromptPartProps> = ({
 	};
 	useEffect(() => {
 		tokenCountReq();
-	}, []);
+	}, [promptPart]);
 
 	return (
 		<li
@@ -106,6 +109,7 @@ const DraggablePromptPart: React.FC<DraggablePromptPartProps> = ({
 				type="checkbox"
 				checked={promptPart.included}
 				onChange={handleCheckboxChange}
+				onClick={handleCheckboxClick}
 			/>
 			{isEditingName ? (
 				<input
