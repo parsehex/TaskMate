@@ -244,16 +244,13 @@ export const App: React.FC = () => {
 				</div>
 				<div className="right-sidebar">
 					{selectedPromptPart && (
-						<div>
-							<h2>Editing: {selectedPromptPart.name}</h2>
-							<Editor
-								initialContent={selectedPromptPart.content}
-								onContentChange={(newContent) => {
-									// Logic to handle content change
-								}}
-								onSave={handleEditorSave}
-							/>
-						</div>
+						<Editor
+							promptPart={selectedPromptPart}
+							onContentChange={(newContent) => {
+								// Logic to handle content change
+							}}
+							onSave={handleEditorSave}
+						/>
 					)}
 				</div>
 			</main>

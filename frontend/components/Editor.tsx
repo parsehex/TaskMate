@@ -46,6 +46,7 @@ const Editor: React.FC<EditorProps> = ({
 
 	return (
 		<div className="editor">
+			<h2>Editing: {promptPart.name}</h2>
 			<textarea
 				className="editor-textarea"
 				value={content || ''}
