@@ -174,14 +174,16 @@ export const App: React.FC = () => {
 
 	const handleEditorSave = async (newContent: string) => {
 		if (!selectedPromptPart) return;
-		await fetch(`/api/prompt_parts/${selectedPromptPart.id}`, {
+		const req = await fetch(`/api/prompt_parts/${selectedPromptPart.id}`, {
 			method: 'PUT',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ content: newContent }),
 		});
+		const res = await req.json();
+		const updatedPromptPart = res.promptPart;
 		setPromptParts((prevPromptParts) =>
 			prevPromptParts.map((pp) =>
-				pp.id === selectedPromptPart.id ? { ...pp, content: newContent } : pp
+				pp.id === updatedPromptPart.id ? updatedPromptPart : pp
 			)
 		);
 	};

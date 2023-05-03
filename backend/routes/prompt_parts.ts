@@ -207,7 +207,13 @@ router.put('/api/prompt_parts/:id', async (req, res) => {
 		if (q.changes === 0) {
 			return res.status(404).json({ error: 'Prompt part not found' });
 		}
-		res.status(200).json({ message: 'Prompt part updated successfully' });
+		const promptPart: any = await db.get(
+			'SELECT * FROM prompt_parts WHERE id = ?',
+			[id]
+		);
+		res
+			.status(200)
+			.json({ message: 'Prompt part updated successfully', promptPart });
 	} catch (err: any) {
 		res.status(500).json({ error: err.message });
 	}
