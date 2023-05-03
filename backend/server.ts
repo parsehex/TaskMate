@@ -6,6 +6,7 @@ import projectsRouter from './routes/projects';
 import promptsRouter from './routes/prompt_parts';
 import { initializeDatabase } from './database';
 import { scanProjectsRoot } from './project-scanner';
+import { getTokenCount } from './tokenizer';
 
 console.log('Starting server...');
 
@@ -33,6 +34,17 @@ export const startServer = async () => {
 
 	app.get('/', (req, res) => {
 		res.sendFile(path.join(staticPath, 'index.html'));
+	});
+
+	// helper api endpoint to count the tokens of given text
+	app.post('/api/count_tokens', async (req, res) => {
+		const { text } = req.body;
+		if (!text) {
+			res.status(200).json({ token_count: 0 });
+			return;
+		}
+		const token_count = getTokenCount(text);
+		res.status(200).json({ token_count });
 	});
 
 	app.listen(port, () => {
