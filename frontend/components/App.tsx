@@ -189,6 +189,9 @@ export const App: React.FC = () => {
 						<button className="edit-project">Edit Project</button>
 					</div>
 					<button onClick={handleNewSnippetClick}>+ Snippet</button>
+					<button onClick={copyPromptToClipboard}>
+						Copy Prompt to Clipboard
+					</button>
 					<ul id="prompt-parts">
 						{promptParts
 							.sort((a, b) => a.position - b.position)
@@ -203,9 +206,6 @@ export const App: React.FC = () => {
 								/>
 							))}
 					</ul>
-					<button onClick={copyPromptToClipboard}>
-						Copy Prompt to Clipboard
-					</button>
 				</div>
 				<div className="right-sidebar">
 					{selectedPromptPart && (
