@@ -33,6 +33,7 @@ export const App: React.FC = () => {
 	const [promptParts, setPromptParts] = useState<Prompt_Part[]>([]);
 	const [selectedPromptPart, setSelectedPromptPart] =
 		useState<Prompt_Part | null>(null);
+	const [selectAll, setSelectAll] = useState(false);
 
 	useEffect(() => {
 		// Fetch projects here and update the 'projects' state
@@ -62,6 +63,14 @@ export const App: React.FC = () => {
 		}
 	}, [selectedProjectId]);
 
+	useEffect(() => {
+		if (promptParts.length > 0) {
+			// Check if all prompt parts are included
+			const allChecked = promptParts.every((part) => part.included);
+			setSelectAll(allChecked);
+		}
+	}, [promptParts]);
+
 	const handleProjectSelection = (
 		event: React.ChangeEvent<HTMLSelectElement>
 	) => {
@@ -70,6 +79,27 @@ export const App: React.FC = () => {
 
 		// Store the selected project ID in localStorage
 		localStorage.setItem('selectedProjectId', projectId.toString());
+	};
+
+	const handleSelectAllChange = async (
+		event: React.ChangeEvent<HTMLInputElement>
+	) => {
+		const isChecked = event.target.checked;
+		setSelectAll(isChecked);
+
+		// Update included value in the database and local state for all prompt parts
+		for (const promptPart of promptParts) {
+			await fetch(`/api/prompt_parts/${promptPart.id}`, {
+				method: 'PUT',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ included: isChecked }),
+			});
+			setPromptParts((prevPromptParts) =>
+				prevPromptParts.map((pp) =>
+					pp.id === promptPart.id ? { ...pp, included: isChecked } : pp
+				)
+			);
+		}
 	};
 
 	const movePromptPart = async (dragIndex: number, hoverIndex: number) => {
@@ -185,6 +215,14 @@ export const App: React.FC = () => {
 						</select>
 						<button className="edit-project">Edit Project</button>
 					</div>
+					<label className="select-all-parts">
+						<input
+							type="checkbox"
+							checked={selectAll}
+							onChange={handleSelectAllChange}
+						/>
+						Select All
+					</label>
 					<button onClick={handleNewSnippetClick}>+ Snippet</button>
 					<button onClick={copyPromptToClipboard}>
 						Copy Prompt to Clipboard
