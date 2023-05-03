@@ -35,19 +35,20 @@ export const App: React.FC = () => {
 		useState<Prompt_Part | null>(null);
 	const [selectAll, setSelectAll] = useState(false);
 
-	useEffect(() => {
-		// Fetch projects here and update the 'projects' state
-		const fetchProjects = async () => {
-			const response = await fetch('/api/projects');
-			const data = await response.json();
-			setProjects(data);
+	// Fetch projects here and update the 'projects' state
+	const fetchProjects = async () => {
+		const response = await fetch('/api/projects');
+		const data = await response.json();
+		setProjects(data);
 
-			// Check for a stored project ID in localStorage
-			const storedProjectId = localStorage.getItem('selectedProjectId');
-			if (storedProjectId) {
-				setSelectedProjectId(Number(storedProjectId));
-			}
-		};
+		// Check for a stored project ID in localStorage
+		const storedProjectId = localStorage.getItem('selectedProjectId');
+		if (storedProjectId) {
+			setSelectedProjectId(Number(storedProjectId));
+		}
+	};
+
+	useEffect(() => {
 		fetchProjects();
 	}, []);
 
@@ -191,7 +192,7 @@ export const App: React.FC = () => {
 	const copyPromptToClipboard = () => {
 		const prompt = promptParts
 			.filter((part) => part.included)
-			.map((part) => part.name + ':\n' + part.content)
+			.map((part) => part.name + ':\n' + part.content.trim())
 			.join('\n\n');
 		navigator.clipboard.writeText(prompt);
 	};
