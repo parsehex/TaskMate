@@ -5,6 +5,16 @@ import { db } from './database';
 import { deleteStatement, insertStatement, updateStatement } from './sql-utils';
 import { fileExists } from './fs-utils';
 
+const DefaultIgnoreFiles = [
+	'.git',
+	'.parcel-cache',
+	'node_modules',
+	'package-lock',
+	'dist', // temp
+	'.env', // temp
+	'database.sqlite3', // temp
+];
+
 function shouldIgnorePath(ignoreFiles: string[], itemPath: string): boolean {
 	return ignoreFiles.some((ignorePath) => itemPath.startsWith(ignorePath));
 }
@@ -34,23 +44,23 @@ async function createPromptPartsForProject(
 		const itemName = item.name;
 		const itemPath = path.join(folderPath, itemName).replace(/\\/g, '/');
 
-		if (shouldIgnorePath(ignoreFiles, itemPath)) {
+		if (shouldIgnorePath(ignoreFiles, itemName)) {
 			continue;
 		}
 
 		if (item.isFile()) {
-			const existingPromptPart: any[] = await db.all(
+			const existingPromptParts: any[] = await db.all(
 				'SELECT id FROM prompt_parts WHERE project_id = ? AND name = ?',
 				[projectId, itemPath]
 			);
 
-			if (!existingPromptPart.length) {
+			if (!existingPromptParts.length) {
 				const { sql, values } = insertStatement('prompt_parts', {
 					project_id: projectId,
 					name: itemPath,
-					content: '', // You can read the file content here if necessary
+					content: '',
 					part_type: 'file',
-					position: 0, // Set the position if required
+					position: existingPromptParts.length,
 					created_at: new Date(),
 					updated_at: new Date(),
 				});
@@ -74,6 +84,10 @@ async function watchProjectFolder(projectId: number, projectName: string) {
 	const handleFileChange = async (eventType: string, fileName: string) => {
 		const filePath = path.join(projectPath, fileName);
 		const fileExistsFlag = await fileExists(filePath);
+
+		if (shouldIgnorePath(DefaultIgnoreFiles, fileName)) {
+			return;
+		}
 
 		if (!fileExistsFlag) {
 			// File does not exist, it means it was deleted or renamed
@@ -99,28 +113,28 @@ async function watchProjectFolder(projectId: number, projectName: string) {
 
 		if (!isFile) return;
 
-		const existingPromptPart: any[] = await db.all(
+		const existingPromptParts: any[] = await db.all(
 			'SELECT id FROM prompt_parts WHERE project_id = ? AND name = ?',
 			[projectId, fileName]
 		);
 
-		if (eventType === 'rename' && !existingPromptPart.length) {
+		if (eventType === 'rename' && !existingPromptParts.length) {
 			const { sql, values } = insertStatement('prompt_parts', {
 				project_id: projectId,
 				name: fileName,
-				content: '', // You can read the file content here if necessary
+				content: '',
 				part_type: 'file',
-				position: 0, // Set the position if required
+				position: existingPromptParts.length,
 				created_at: new Date(),
 				updated_at: new Date(),
 			});
 			await db.run(sql, values);
 			console.log(`Added prompt part: ${fileName} in project: ${projectName}`);
-		} else if (eventType === 'rename' && existingPromptPart.length) {
+		} else if (eventType === 'rename' && existingPromptParts.length) {
 			const { sql, values } = updateStatement(
 				'prompt_parts',
 				{ name: fileName, updated_at: new Date() },
-				{ id: existingPromptPart[0].id }
+				{ id: existingPromptParts[0].id }
 			);
 			await db.run(sql, values);
 			console.log(
@@ -156,12 +170,10 @@ async function scanProjectsRoot() {
 			let projectId: number;
 
 			if (!existingProject.length) {
-				const defaultIgnoreFiles = JSON.stringify(['.git', 'node_modules']);
-
 				const { sql, values } = insertStatement('projects', {
 					name: projectName,
 					description: '',
-					ignore_files: defaultIgnoreFiles,
+					ignore_files: JSON.stringify(DefaultIgnoreFiles),
 					created_at: new Date(),
 				});
 				const { lastID } = await db.run(sql, values);
@@ -169,10 +181,12 @@ async function scanProjectsRoot() {
 				console.log(`Added project: ${projectName}`);
 			} else {
 				projectId = existingProject[0].id;
+				console.log('Found existing project:', projectName);
 			}
 
 			await watchProjectFolder(projectId, projectName);
 			await createPromptPartsForProject(projectId, projectName);
+			console.log('Scanned project:', projectName);
 		}
 	} catch (error) {
 		console.error('Error scanning PROJECTS_ROOT:', error);
