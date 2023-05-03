@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { encode } from 'gpt-tokenizer';
 import Editor from './Editor';
 import DraggablePromptPart from './DraggablePromptPart';
 
@@ -34,8 +33,6 @@ export const App: React.FC = () => {
 	const [promptParts, setPromptParts] = useState<Prompt_Part[]>([]);
 	const [selectedPromptPart, setSelectedPromptPart] =
 		useState<Prompt_Part | null>(null);
-
-	const gptTokenCache = new Map<string, string>();
 
 	useEffect(() => {
 		// Fetch projects here and update the 'projects' state
