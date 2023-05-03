@@ -14,9 +14,11 @@ const port = 8080;
 
 export const startServer = async () => {
 	await initializeDatabase();
+	console.log('Initialized database');
 
 	// scans and populates database with projects and prompt parts according to project folder files
 	await scanProjectsRoot();
+	console.log('Scanned projects root');
 
 	app.use(cors());
 	app.use(express.json());
