@@ -11,7 +11,6 @@ interface DraggablePromptPartProps {
 	) => void;
 	movePromptPart: (dragIndex: number, hoverIndex: number) => void;
 	index: number;
-	tokenCount: number;
 }
 
 const DraggablePromptPart: React.FC<DraggablePromptPartProps> = ({
@@ -20,7 +19,6 @@ const DraggablePromptPart: React.FC<DraggablePromptPartProps> = ({
 	onCheckboxChange,
 	movePromptPart,
 	index,
-	tokenCount,
 }) => {
 	const ref = useRef<HTMLLIElement>(null);
 
@@ -83,6 +81,18 @@ const DraggablePromptPart: React.FC<DraggablePromptPartProps> = ({
 	const handleOnClick = () => {
 		onClick(promptPart);
 	};
+
+	const [tokenCount, setTokenCount] = useState(false);
+	const tokenCountReq = async () => {
+		const response = await fetch(
+			`/api/prompt_parts/${promptPart.id}/token_count`
+		);
+		const data = await response.json();
+		setTokenCount(data.token_count);
+	};
+	useEffect(() => {
+		tokenCountReq();
+	}, []);
 
 	return (
 		<li

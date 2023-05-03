@@ -12,6 +12,7 @@ import {
 	renameFile,
 	writeFileContents,
 } from '../fs-utils';
+import { getTokenCount } from '../tokenizer';
 
 const router = express.Router();
 
@@ -73,6 +74,35 @@ router.get('/api/prompt_parts/:project_id', async (req, res) => {
 		}
 
 		res.status(200).json(promptParts);
+	} catch (err: any) {
+		res.status(500).json({ error: err.message });
+	}
+});
+
+// Get prompt part token count by id
+router.get('/api/prompt_parts/:id/token_count', async (req, res) => {
+	const { id } = req.params;
+	try {
+		const promptPart: any = await db.get(
+			'SELECT * FROM prompt_parts WHERE id = ?',
+			[id]
+		);
+		if (!promptPart) {
+			return res.status(404).json({ error: 'Prompt part not found' });
+		}
+		if (promptPart.part_type === 'file') {
+			const project: any = await db.get(
+				'SELECT name FROM projects WHERE id = ?',
+				[promptPart.project_id]
+			);
+			const p = path.join(
+				process.env.PROJECTS_ROOT as string,
+				project.name,
+				promptPart.name
+			);
+			promptPart.content = await readFileContents(p);
+		}
+		res.status(200).json({ token_count: getTokenCount(promptPart.content) });
 	} catch (err: any) {
 		res.status(500).json({ error: err.message });
 	}

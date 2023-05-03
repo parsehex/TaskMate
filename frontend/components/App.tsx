@@ -19,6 +19,7 @@ export interface Prompt_Part {
 	name: string;
 	snippet: boolean;
 	part_type: 'file' | 'snippet';
+	token_count: number;
 	included: boolean;
 	position: number;
 	created_at: string;
@@ -196,7 +197,6 @@ export const App: React.FC = () => {
 									key={promptPart.id}
 									index={index}
 									promptPart={promptPart}
-									tokenCount={encode(promptPart.content, gptTokenCache).length}
 									onClick={handlePromptPartClick}
 									onCheckboxChange={handleCheckboxChange}
 									movePromptPart={movePromptPart}
