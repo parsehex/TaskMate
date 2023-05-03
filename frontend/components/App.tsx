@@ -224,9 +224,7 @@ export const App: React.FC = () => {
 						Select All
 					</label>
 					<button onClick={handleNewSnippetClick}>+ Snippet</button>
-					<button onClick={copyPromptToClipboard}>
-						Copy Prompt to Clipboard
-					</button>
+					<button onClick={copyPromptToClipboard}>Copy Prompt</button>
 					<ul id="prompt-parts">
 						{promptParts
 							.sort((a, b) => a.position - b.position)
