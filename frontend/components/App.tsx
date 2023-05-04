@@ -5,6 +5,10 @@ import { Project, Prompt_Part } from '../types';
 import { fetchProjects, fetchPromptParts, getTokenCount } from '../api';
 import ProjectSelector from './ProjectSelector';
 import PromptPartsList from './PromptPartsList';
+import PreviewPromptButton from './PreviewPromptButton';
+import CopyPromptButton from './CopyPromptButton';
+import TokenCountDisplay from './TokenCountDisplay';
+import { makePrompt } from '../utils';
 
 export const App: React.FC = () => {
 	const [projects, setProjects] = useState<Project[]>([]);
@@ -44,50 +48,23 @@ export const App: React.FC = () => {
 		}
 	}, [selectedProjectId]);
 
-	const makePrompt = () => {
-		const prompt = promptParts
-			.filter((part) => part.included)
-			.map((part) => part.name + ':\n' + part.content.trim())
-			.join('\n\n');
-		return prompt;
+	useEffect(() => {
+		const prompt = makePrompt(includedPromptParts);
+		getTokenCount({ text: prompt }).then((data) => {
+			setPromptTokenCount(data.token_count);
+		});
+	}, [includedPromptParts]);
+
+	const updateIncludedPromptParts = () => {
+		if (promptParts.length > 0) {
+			const includedPromptParts = promptParts.filter((part) => part.included);
+			setIncludedPromptParts(includedPromptParts);
+		}
 	};
 
 	useEffect(() => {
-		if (promptParts.length > 0) {
-			setIncludedPromptParts(promptParts.filter((part) => part.included));
-		}
-
-		const prompt = makePrompt();
-		getTokenCount({ text: prompt }).then((data) => {
-			if (!data) return;
-			setPromptTokenCount(data.token_count);
-		});
+		updateIncludedPromptParts();
 	}, [promptParts]);
-
-	const handlePreviewClick = () => {
-		setReadOnly(true);
-
-		// fake Prompt_Part object with the generated prompt content
-		const previewPromptPart = {
-			id: -1,
-			name: `Prompt Preview (${includedPromptParts.length} parts)`,
-			content: makePrompt(),
-			included: false,
-			token_count: 0,
-			project_id: selectedProjectId ? selectedProjectId : -1,
-		} as Prompt_Part;
-
-		setSelectedPromptPart(previewPromptPart);
-	};
-
-	const copyPromptToClipboard = () => {
-		fetchPromptParts(selectedProjectId).then((promptParts) => {
-			setPromptParts(promptParts);
-		});
-
-		const prompt = makePrompt();
-		navigator.clipboard.writeText(prompt);
-	};
 
 	return (
 		<div className="app">
@@ -102,18 +79,18 @@ export const App: React.FC = () => {
 						setSelectedProjectId={setSelectedProjectId}
 					/>
 					<div>
-						<button onClick={copyPromptToClipboard}>Copy Prompt</button>
-						<button onClick={handlePreviewClick}>Preview</button>
-						<span
-							className={
-								'token-count' + (promptTokenCount >= 4096 ? ' red' : '')
-							}
-							title={promptTokenCount + ' tokens'}
-						>
-							{promptTokenCount} tokens / {includedPromptParts.length} parts
-						</span>
+						<CopyPromptButton
+							promptParts={includedPromptParts}
+							selectedProjectId={selectedProjectId}
+							setPromptParts={setPromptParts}
+						/>
+						<PreviewPromptButton
+							promptParts={includedPromptParts}
+							setReadOnly={setReadOnly}
+							setSelectedPromptPart={setSelectedPromptPart}
+						/>
+						<TokenCountDisplay promptTokenCount={promptTokenCount} />
 					</div>
-
 					<PromptPartsList
 						selectedProjectId={selectedProjectId}
 						promptParts={promptParts}
