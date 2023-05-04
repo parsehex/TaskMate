@@ -86,13 +86,17 @@ button {
 			margin: 0;
 			list-style: none;
 
-			li {
+			li.prompt-part {
 				display: flex;
 				align-items: center;
 				justify-content: space-between;
 				padding: 2px;
 				font-size: 0.85em;
 				font-family: monospace;
+
+				&.selected {
+					background-color: #ccc !important;
+				}
 
 				input[type='checkbox'] {
 				}
@@ -114,7 +118,7 @@ button {
 
 				&:hover {
 					cursor: pointer;
-					background-color: #ccc;
+					background-color: #ddd;
 				}
 			}
 		}
