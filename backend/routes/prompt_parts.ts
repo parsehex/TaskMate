@@ -1,18 +1,20 @@
 import express from 'express';
 import path from 'path';
-import { db } from '../database';
+import { db } from '../db';
 import {
 	insertStatement,
 	updateStatement,
 	deleteStatement,
-} from '../sql-utils';
+} from '../db/sql-utils';
 import {
 	deleteFile,
+	fileExists,
 	readFileContents,
 	renameFile,
 	writeFileContents,
 } from '../fs-utils';
 import { getTokenCount } from '../tokenizer';
+import { getProjectPath } from '../path-utils';
 
 const router = express.Router();
 
@@ -123,6 +125,21 @@ router.post('/api/prompt_parts', async (req, res) => {
 		);
 		const position = existingPromptParts.length + 1;
 
+		let fileContents: string | undefined;
+		if (part_type === 'file') {
+			// if adding a file, it must exist
+			const project: any = await db.get(
+				'SELECT name FROM projects WHERE id = ?',
+				[project_id]
+			);
+			const p = getProjectPath(project.name, name);
+			if (!(await fileExists(p))) {
+				return res.status(404).json({ error: 'File not found' });
+			} else {
+				fileContents = await readFileContents(p);
+			}
+		}
+
 		const { sql, values } = insertStatement('prompt_parts', {
 			name,
 			project_id,
@@ -134,9 +151,11 @@ router.post('/api/prompt_parts', async (req, res) => {
 		});
 
 		const q = await db.run(sql, values);
-		const promptPart = await db.get('SELECT * FROM prompt_parts WHERE id = ?', [
-			q.lastID,
-		]);
+		const promptPart: any = await db.get(
+			'SELECT * FROM prompt_parts WHERE id = ?',
+			[q.lastID]
+		);
+		if (part_type === 'file') promptPart.content = fileContents;
 		res
 			.status(201)
 			.json({ message: 'Prompt part created successfully', promptPart });
@@ -147,14 +166,13 @@ router.post('/api/prompt_parts', async (req, res) => {
 
 // Update prompt part
 router.put('/api/prompt_parts/:id', async (req, res) => {
-	const { id } = req.params;
+	const { id: idStr } = req.params;
+	const id = parseInt(idStr);
 	const { name, content, position, included } = req.body;
 
 	if (
-		!name &&
-		!content &&
-		!Number.isInteger(position) &&
-		included === undefined
+		(!id && id !== 0) ||
+		(!name && !content && !Number.isInteger(position) && included === undefined)
 	) {
 		return res.status(400).json({ error: 'Missing required fields' });
 	}
@@ -165,6 +183,7 @@ router.put('/api/prompt_parts/:id', async (req, res) => {
 	);
 
 	const fieldsObj = { name, content, position, included };
+	let fileContents: string | undefined;
 	if (promptPart.part_type === 'file') {
 		const project: any = await db.get(
 			'SELECT name FROM projects WHERE id = ?',
@@ -189,7 +208,11 @@ router.put('/api/prompt_parts/:id', async (req, res) => {
 			project.name,
 			name || promptPart.name
 		);
-		if (content) await writeFileContents(p, content);
+		if (content) {
+			await writeFileContents(p, content);
+		} else {
+			fileContents = await readFileContents(p);
+		}
 		delete fieldsObj.content;
 	}
 
@@ -211,6 +234,7 @@ router.put('/api/prompt_parts/:id', async (req, res) => {
 			'SELECT * FROM prompt_parts WHERE id = ?',
 			[id]
 		);
+		if (promptPart.part_type === 'file') promptPart.content = fileContents;
 		res
 			.status(200)
 			.json({ message: 'Prompt part updated successfully', promptPart });
@@ -221,13 +245,21 @@ router.put('/api/prompt_parts/:id', async (req, res) => {
 
 // Delete prompt part
 router.delete('/api/prompt_parts/:id', async (req, res) => {
-	const { id } = req.params;
+	const { id: idStr } = req.params;
+	const id = parseInt(idStr);
+
+	if (!id) {
+		return res.status(400).json({ error: 'Missing required fields' });
+	}
 
 	try {
 		const promptPart: any = await db.get(
 			'SELECT part_type, project_id, name FROM prompt_parts WHERE id = ?',
 			[id]
 		);
+		if (!promptPart) {
+			return res.status(404).json({ error: 'Prompt part not found' });
+		}
 		if (promptPart.part_type === 'file') {
 			const project: any = await db.get(
 				'SELECT name FROM projects WHERE id = ?',
@@ -238,16 +270,23 @@ router.delete('/api/prompt_parts/:id', async (req, res) => {
 				project.name,
 				promptPart.name
 			);
-			await deleteFile(p);
+			if (await fileExists(p)) {
+				await deleteFile(p);
+				console.log('Deleted file', p);
+			}
 		}
 
-		const sql = deleteStatement('prompt_parts', { id });
-		const q = await db.run(sql);
+		const { sql, values } = deleteStatement('prompt_parts', { id });
+		const q = await db.run(sql, ...values);
 		if (q.changes === 0) {
 			return res.status(404).json({ error: 'Prompt part not found' });
 		}
-		res.status(200).json({ message: 'Prompt part deleted successfully' });
+
+		res
+			.status(200)
+			.json({ message: 'Prompt part deleted successfully', promptPart });
 	} catch (err: any) {
+		console.log(err);
 		res.status(500).json({ error: err.message });
 	}
 });

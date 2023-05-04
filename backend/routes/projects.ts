@@ -1,10 +1,10 @@
 import express from 'express';
-import { db } from '../database';
+import { db } from '../db';
 import {
 	deleteStatement,
 	insertStatement,
 	updateStatement,
-} from '../sql-utils';
+} from '../db/sql-utils';
 import path from 'path';
 import fs from 'fs';
 
@@ -111,8 +111,8 @@ router.delete('/api/projects/:id', async (req, res) => {
 	const { id } = req.params;
 
 	try {
-		const sql = deleteStatement('projects', { id });
-		const q = await db.run(sql);
+		const { sql, values } = deleteStatement('projects', { id: +id });
+		const q = await db.run(sql, ...values);
 		if (q.changes === 0) {
 			return res.status(404).json({ error: 'Project not found' });
 		}

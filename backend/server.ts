@@ -4,7 +4,7 @@ import path from 'path';
 // import Router from 'express-static-gzip';
 import projectsRouter from './routes/projects';
 import promptsRouter from './routes/prompt_parts';
-import { initializeDatabase } from './database';
+import { initializeDatabase } from './db';
 import { scanProjectsRoot } from './project-scanner';
 import { getTokenCount } from './tokenizer';
 

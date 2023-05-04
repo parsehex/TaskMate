@@ -27,13 +27,17 @@
 		"start": "concurrently \"npm run f:dev\" \"npm run b:dev\""
 	},
 	"dependencies": {
+		"@monaco-editor/react": "^4.5.0",
 		"aws-sdk": "^2.1368.0",
 		"cors": "^2.8.5",
 		"dotenv": "^16.0.3",
 		"express": "^4.18.2",
 		"express-static-gzip": "^2.1.7",
+		"file-type": "^18.3.0",
 		"fs-extra": "^11.1.1",
+		"glob": "^10.2.2",
 		"gpt-tokenizer": "^1.0.4",
+		"monaco-editor": "^0.38.0",
 		"promised-sqlite3": "^2.0.1",
 		"react": "^18.2.0",
 		"react-dnd": "^16.0.1",

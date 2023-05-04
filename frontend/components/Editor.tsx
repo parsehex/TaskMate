@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Prompt_Part } from './App';
+import MonacoEditor from '@monaco-editor/react';
+import { Monaco } from '@monaco-editor/react';
+import { Prompt_Part } from '../types';
+import { getTokenCount } from '../api';
 
 interface EditorProps {
 	promptPart: Prompt_Part;
-	onContentChange: (content: string) => void;
+	readOnly: boolean;
+	onContentChange?: (content: string) => void;
 	onSave: (content: string) => void;
 }
 
 const Editor: React.FC<EditorProps> = ({
+	promptPart,
+	readOnly,
 	onContentChange,
 	onSave,
-	promptPart,
 }) => {
 	const initialContent = promptPart.content;
 	const [content, setContent] = useState(initialContent);
@@ -20,43 +25,57 @@ const Editor: React.FC<EditorProps> = ({
 		setContent(promptPart.content);
 	}, [promptPart]);
 
-	const getTokenCount = async (text: string) => {
-		const response = await fetch('/api/count_tokens', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({ text }),
-		});
-		const data = await response.json();
-		setTokenCount(data.token_count);
-	};
 	useEffect(() => {
-		getTokenCount(content);
+		getTokenCount({ text: content }).then((data) => {
+			if (!data) return;
+			setTokenCount(data.token_count);
+		});
 	}, [content]);
 
-	const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-		setContent(event.target.value);
-		onContentChange(event.target.value);
+	const handleChange = (value: string | undefined, ev: any) => {
+		if (!value) return;
+		setContent(value);
+		onContentChange && onContentChange(value);
 	};
 
-	const handelSave = () => {
+	const handleSave = () => {
 		onSave(content);
+	};
+
+	const detectFileLanguage = (name: string) => {
+		const extension = name.split('.').pop();
+		switch (extension) {
+			case 'js':
+				return 'javascript';
+			case 'ts':
+				return 'typescript';
+			case 'py':
+				return 'python';
+			case '':
+				return 'markdown';
+			default:
+				return extension;
+		}
 	};
 
 	return (
 		<div className="editor">
-			<h2>Editing: {promptPart.name}</h2>
-			<textarea
-				className="editor-textarea"
-				value={content || ''}
+			<h2>
+				{readOnly ? '' : 'Editing:'} {promptPart.name}
+			</h2>
+			<MonacoEditor
+				height="75vh"
+				width="100%"
+				language={detectFileLanguage(promptPart.name)}
+				theme="vs-dark"
+				value={content}
 				onChange={handleChange}
+				options={{ domReadOnly: readOnly, wordWrap: 'on' }}
 			/>
-			{/* save button */}
-			<button type="button" onClick={handelSave}>
+			<button type="button" onClick={handleSave}>
 				Save
 			</button>
-			Tokens: {tokenCount}
+			<span className="token-count">{tokenCount} tokens</span>
 		</div>
 	);
 };

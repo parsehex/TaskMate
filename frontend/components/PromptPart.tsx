@@ -1,8 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { Prompt_Part } from './App';
+import { Prompt_Part } from '../types';
+import { getTokenCount, updatePromptPart } from '../api';
 
-interface DraggablePromptPartProps {
+interface PromptPartProps {
 	promptPart: Prompt_Part;
 	onClick: (promptPart: Prompt_Part) => void;
 	onCheckboxChange: (
@@ -11,14 +12,16 @@ interface DraggablePromptPartProps {
 	) => void;
 	movePromptPart: (dragIndex: number, hoverIndex: number) => void;
 	index: number;
+	selected: boolean;
 }
 
-const DraggablePromptPart: React.FC<DraggablePromptPartProps> = ({
+const PromptPart: React.FC<PromptPartProps> = ({
 	promptPart,
 	onClick,
 	onCheckboxChange,
 	movePromptPart,
 	index,
+	selected,
 }) => {
 	const ref = useRef<HTMLLIElement>(null);
 
@@ -65,12 +68,10 @@ const DraggablePromptPart: React.FC<DraggablePromptPartProps> = ({
 			setIsEditingName(false);
 			const newName = event.currentTarget.value;
 			if (newName !== promptPart.name) {
-				await fetch(`/api/prompt_parts/${promptPart.id}`, {
-					method: 'PUT',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ name: newName }),
-				});
-				onClick({ ...promptPart, name: newName });
+				promptPart.name = newName;
+				promptPart = (await updatePromptPart(promptPart.id, { name: newName }))
+					.promptPart;
+				onClick(promptPart);
 			}
 		}
 	};
@@ -85,21 +86,19 @@ const DraggablePromptPart: React.FC<DraggablePromptPartProps> = ({
 		onClick(promptPart);
 	};
 
-	const [tokenCount, setTokenCount] = useState(false);
-	const tokenCountReq = async () => {
-		const response = await fetch(
-			`/api/prompt_parts/${promptPart.id}/token_count`
-		);
-		const data = await response.json();
-		setTokenCount(data.token_count);
-	};
+	const [tokenCount, setTokenCount] = useState(0);
 	useEffect(() => {
-		tokenCountReq();
+		// console.log(promptPart);
+		getTokenCount({ promptPartId: promptPart.id }).then((data) => {
+			if (!data) return;
+			setTokenCount(data.token_count);
+		});
 	}, [promptPart]);
 
 	return (
 		<li
 			ref={ref}
+			className={`prompt-part ${selected ? 'selected' : ''}`}
 			onClick={handleOnClick}
 			style={{
 				opacity: isDragging ? 0.5 : 1,
@@ -107,7 +106,7 @@ const DraggablePromptPart: React.FC<DraggablePromptPartProps> = ({
 		>
 			<input
 				type="checkbox"
-				checked={promptPart.included}
+				checked={!!promptPart.included}
 				onChange={handleCheckboxChange}
 				onClick={handleCheckboxClick}
 			/>
@@ -135,4 +134,4 @@ const DraggablePromptPart: React.FC<DraggablePromptPartProps> = ({
 	);
 };
 
-export default DraggablePromptPart;
+export default PromptPart;

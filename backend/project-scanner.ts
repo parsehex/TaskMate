@@ -1,34 +1,22 @@
 import fs from 'fs-extra';
 import path from 'path';
 import { Dirent } from 'fs';
-import { db } from './database';
-import { deleteStatement, insertStatement, updateStatement } from './sql-utils';
+import { db } from './db';
+import {
+	deleteStatement,
+	insertStatement,
+	updateStatement,
+} from './db/sql-utils';
 import { fileExists } from './fs-utils';
-
-const DefaultIgnoreFiles = [
-	'.git',
-	'.parcel-cache',
-	'node_modules',
-	'package-lock',
-	'dist', // temp
-	'.env', // temp
-	'database.sqlite3', // temp
-];
-
-function shouldIgnorePath(ignoreFiles: string[], itemPath: string): boolean {
-	return ignoreFiles.some((ignorePath) => itemPath.startsWith(ignorePath));
-}
+import { shouldIgnorePath, getProjectPath } from './path-utils';
+import { DefaultIgnoreFiles } from './const';
 
 async function createPromptPartsForProject(
 	projectId: number,
 	projectName: string,
 	folderPath = ''
 ) {
-	const projectPath = path.join(
-		process.env.PROJECTS_ROOT as string,
-		projectName,
-		folderPath
-	);
+	const projectPath = getProjectPath(projectName, folderPath);
 
 	const project: any[] = await db.all(
 		'SELECT ignore_files FROM projects WHERE id = ?',
@@ -44,7 +32,7 @@ async function createPromptPartsForProject(
 		const itemName = item.name;
 		const itemPath = path.join(folderPath, itemName).replace(/\\/g, '/');
 
-		if (shouldIgnorePath(ignoreFiles, itemName)) {
+		if (await shouldIgnorePath(ignoreFiles, itemName)) {
 			continue;
 		}
 
@@ -76,16 +64,13 @@ async function createPromptPartsForProject(
 }
 
 async function watchProjectFolder(projectId: number, projectName: string) {
-	const projectPath = path.join(
-		process.env.PROJECTS_ROOT as string,
-		projectName
-	);
+	const projectPath = getProjectPath(projectName);
 
 	const handleFileChange = async (eventType: string, fileName: string) => {
 		const filePath = path.join(projectPath, fileName);
 		const fileExistsFlag = await fileExists(filePath);
 
-		if (shouldIgnorePath(DefaultIgnoreFiles, fileName)) {
+		if (await shouldIgnorePath(DefaultIgnoreFiles, fileName)) {
 			return;
 		}
 
@@ -97,49 +82,16 @@ async function watchProjectFolder(projectId: number, projectName: string) {
 			);
 
 			if (existingPromptPart.length) {
-				const deleteSql = deleteStatement('prompt_parts', {
+				const { sql, values } = deleteStatement('prompt_parts', {
 					id: existingPromptPart[0].id,
 				});
-				await db.run(deleteSql);
+				await db.run(sql, values);
 				console.log(
 					`Removed prompt part: ${fileName} from project: ${projectName}`
 				);
 			}
 
 			return;
-		}
-
-		const isFile = (await fs.promises.stat(filePath)).isFile();
-
-		if (!isFile) return;
-
-		const existingPromptParts: any[] = await db.all(
-			'SELECT id FROM prompt_parts WHERE project_id = ? AND name = ?',
-			[projectId, fileName]
-		);
-
-		if (eventType === 'rename' && !existingPromptParts.length) {
-			const { sql, values } = insertStatement('prompt_parts', {
-				project_id: projectId,
-				name: fileName,
-				content: '',
-				part_type: 'file',
-				position: existingPromptParts.length,
-				created_at: new Date(),
-				updated_at: new Date(),
-			});
-			await db.run(sql, values);
-			console.log(`Added prompt part: ${fileName} in project: ${projectName}`);
-		} else if (eventType === 'rename' && existingPromptParts.length) {
-			const { sql, values } = updateStatement(
-				'prompt_parts',
-				{ name: fileName, updated_at: new Date() },
-				{ id: existingPromptParts[0].id }
-			);
-			await db.run(sql, values);
-			console.log(
-				`Renamed prompt part: ${fileName} in project: ${projectName}`
-			);
 		}
 	};
 	fs.watch(projectPath, (eventType, fileName) => {
@@ -149,7 +101,7 @@ async function watchProjectFolder(projectId: number, projectName: string) {
 	});
 }
 
-async function scanProjectsRoot() {
+export async function scanProjectsRoot() {
 	const projectsRoot = process.env.PROJECTS_ROOT;
 	if (!projectsRoot) {
 		console.error('PROJECTS_ROOT environment variable is not set.');
@@ -192,5 +144,3 @@ async function scanProjectsRoot() {
 		console.error('Error scanning PROJECTS_ROOT:', error);
 	}
 }
-
-export { scanProjectsRoot };

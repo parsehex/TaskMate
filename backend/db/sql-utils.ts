@@ -29,7 +29,10 @@ export function updateStatement(
 }
 
 export function deleteStatement(tableName: string, where: Record<string, any>) {
-	return `DELETE FROM ${tableName} WHERE ${Object.keys(where).join(
-		' = ? AND '
-	)} = ?`;
+	const whereKeys = Object.keys(where);
+	const whereValues = whereKeys.map((key) => where[key]);
+	const whereClause = whereKeys.map((field) => `${field} = ?`).join(' AND ');
+	const sql = `DELETE FROM ${tableName} WHERE ${whereClause}`;
+
+	return { sql, values: whereValues };
 }
