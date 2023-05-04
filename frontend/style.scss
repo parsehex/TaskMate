@@ -131,6 +131,10 @@ button {
 		overflow-y: auto;
 		margin-left: calc(100% / 3);
 
+		form {
+			display: inline-block;
+		}
+
 		h2 {
 			margin-top: 0;
 		}

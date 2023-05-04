@@ -1,29 +1,46 @@
-import React, { useState, useEffect } from 'react';
-import MonacoEditor from '@monaco-editor/react';
-import { Monaco } from '@monaco-editor/react';
+import React, { useState, useEffect, useCallback } from 'react';
+import MonacoEditor, { useMonaco, Monaco } from '@monaco-editor/react';
 import { Prompt_Part } from '../types';
-import { getTokenCount } from '../api';
+import { getTokenCount, updatePromptPart } from '../api';
 
 interface EditorProps {
-	promptPart: Prompt_Part;
+	selectedPromptPartId: number | null;
+	promptParts: Prompt_Part[];
+	setPromptParts: (promptParts: Prompt_Part[]) => void;
 	readOnly: boolean;
 	onContentChange?: (content: string) => void;
 	onSave: (content: string) => void;
 }
 
 const Editor: React.FC<EditorProps> = ({
-	promptPart,
+	selectedPromptPartId,
+	promptParts,
+	setPromptParts,
 	readOnly,
 	onContentChange,
 	onSave,
 }) => {
-	const initialContent = promptPart.content;
+	const initialPromptPart = promptParts.find(
+		(promptPart) => promptPart.id === selectedPromptPartId
+	);
+	if (!initialPromptPart) return null;
+	const [selectedPromptPart, setSelectedPromptPart] =
+		useState<Prompt_Part>(initialPromptPart);
+	const initialContent = initialPromptPart.content;
 	const [content, setContent] = useState(initialContent);
-	const [tokenCount, setTokenCount] = useState(promptPart.token_count);
+	const [tokenCount, setTokenCount] = useState(initialPromptPart.token_count);
+	const [isSaved, setIsSaved] = useState(true);
+	const [isEditingName, setIsEditingName] = useState(false);
+	const [newName, setNewName] = useState(initialPromptPart.name);
 
 	useEffect(() => {
-		setContent(promptPart.content);
-	}, [promptPart]);
+		const part = promptParts?.find((part) => part.id === selectedPromptPartId);
+		if (!part) return;
+		setSelectedPromptPart(part);
+		if (part.content !== content) {
+		}
+		setIsSaved(part.content === content);
+	}, [selectedPromptPartId, promptParts]);
 
 	useEffect(() => {
 		getTokenCount({ text: content }).then((data) => {
@@ -32,14 +49,62 @@ const Editor: React.FC<EditorProps> = ({
 		});
 	}, [content]);
 
+	// Save on Ctrl+S
+	const handleKeyPress = useCallback(
+		(event: KeyboardEvent) => {
+			if (event.code === 'KeyS' && (event.ctrlKey || event.metaKey)) {
+				event.preventDefault();
+				handleSave();
+			}
+		},
+		[content]
+	);
+	useEffect(() => {
+		window.addEventListener('keydown', handleKeyPress);
+
+		return () => {
+			window.removeEventListener('keydown', handleKeyPress);
+		};
+	}, [handleKeyPress]);
+
+	const handleNameChange = (event) => {
+		setNewName(event.target.value);
+	};
+
+	const handleNameSubmit = async (event) => {
+		event.preventDefault();
+		const updatedPromptPart = await updatePromptPart(selectedPromptPart.id, {
+			name: newName,
+		});
+		const updatedPromptParts = promptParts?.map((part) => {
+			if (part.id === updatedPromptPart.promptPart.id) {
+				return updatedPromptPart.promptPart;
+			}
+			return part;
+		});
+		if (updatedPromptParts) {
+			setPromptParts(updatedPromptParts);
+		}
+
+		setIsEditingName(false);
+	};
+
+	const handleNameDoubleClick = () => {
+		if (!readOnly) {
+			setIsEditingName(true);
+		}
+	};
+
 	const handleChange = (value: string | undefined, ev: any) => {
 		if (!value) return;
 		setContent(value);
+		setIsSaved(value === selectedPromptPart.content);
 		onContentChange && onContentChange(value);
 	};
 
 	const handleSave = () => {
 		onSave(content);
+		setIsSaved(true);
 	};
 
 	const detectFileLanguage = (name: string) => {
@@ -61,12 +126,28 @@ const Editor: React.FC<EditorProps> = ({
 	return (
 		<div className="editor">
 			<h2>
-				{readOnly ? '' : 'Editing:'} {promptPart.name}
+				{readOnly ? '' : 'Editing: '}
+				{isEditingName ? (
+					<form onSubmit={handleNameSubmit}>
+						<input
+							type="text"
+							value={newName}
+							onChange={handleNameChange}
+							onBlur={handleNameSubmit}
+							autoFocus
+						/>
+					</form>
+				) : (
+					<span onDoubleClick={handleNameDoubleClick}>
+						{selectedPromptPart.name}
+					</span>
+				)}
+				{isSaved ? '' : '*'}
 			</h2>
 			<MonacoEditor
 				height="75vh"
 				width="100%"
-				language={detectFileLanguage(promptPart.name)}
+				language={detectFileLanguage(selectedPromptPart.name)}
 				theme="vs-dark"
 				value={content}
 				onChange={handleChange}

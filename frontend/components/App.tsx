@@ -140,7 +140,9 @@ export const App: React.FC = () => {
 				<div className="right-sidebar">
 					{selectedPromptPart && (
 						<Editor
-							promptPart={selectedPromptPart}
+							selectedPromptPartId={selectedPromptPart.id}
+							promptParts={promptParts}
+							setPromptParts={setPromptParts}
 							onSave={handleEditorSave}
 							readOnly={readOnly}
 						/>
