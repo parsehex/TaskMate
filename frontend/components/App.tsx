@@ -1,13 +1,8 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { useState, useEffect } from 'react';
 import Editor from './Editor';
 import { Project, Prompt_Part } from '../types';
-import {
-	fetchProjects,
-	fetchPromptParts,
-	updatePromptPart,
-	getTokenCount,
-} from '../api';
+import { fetchProjects, fetchPromptParts, getTokenCount } from '../api';
 import ProjectSelector from './ProjectSelector';
 import PromptPartsList from './PromptPartsList';
 
@@ -16,7 +11,6 @@ export const App: React.FC = () => {
 	const [selectedProjectId, setSelectedProjectId] = useState<number | null>(
 		null
 	);
-	const [promptParts, setPromptParts] = useState<Prompt_Part[]>([]);
 	const [selectedPromptPart, setSelectedPromptPart] =
 		useState<Prompt_Part | null>(null);
 	const [promptTokenCount, setPromptTokenCount] = useState(0);
@@ -24,6 +18,14 @@ export const App: React.FC = () => {
 		[]
 	);
 	const [readOnly, setReadOnly] = useState(false);
+	const [promptParts, setPromptParts] = useState<Prompt_Part[]>([]);
+	const setPromptPart = (promptPart: Prompt_Part) => {
+		const updatedPromptParts = promptParts.map((part) =>
+			part.id === promptPart.id ? promptPart : part
+		);
+		// console.log(promptPart, updatedPromptParts);
+		setPromptParts(updatedPromptParts);
+	};
 
 	useEffect(() => {
 		fetchProjects().then((projects) => setProjects(projects));
@@ -62,30 +64,13 @@ export const App: React.FC = () => {
 		});
 	}, [promptParts]);
 
-	const handleEditorSave = async (newContent: string) => {
-		if (selectedPromptPart) {
-			const updatedPromptPart = (
-				await updatePromptPart(selectedPromptPart.id, {
-					content: newContent,
-				})
-			).promptPart;
-			setPromptParts((prevPromptParts) =>
-				prevPromptParts.map((prevPromptPart) =>
-					prevPromptPart.id === selectedPromptPart.id
-						? updatedPromptPart
-						: prevPromptPart
-				)
-			);
-		}
-	};
-
 	const handlePreviewClick = () => {
 		setReadOnly(true);
 
 		// fake Prompt_Part object with the generated prompt content
 		const previewPromptPart = {
 			id: -1,
-			name: 'Prompt Preview',
+			name: `Prompt Preview (${includedPromptParts.length} parts)`,
 			content: makePrompt(),
 			included: false,
 			token_count: 0,
@@ -140,10 +125,8 @@ export const App: React.FC = () => {
 				<div className="right-sidebar">
 					{selectedPromptPart && (
 						<Editor
-							selectedPromptPartId={selectedPromptPart.id}
-							promptParts={promptParts}
-							setPromptParts={setPromptParts}
-							onSave={handleEditorSave}
+							promptPart={selectedPromptPart}
+							setPromptPart={setPromptPart}
 							readOnly={readOnly}
 						/>
 					)}
