@@ -78,9 +78,9 @@ router.get('/api/projects/listDirectories', (req, res) => {
 
 router.put('/api/projects/:id', async (req, res) => {
 	const { id } = req.params;
-	const { name, description } = req.body;
+	const { name, description, ignore_files } = req.body;
 
-	if (!name && !description) {
+	if (!id || (!name && !description && !ignore_files)) {
 		return res.status(400).json({ error: 'Missing required fields' });
 	}
 
@@ -92,10 +92,9 @@ router.put('/api/projects/:id', async (req, res) => {
 	try {
 		const { sql, values } = updateStatement(
 			'projects',
-			{ name, description },
+			{ name, description, ignore_files },
 			{ id: +id }
 		);
-		// console.log({ name, description, folder_path }, { id: +id }, sql, values);
 
 		const q = await db.run(sql, ...values);
 		if (q.changes === 0) {
@@ -109,6 +108,10 @@ router.put('/api/projects/:id', async (req, res) => {
 
 router.delete('/api/projects/:id', async (req, res) => {
 	const { id } = req.params;
+
+	if (!id) {
+		return res.status(400).json({ error: 'Missing required fields' });
+	}
 
 	try {
 		const { sql, values } = deleteStatement('projects', { id: +id });
