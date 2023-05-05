@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Project } from '../types';
+import ProjectSettingsModal from './ProjectSettingsModal';
 
 interface ProjectSelectorProps {
 	projects: Project[];
@@ -12,6 +13,19 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
 	selectedProjectId,
 	setSelectedProjectId,
 }) => {
+	const [showSettingsModal, setShowSettingsModal] = useState(false);
+	const selectedProject = projects.find(
+		(project) => project.id === selectedProjectId
+	);
+
+	const handleEditProjectClick = () => {
+		setShowSettingsModal(true);
+	};
+
+	const handleCloseSettingsModal = () => {
+		setShowSettingsModal(false);
+	};
+
 	const handleProjectSelection = (
 		event: React.ChangeEvent<HTMLSelectElement>
 	) => {
@@ -32,7 +46,14 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
 					</option>
 				))}
 			</select>
-			<button className="edit-project">Edit Project</button>
+			<button className="edit-project" onClick={handleEditProjectClick}>
+				Edit Project
+			</button>
+			<ProjectSettingsModal
+				project={selectedProject as Project}
+				onClose={handleCloseSettingsModal}
+				isOpen={showSettingsModal && !!selectedProject}
+			/>
 		</div>
 	);
 };

@@ -46,6 +46,9 @@ export const App: React.FC = () => {
 				setPromptParts(promptParts);
 			});
 		}
+		if (selectedProjectId !== -1) {
+			setReadOnly(false);
+		}
 	}, [selectedProjectId]);
 
 	useEffect(() => {
@@ -64,6 +67,9 @@ export const App: React.FC = () => {
 
 	useEffect(() => {
 		updateIncludedPromptParts();
+		if (selectedProjectId !== -1) {
+			setReadOnly(false);
+		}
 	}, [promptParts]);
 
 	return (
