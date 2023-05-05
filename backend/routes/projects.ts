@@ -89,12 +89,13 @@ router.put('/api/projects/:id', async (req, res) => {
 		return res.status(400).json({ error: 'Invalid folder path' });
 	}
 
+	const fieldsObj = { name, description, ignore_files };
+	if (!name) delete fieldsObj.name;
+	if (!description) delete fieldsObj.description;
+	if (!ignore_files) delete fieldsObj.ignore_files;
+
 	try {
-		const { sql, values } = updateStatement(
-			'projects',
-			{ name, description, ignore_files },
-			{ id: +id }
-		);
+		const { sql, values } = updateStatement('projects', fieldsObj, { id: +id });
 
 		const q = await db.run(sql, ...values);
 		if (q.changes === 0) {

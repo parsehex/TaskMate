@@ -16,19 +16,29 @@ export const fetchPromptParts = async (
 	return await response.json();
 };
 
-interface PromptPartUpdate {
-	name?: string;
-	included?: boolean;
-	position?: number;
-	content?: string;
-}
+export const updateProject = async (
+	id: number,
+	data: Partial<Project>
+): Promise<void> => {
+	const response = await fetch(`/api/projects/${id}`, {
+		method: 'PUT',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(data),
+	});
+
+	if (!response.ok) {
+		const { error } = await response.json();
+		throw new Error(error);
+	}
+};
+
 interface PromptPartUpdateResponse {
 	message: string;
 	promptPart: Prompt_Part;
 }
 export const updatePromptPart = async (
 	id: number,
-	data: PromptPartUpdate
+	data: Partial<Prompt_Part>
 ): Promise<PromptPartUpdateResponse> => {
 	const response = await fetch(`/api/prompt_parts/${id}`, {
 		method: 'PUT',
@@ -40,7 +50,7 @@ export const updatePromptPart = async (
 
 export const updatePromptParts = async (
 	ids: number[],
-	promptParts: PromptPartUpdate[]
+	promptParts: Partial<Prompt_Part>[] = []
 ): Promise<Prompt_Part[]> => {
 	const updatedPromptParts = await Promise.all(
 		ids.map(async (id, i) => {
