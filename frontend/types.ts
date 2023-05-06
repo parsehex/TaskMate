@@ -9,12 +9,12 @@ export interface Project {
 export interface Prompt_Part {
 	id: number;
 	project_id: number;
-	content: string;
 	name: string;
-	snippet: boolean;
-	part_type: 'file' | 'snippet';
-	token_count: number;
+	content: string;
+	summary: string;
 	included: boolean;
+	use_summary: boolean;
+	part_type: 'file' | 'snippet';
 	position: number;
 	created_at: string;
 	updated_at: string;
