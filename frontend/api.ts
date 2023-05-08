@@ -1,5 +1,14 @@
 import { Project, Prompt_Part } from './types';
 
+// helper function to convert sqlite's 0/1 to boolean based on column names
+const convertBooleans = (obj: any, ...columns: string[]): any => {
+	for (const column of columns) {
+		if (obj[column] === 0) obj[column] = false;
+		else if (obj[column] === 1) obj[column] = true;
+	}
+	return obj;
+};
+
 export const fetchProjects = async (): Promise<Project[]> => {
 	const response = await fetch('/api/projects');
 	return await response.json();
@@ -10,10 +19,16 @@ export const fetchPromptParts = async (
 ): Promise<Prompt_Part[]> => {
 	if (!selectedProjectId) {
 		const response = await fetch('/api/prompt_parts');
-		return await response.json();
+		const parts = await response.json();
+		return parts.map((part: any) =>
+			convertBooleans(part, 'included', 'use_summary')
+		);
 	}
 	const response = await fetch(`/api/prompt_parts/${selectedProjectId}`);
-	return await response.json();
+	const parts = await response.json();
+	return parts.map((part: any) =>
+		convertBooleans(part, 'included', 'use_summary')
+	);
 };
 
 export const updateProject = async (
@@ -40,12 +55,19 @@ export const updatePromptPart = async (
 	id: number,
 	data: Partial<Prompt_Part>
 ): Promise<PromptPartUpdateResponse> => {
+	if (!id) throw new Error('Prompt part id is required');
+	if (data.included !== undefined)
+		(data as any).included = data.included ? 1 : 0;
+	if (data.use_summary !== undefined)
+		(data as any).use_summary = data.use_summary ? 1 : 0;
 	const response = await fetch(`/api/prompt_parts/${id}`, {
 		method: 'PUT',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify(data),
 	});
-	return response.json();
+	const res = await response.json();
+	res.promptPart = convertBooleans(res.promptPart, 'included', 'use_summary');
+	return res;
 };
 
 export const updatePromptParts = async (
@@ -55,6 +77,7 @@ export const updatePromptParts = async (
 	const updatedPromptParts = await Promise.all(
 		ids.map(async (id, i) => {
 			const res = await updatePromptPart(id, promptParts[i]);
+			res.promptPart = convertBooleans(res.promptPart, 'included');
 			return res.promptPart;
 		})
 	);
@@ -75,13 +98,14 @@ export const createPromptPart = async (
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({
 			name,
-			content: '',
 			project_id: selectedProjectId,
 			part_type: 'snippet',
 		}),
 	});
 	if (response.ok) {
-		return await response.json();
+		const res = await response.json();
+		res.promptPart = convertBooleans(res.promptPart, 'included');
+		return res;
 	}
 };
 
