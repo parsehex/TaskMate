@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import MonacoEditor, { useMonaco, Monaco } from '@monaco-editor/react';
 import { Prompt_Part } from '../types';
 import { getTokenCount, updatePromptPart } from '../api';
+import EditableName from './EditableName';
 
 interface EditorProps {
 	promptPart: Prompt_Part;
@@ -56,24 +57,12 @@ const Editor: React.FC<EditorProps> = ({
 		};
 	}, [handleKeyPress]);
 
-	const handleNameChange = (event) => {
-		setNewName(event.target.value);
-	};
-
-	const handleNameSubmit = async (event) => {
-		event.preventDefault();
-		if (promptPart.id === -1) return;
-		const updatedPromptPart = await updatePromptPart(promptPart.id, {
-			name: newName,
-		});
-		setPromptPart(updatedPromptPart.promptPart);
-
-		setIsEditingName(false);
-	};
-
-	const handleNameDoubleClick = () => {
-		if (!readOnly) {
-			setIsEditingName(true);
+	const handleNameChange = async (event) => {
+		const newName = event.target.value;
+		if (newName !== promptPart.name) {
+			promptPart = (await updatePromptPart(promptPart.id, { name: newName }))
+				.promptPart;
+			setPromptPart(promptPart);
 		}
 	};
 
@@ -121,19 +110,12 @@ const Editor: React.FC<EditorProps> = ({
 		<div className="editor">
 			<h2>
 				{readOnly ? '' : 'Editing: '}
-				{isEditingName ? (
-					<form onSubmit={handleNameSubmit}>
-						<input
-							type="text"
-							value={newName}
-							onChange={handleNameChange}
-							onBlur={handleNameSubmit}
-							autoFocus
-						/>
-					</form>
-				) : (
-					<span onDoubleClick={handleNameDoubleClick}>{promptPart.name}</span>
-				)}
+				<EditableName
+					name={promptPart.name}
+					onNameChange={(newName) => {
+						handleNameChange(newName);
+					}}
+				/>
 				{isSaved || readOnly ? '' : '*'}
 			</h2>
 			<MonacoEditor

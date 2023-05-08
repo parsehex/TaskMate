@@ -7,6 +7,7 @@ import SelectCheckbox from './SelectCheckbox';
 interface PromptPartsListProps {
 	selectedProjectId: number | null;
 	promptParts: Prompt_Part[];
+	setPromptPart: (promptPart: Prompt_Part) => void;
 	setPromptParts: (promptParts: Prompt_Part[]) => void;
 	selectedPromptPart: Prompt_Part | null;
 	setSelectedPromptPart: (promptPart: Prompt_Part) => void;
@@ -15,6 +16,7 @@ interface PromptPartsListProps {
 const PromptPartsList: React.FC<PromptPartsListProps> = ({
 	selectedProjectId,
 	promptParts,
+	setPromptPart,
 	setPromptParts,
 	selectedPromptPart,
 	setSelectedPromptPart,
@@ -103,6 +105,7 @@ const PromptPartsList: React.FC<PromptPartsListProps> = ({
 						key={promptPart.id}
 						promptPart={promptPart}
 						onClick={setSelectedPromptPart}
+						setPromptPart={setPromptPart}
 						onCheckboxChange={onCheckboxChange}
 						movePromptPart={movePromptPart}
 						index={index}

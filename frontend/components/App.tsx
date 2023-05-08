@@ -107,6 +107,7 @@ export const App: React.FC = () => {
 					<PromptPartsList
 						selectedProjectId={selectedProjectId}
 						promptParts={promptParts}
+						setPromptPart={setPromptPart}
 						setPromptParts={setPromptParts}
 						selectedPromptPart={selectedPromptPart}
 						setSelectedPromptPart={setSelectedPromptPart}
