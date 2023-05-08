@@ -7,7 +7,7 @@ import TokenCountDisplay from './TokenCountDisplay';
 
 interface PromptPartProps {
 	promptPart: Prompt_Part;
-	onClick: (promptPart: Prompt_Part) => void;
+	onSelect: (promptPart: Prompt_Part) => void;
 	setPromptPart: (promptPart: Prompt_Part) => void;
 	onCheckboxChange: (
 		event: React.ChangeEvent<HTMLInputElement>,
@@ -20,7 +20,7 @@ interface PromptPartProps {
 
 const PromptPart: React.FC<PromptPartProps> = ({
 	promptPart,
-	onClick,
+	onSelect,
 	setPromptPart,
 	onCheckboxChange,
 	movePromptPart,
@@ -66,8 +66,8 @@ const PromptPart: React.FC<PromptPartProps> = ({
 	const handleCheckboxClick = (event: React.MouseEvent<HTMLInputElement>) => {
 		event.stopPropagation();
 	};
-	const handleOnClick = () => {
-		onClick(promptPart);
+	const handleOnSelect = () => {
+		onSelect(promptPart);
 	};
 
 	const [tokenCount, setTokenCount] = useState(0);
@@ -82,7 +82,7 @@ const PromptPart: React.FC<PromptPartProps> = ({
 		<li
 			ref={ref}
 			className={`prompt-part ${selected ? 'selected' : ''}`}
-			onClick={handleOnClick}
+			onClick={handleOnSelect}
 			style={{
 				opacity: isDragging ? 0.5 : 1,
 			}}

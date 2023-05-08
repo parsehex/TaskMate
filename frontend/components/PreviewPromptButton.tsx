@@ -29,10 +29,11 @@ const createPreviewPromptPart = (content: string) => {
 	return {
 		id: -1,
 		name: 'Prompt Preview',
-		content: content,
+		content,
+		summary: '',
 		included: false,
-		token_count: 0,
 		project_id: -1,
+		use_summary: false,
 	} as Prompt_Part;
 };
 

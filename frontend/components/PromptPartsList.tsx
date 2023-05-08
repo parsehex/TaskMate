@@ -104,8 +104,8 @@ const PromptPartsList: React.FC<PromptPartsListProps> = ({
 					<PromptPart
 						key={promptPart.id}
 						promptPart={promptPart}
-						onClick={setSelectedPromptPart}
 						setPromptPart={setPromptPart}
+						onSelect={setSelectedPromptPart}
 						onCheckboxChange={onCheckboxChange}
 						movePromptPart={movePromptPart}
 						index={index}

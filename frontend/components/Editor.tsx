@@ -19,27 +19,34 @@ const Editor: React.FC<EditorProps> = ({
 	readOnly,
 	onContentChange,
 }) => {
-	const initialContent = promptPart.content;
-	const [content, setContent] = useState(initialContent);
+	const [content, setContent] = useState(promptPart.content || '');
 	const [tokenCount, setTokenCount] = useState(0);
 	const [isSaved, setIsSaved] = useState(true);
-	const [isEditingName, setIsEditingName] = useState(false);
-	const [newName, setNewName] = useState(promptPart.name);
+	const [summary, setSummary] = useState(promptPart.summary || '');
+	const [activeTab, setActiveTab] = useState<'content' | 'summary'>(
+		promptPart.use_summary ? 'summary' : 'content'
+	);
+	const [useSummary, setUseSummary] = useState(promptPart.use_summary);
 
 	useEffect(() => {
 		if (!promptPart) return;
 		if (!content || promptPart.content !== content) {
 			setContent(promptPart.content);
 		}
+		if (!summary || promptPart.summary !== summary) {
+			setSummary(promptPart.summary);
+		}
+		setUseSummary(promptPart.use_summary);
 		setIsSaved(true);
 	}, [promptPart]);
 
 	useEffect(() => {
-		getTokenCount({ text: content }).then((data) => {
+		const text = activeTab === 'content' ? content : summary;
+		getTokenCount({ text }).then((data) => {
 			if (!data) return;
 			setTokenCount(data.token_count);
 		});
-	}, [content]);
+	}, [content, summary, activeTab]);
 
 	// Save on Ctrl+S
 	const handleKeyPress = useCallback(
@@ -49,7 +56,7 @@ const Editor: React.FC<EditorProps> = ({
 				await handleSave();
 			}
 		},
-		[content]
+		[content, summary]
 	);
 	useEffect(() => {
 		window.addEventListener('keydown', handleKeyPress);
@@ -80,6 +87,7 @@ const Editor: React.FC<EditorProps> = ({
 			const updatedPromptPart = (
 				await updatePromptPart(promptPart.id, {
 					content,
+					summary,
 				})
 			).promptPart;
 			setPromptPart(updatedPromptPart);
@@ -87,6 +95,23 @@ const Editor: React.FC<EditorProps> = ({
 		setIsSaved(true);
 	};
 
+	const handleSummaryChange = (value: string | undefined, ev: any) => {
+		if (!value) return;
+		setSummary(value);
+		setIsSaved(value === promptPart.summary);
+		onContentChange && onContentChange(value);
+	};
+	const handleUseSummaryChange = async (event) => {
+		if (!promptPart || promptPart.id < 0) return;
+		const useSummary = event.target.checked;
+		const updatedPromptPart = (
+			await updatePromptPart(promptPart.id, {
+				use_summary: useSummary,
+			})
+		).promptPart;
+		// console.log(useSummary, updatedPromptPart.use_summary);
+		setPromptPart(updatedPromptPart);
+	};
 
 	const options: any = {
 		readOnly: readOnly,
@@ -105,19 +130,49 @@ const Editor: React.FC<EditorProps> = ({
 				/>
 				{isSaved || readOnly ? '' : '*'}
 			</h2>
+			<div>
+				<div className={'tab-buttons' + (readOnly ? ' hidden' : '')}>
+					<button
+						className={activeTab === 'content' ? 'active' : ''}
+						onClick={() => setActiveTab('content')}
+					>
+						Content
+					</button>
+					<button
+						className={activeTab === 'summary' ? 'active' : ''}
+						onClick={() => setActiveTab('summary')}
+					>
+						Summary
+					</button>
+				</div>
+				<div className={'options' + (readOnly ? ' hidden' : '')}>
+					<label>
+						<input
+							type="checkbox"
+							checked={useSummary}
+							onChange={(event) => {
+								handleUseSummaryChange(event);
+								setUseSummary(event.target.checked);
+							}}
+						/>
+						Use summary
+					</label>
+				</div>
+			</div>
 			<MonacoEditor
-				height="75vh"
 				width="100%"
 				language={detectFileLanguage(promptPart.name)}
 				theme="vs-dark"
-				value={content}
-				onChange={handleChange}
+				value={activeTab === 'content' ? content : summary}
+				onChange={activeTab === 'content' ? handleChange : handleSummaryChange}
 				options={options}
 			/>
-			<button type="button" onClick={handleSave}>
-				Save
-			</button>
+			<div className="bottom-bar">
+				<button type="button" onClick={handleSave}>
+					Save
+				</button>
 				<TokenCountDisplay tokenCount={tokenCount} />
+			</div>
 		</div>
 	);
 };
