@@ -5,3 +5,19 @@ export const makePrompt = (includedPromptParts: Prompt_Part[]): string => {
 		.map((part) => part.name + ':\n' + part.content.trim())
 		.join('\n\n');
 };
+
+export const detectFileLanguage = (name: string) => {
+	const extension = name.split('.').pop();
+	switch (extension) {
+		case 'js':
+			return 'javascript';
+		case 'ts':
+			return 'typescript';
+		case 'py':
+			return 'python';
+		case '':
+			return 'markdown';
+		default:
+			return extension;
+	}
+};

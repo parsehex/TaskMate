@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import MonacoEditor, { useMonaco, Monaco } from '@monaco-editor/react';
 import { Prompt_Part } from '../types';
 import { getTokenCount, updatePromptPart } from '../api';
+import { detectFileLanguage } from '../utils';
 import EditableName from './EditableName';
 import TokenCountDisplay from './TokenCountDisplay';
 
@@ -86,21 +87,6 @@ const Editor: React.FC<EditorProps> = ({
 		setIsSaved(true);
 	};
 
-	const detectFileLanguage = (name: string) => {
-		const extension = name.split('.').pop();
-		switch (extension) {
-			case 'js':
-				return 'javascript';
-			case 'ts':
-				return 'typescript';
-			case 'py':
-				return 'python';
-			case '':
-				return 'markdown';
-			default:
-				return extension;
-		}
-	};
 
 	const options: any = {
 		readOnly: readOnly,
