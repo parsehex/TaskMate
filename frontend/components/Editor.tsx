@@ -3,6 +3,7 @@ import MonacoEditor, { useMonaco, Monaco } from '@monaco-editor/react';
 import { Prompt_Part } from '../types';
 import { getTokenCount, updatePromptPart } from '../api';
 import EditableName from './EditableName';
+import TokenCountDisplay from './TokenCountDisplay';
 
 interface EditorProps {
 	promptPart: Prompt_Part;
@@ -130,7 +131,7 @@ const Editor: React.FC<EditorProps> = ({
 			<button type="button" onClick={handleSave}>
 				Save
 			</button>
-			<span className="token-count">{tokenCount} tokens</span>
+				<TokenCountDisplay tokenCount={tokenCount} />
 		</div>
 	);
 };

@@ -101,7 +101,7 @@ export const App: React.FC = () => {
 							setReadOnly={setReadOnly}
 							setSelectedPromptPart={setSelectedPromptPart}
 						/>
-						<TokenCountDisplay promptTokenCount={promptTokenCount} /> /{' '}
+						<TokenCountDisplay tokenCount={promptTokenCount} /> /{' '}
 						{includedPromptParts.length} parts
 					</div>
 					<PromptPartsList

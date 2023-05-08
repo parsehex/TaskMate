@@ -3,6 +3,7 @@ import { useDrag, useDrop } from 'react-dnd';
 import { Prompt_Part } from '../types';
 import { getTokenCount, updatePromptPart } from '../api';
 import EditableName from './EditableName';
+import TokenCountDisplay from './TokenCountDisplay';
 
 interface PromptPartProps {
 	promptPart: Prompt_Part;
@@ -104,9 +105,7 @@ const PromptPart: React.FC<PromptPartProps> = ({
 			{promptPart.part_type === 'file' && (
 				<span className="file-indicator">File</span>
 			)}
-			<span className="token-count" title={tokenCount + ' tokens'}>
-				{tokenCount}
-			</span>
+			<TokenCountDisplay tokenCount={tokenCount} />
 		</li>
 	);
 };

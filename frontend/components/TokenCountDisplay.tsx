@@ -1,18 +1,18 @@
 import React from 'react';
 
 interface TokenCountDisplayProps {
-	promptTokenCount: number;
+	tokenCount: number;
 }
 
 const TokenCountDisplay: React.FC<TokenCountDisplayProps> = ({
-	promptTokenCount,
+	tokenCount,
 }) => {
 	const tokenCountClass =
-		promptTokenCount >= 4096 ? 'token-count red' : 'token-count';
+		tokenCount >= 4096 ? 'token-count red' : 'token-count';
 
 	return (
-		<span className={tokenCountClass} title={`${promptTokenCount} tokens`}>
-			{promptTokenCount} tokens
+		<span className={tokenCountClass} title={`${tokenCount} tokens`}>
+			{tokenCount} tokens
 		</span>
 	);
 };
