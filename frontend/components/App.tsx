@@ -46,10 +46,16 @@ export const App: React.FC = () => {
 				setPromptParts(promptParts);
 			});
 		}
-		if (selectedProjectId !== -1) {
+		if (selectedPromptPart?.id !== -1) {
 			setReadOnly(false);
 		}
 	}, [selectedProjectId]);
+
+	useEffect(() => {
+		if (selectedPromptPart?.id !== -1) {
+			setReadOnly(false);
+		}
+	}, [selectedPromptPart]);
 
 	useEffect(() => {
 		const prompt = makePrompt(includedPromptParts);
@@ -67,7 +73,7 @@ export const App: React.FC = () => {
 
 	useEffect(() => {
 		updateIncludedPromptParts();
-		if (selectedProjectId !== -1) {
+		if (selectedPromptPart?.id !== -1) {
 			setReadOnly(false);
 		}
 	}, [promptParts]);
