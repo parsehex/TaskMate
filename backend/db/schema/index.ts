@@ -12,7 +12,7 @@ async function applyMigration(db: AsyncDatabase, version: number) {
 	const migrationFile = path.join(MIGRATIONS_DIR, `v${version}.js`); // js when compiled
 
 	if (await fs.pathExists(migrationFile)) {
-		const migration = await import(migrationFile);
+		const migration = await import('file://' + migrationFile);
 		await migration.update(db);
 		return true;
 	}
