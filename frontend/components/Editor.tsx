@@ -153,7 +153,7 @@ const Editor: React.FC<EditorProps> = ({
 					>
 						Summary
 					</button>
-					{!readOnly && (
+					{!readOnly && activeTab !== 'summary' && (
 						<button onClick={handleGenerateSummary}>Generate Summary</button>
 					)}
 				</div>
