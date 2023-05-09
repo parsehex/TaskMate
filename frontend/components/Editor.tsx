@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import MonacoEditor, { useMonaco, Monaco } from '@monaco-editor/react';
 import { Prompt_Part } from '../types';
-import { getTokenCount, updatePromptPart } from '../api';
+import { generateSummary, getTokenCount, updatePromptPart } from '../api';
 import { detectFileLanguage } from '../utils';
 import EditableName from './EditableName';
 import TokenCountDisplay from './TokenCountDisplay';
@@ -113,6 +113,15 @@ const Editor: React.FC<EditorProps> = ({
 		setPromptPart(updatedPromptPart);
 	};
 
+	const handleGenerateSummary = async () => {
+		if (promptPart && promptPart.id >= 0) {
+			const summary = (await generateSummary(promptPart.id)).summary;
+			setSummary(summary);
+			setIsSaved(false);
+			setActiveTab('summary');
+		}
+	};
+
 	const options: any = {
 		readOnly: readOnly,
 		wordWrap: 'on',
@@ -144,6 +153,9 @@ const Editor: React.FC<EditorProps> = ({
 					>
 						Summary
 					</button>
+					{!readOnly && (
+						<button onClick={handleGenerateSummary}>Generate Summary</button>
+					)}
 				</div>
 				<div className={'options' + (readOnly ? ' hidden' : '')}>
 					<label>
@@ -161,7 +173,7 @@ const Editor: React.FC<EditorProps> = ({
 			</div>
 			<MonacoEditor
 				width="100%"
-				language={detectFileLanguage(promptPart.name)}
+				language={detectFileLanguage(promptPart, activeTab)}
 				theme="vs-dark"
 				value={activeTab === 'content' ? content : summary}
 				onChange={activeTab === 'content' ? handleChange : handleSummaryChange}

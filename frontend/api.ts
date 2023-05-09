@@ -3,6 +3,7 @@ import { Project, Prompt_Part } from './types';
 // helper function to convert sqlite's 0/1 to boolean based on column names
 const convertBooleans = (obj: any, ...columns: string[]): any => {
 	for (const column of columns) {
+		if (obj[column] === undefined) continue;
 		if (obj[column] === 0) obj[column] = false;
 		else if (obj[column] === 1) obj[column] = true;
 	}
@@ -137,4 +138,15 @@ export const getTokenCount = async (
 	} else {
 		return { token_count: 0 };
 	}
+};
+
+interface GenerateSummaryResponse {
+	summary: string;
+}
+export const generateSummary = async (
+	partId: number
+): Promise<GenerateSummaryResponse> => {
+	const response = await fetch(`/api/prompt_parts/${partId}/generate_summary`);
+	const res = await response.json();
+	return res;
 };

@@ -14,8 +14,19 @@ export const makePrompt = (includedPromptParts: Prompt_Part[]): string => {
 		.join('\n\n');
 };
 
-export const detectFileLanguage = (name: string) => {
-	const extension = name.split('.').pop();
+export const detectFileLanguage = (
+	prompPart: Prompt_Part,
+	previewing: 'summary' | 'content' = 'content'
+) => {
+	const name = prompPart.name;
+	let extension = name?.split('.').pop();
+	if (
+		!name.includes('.') ||
+		extension === name ||
+		prompPart.use_summary ||
+		previewing === 'summary'
+	)
+		extension = '';
 	switch (extension) {
 		case 'js':
 			return 'javascript';
