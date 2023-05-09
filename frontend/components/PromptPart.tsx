@@ -105,7 +105,7 @@ const PromptPart: React.FC<PromptPartProps> = ({
 			{promptPart.part_type === 'file' && (
 				<span className="file-indicator">File</span>
 			)}
-			<TokenCountDisplay tokenCount={tokenCount} />
+			<TokenCountDisplay tokenCount={tokenCount} small={true} />
 		</li>
 	);
 };
