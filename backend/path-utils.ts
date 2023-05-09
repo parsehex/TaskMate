@@ -1,6 +1,6 @@
 import path from 'path';
 import { glob } from 'glob';
-import { DefaultIgnoreFiles } from './const';
+import { DefaultIgnoreFiles } from './const.js';
 
 export async function shouldIgnorePath(
 	ignoreFiles: string[],

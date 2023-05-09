@@ -1,20 +1,21 @@
 import express from 'express';
 import path from 'path';
-import { db } from '../db';
+import { db } from '../db/index.js';
 import {
 	insertStatement,
 	updateStatement,
 	deleteStatement,
-} from '../db/sql-utils';
+} from '../db/sql-utils.js';
 import {
 	deleteFile,
 	fileExists,
 	readFileContents,
 	renameFile,
 	writeFileContents,
-} from '../fs-utils';
-import { getTokenCount } from '../tokenizer';
-import { getProjectPath } from '../path-utils';
+} from '../fs-utils.js';
+import { getTokenCount } from '../tokenizer.js';
+import { getProjectPath } from '../path-utils.js';
+import { summarize } from '../openai.js';
 
 const router = express.Router();
 

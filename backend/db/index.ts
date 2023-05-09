@@ -1,7 +1,7 @@
 import { AsyncDatabase } from 'promised-sqlite3';
 import path from 'path';
 import fs from 'fs-extra';
-import { updateSchema } from './schema';
+import { updateSchema } from './schema/index.js';
 
 export let db: AsyncDatabase;
 

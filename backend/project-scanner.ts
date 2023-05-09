@@ -1,15 +1,15 @@
 import fs from 'fs-extra';
 import path from 'path';
 import { Dirent } from 'fs';
-import { db } from './db';
+import { db } from './db/index.js';
 import {
 	deleteStatement,
 	insertStatement,
 	updateStatement,
-} from './db/sql-utils';
-import { fileExists } from './fs-utils';
-import { shouldIgnorePath, getProjectPath } from './path-utils';
-import { DefaultIgnoreFiles } from './const';
+} from './db/sql-utils.js';
+import { fileExists } from './fs-utils.js';
+import { shouldIgnorePath, getProjectPath } from './path-utils.js';
+import { DefaultIgnoreFiles } from './const.js';
 
 async function createPromptPartsForProject(
 	projectId: number,

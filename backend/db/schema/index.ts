@@ -1,7 +1,10 @@
 import fs from 'fs-extra';
 import path from 'path';
 import { AsyncDatabase } from 'promised-sqlite3';
-import { backupDatabase } from '..';
+import { backupDatabase } from '../index.js';
+import * as url from 'url';
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 const MIGRATIONS_DIR = path.join(__dirname, 'ver');
 

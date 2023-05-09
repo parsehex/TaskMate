@@ -1,10 +1,10 @@
 import express from 'express';
-import { db } from '../db';
+import { db } from '../db/index.js';
 import {
 	deleteStatement,
 	insertStatement,
 	updateStatement,
-} from '../db/sql-utils';
+} from '../db/sql-utils.js';
 import path from 'path';
 import fs from 'fs';
 

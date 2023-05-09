@@ -2,11 +2,14 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 // import Router from 'express-static-gzip';
-import projectsRouter from './routes/projects';
-import promptsRouter from './routes/prompt_parts';
-import { initializeDatabase } from './db';
-import { scanProjectsRoot } from './project-scanner';
-import { getTokenCount } from './tokenizer';
+import projectsRouter from './routes/projects.js';
+import promptsRouter from './routes/prompt_parts.js';
+import { initializeDatabase } from './db/index.js';
+import { scanProjectsRoot } from './project-scanner.js';
+import { getTokenCount } from './tokenizer.js';
+import * as url from 'url';
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 console.log('Starting server...');
 
