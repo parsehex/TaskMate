@@ -111,6 +111,36 @@ router.get('/api/prompt_parts/:id/token_count', async (req, res) => {
 	}
 });
 
+router.get('/api/prompt_parts/:id/generate_summary', async (req, res) => {
+	const { id } = req.params;
+	try {
+		const promptPart: any = await db.get(
+			'SELECT * FROM prompt_parts WHERE id = ?',
+			[+id]
+		);
+		if (!promptPart) {
+			return res.status(404).json({ error: 'Prompt part not found' });
+		}
+		if (promptPart.part_type === 'file') {
+			const project: any = await db.get(
+				'SELECT name FROM projects WHERE id = ?',
+				[promptPart.project_id]
+			);
+			const p = path.join(
+				process.env.PROJECTS_ROOT as string,
+				project.name,
+				promptPart.name
+			);
+			promptPart.content = await readFileContents(p);
+		}
+		const summary = await summarize(promptPart);
+		console.log(summary);
+		res.status(200).json({ summary: summary.text });
+	} catch (err: any) {
+		res.status(500).json({ error: err.message });
+	}
+});
+
 // Create new prompt part
 router.post('/api/prompt_parts', async (req, res) => {
 	const { name, project_id, part_type } = req.body;
