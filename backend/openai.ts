@@ -1,8 +1,11 @@
-import { ChatGPTAPI } from 'chatgpt';
+import { ChatOpenAI } from 'langchain/chat_models/openai';
+import { HumanChatMessage, SystemChatMessage } from 'langchain/schema';
 import { db } from './db/index.js';
 
-const api = new ChatGPTAPI({
-	apiKey: process.env.OPENAI_API_KEY as string,
+const chat = new ChatOpenAI({
+	openAIApiKey: process.env.OPENAI_API_KEY as string,
+	modelName: 'gpt-3.5-turbo',
+	temperature: 0.3,
 });
 
 export const summarize = async (promptPart: any) => {
@@ -16,8 +19,8 @@ export const summarize = async (promptPart: any) => {
 		prompt = `Summarize the following file from the ${projectName} project in a succinct but information-rich way. Include information that other files in the project need to know.`;
 	}
 	const text = promptPart.use_summary ? promptPart.summary : promptPart.content;
-	const response = await api.sendMessage(
-		prompt + '\n\n' + promptPart.name + text
-	);
+	const response = await chat.call([
+		new HumanChatMessage(prompt + '\n\n' + promptPart.name + text),
+	]);
 	return response;
 };
