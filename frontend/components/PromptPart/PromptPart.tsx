@@ -69,7 +69,11 @@ const PromptPart: React.FC<PromptPartProps> = ({
 	return (
 		<li
 			ref={ref}
-			className={`prompt-part ${selected ? 'selected' : ''}`}
+			className={[
+				'prompt-part',
+				promptPart.included ? 'included' : '',
+				selected ? 'selected' : '',
+			].join(' ')}
 			onClick={handleOnSelect}
 			onContextMenu={handleContextMenu}
 			style={{

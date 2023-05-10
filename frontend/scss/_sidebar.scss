@@ -38,6 +38,9 @@
 			font-size: 0.9em;
 			font-family: monospace;
 
+			&.included {
+				background-color: #fff0b8;
+			}
 			&.selected {
 				background-color: #ccc !important;
 			}
