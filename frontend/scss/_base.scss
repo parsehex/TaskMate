@@ -1,0 +1,28 @@
+body {
+	font-family: $font-stack;
+	margin: 0;
+	padding: 0;
+	background-color: $bg-color;
+}
+
+#root {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	height: 100vh;
+}
+
+.right-sidebar {
+	flex: 2;
+}
+
+.red {
+	color: red;
+}
+
+.hidden {
+	display: none !important;
+}
+.flex-1 {
+	flex: 1;
+}
