@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import Editor from './Editor';
-import { Project, Prompt_Part } from '../types';
+import { Project, Prompt_Part } from '../../types';
 import { fetchProjects, fetchPromptParts, getTokenCount } from '../api';
 import ProjectSelector from './ProjectSelector';
 import PromptPartsList from './PromptPartsList';

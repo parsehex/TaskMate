@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Prompt_Part } from '../types';
+import { Prompt_Part } from '../../types';
 import PromptPart from './PromptPart';
 import { createPromptPart, updatePromptPart, updatePromptParts } from '../api';
 import SelectCheckbox from './SelectCheckbox';

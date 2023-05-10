@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Project } from '../types';
+import { Project } from '../../types';
 import ProjectSettingsModal from './ProjectSettingsModal';
 
 interface ProjectSelectorProps {

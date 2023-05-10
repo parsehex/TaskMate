@@ -1,4 +1,4 @@
-import { Project, Prompt_Part } from './types';
+import { Project, Prompt_Part } from '../types';
 
 const PromptPartBooleanColumns = ['included', 'use_title', 'use_summary'];
 

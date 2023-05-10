@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import MonacoEditor from '@monaco-editor/react';
-import { Prompt_Part } from '../types';
+import { Prompt_Part } from '../../types';
 import { generateSummary, getTokenCount, updatePromptPart } from '../api';
 import { detectFileLanguage } from '../utils';
 import EditableName from './EditableName';

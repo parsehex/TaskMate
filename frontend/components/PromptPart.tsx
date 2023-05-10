@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { Prompt_Part } from '../types';
+import { Prompt_Part } from '../../types';
 import { getTokenCount, updatePromptPart } from '../api';
 import EditableName from './EditableName';
 import TokenCountDisplay from './TokenCountDisplay';

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Project } from '../types';
+import { Project } from '../../types';
 import { updateProject } from '../api';
 
 interface ProjectSettingsModalProps {
