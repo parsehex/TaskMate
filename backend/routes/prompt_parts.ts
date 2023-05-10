@@ -1,12 +1,8 @@
 import express from 'express';
+import { check } from 'express-validator';
 import path from 'path';
 import { Prompt_Part } from '../../types/index.js';
-import { db } from '../db/index.js';
-import {
-	insertStatement,
-	updateStatement,
-	deleteStatement,
-} from '../db/sql-utils.js';
+import * as helper from '../db/helper/prompt_parts.js';
 import {
 	deleteFile,
 	fileExists,
@@ -15,37 +11,16 @@ import {
 	writeFileContents,
 } from '../fs-utils.js';
 import { getTokenCount } from '../tokenizer.js';
-import { getProjectPath } from '../path-utils.js';
+import { getProjectPathLookup } from '../path-utils.js';
 import { summarize } from '../openai.js';
+import { validateRequest } from '../express.js';
 
 const router = express.Router();
 
 // Get all prompt parts
 router.get('/api/prompt_parts', async (req, res) => {
 	try {
-		const promptParts: any[] = await db.all('SELECT * FROM prompt_parts');
-		for (const promptPart of promptParts) {
-			if (promptPart.part_type === 'file') {
-				const project_id = promptPart.project_id;
-				const project: any = await db.get(
-					'SELECT name FROM projects WHERE id = ?',
-					[project_id]
-				);
-
-				if (!project) {
-					// if project doesn't exist splice from results
-					promptParts.splice(promptParts.indexOf(promptPart), 1);
-					continue;
-				}
-				const p = path.join(
-					process.env.PROJECTS_ROOT as string,
-					project.name,
-					promptPart.name
-				);
-				promptPart.content = await readFileContents(p);
-				// console.log('Read file contents');
-			}
-		}
+		const promptParts = await helper.getPromptParts();
 		res.status(200).json(promptParts);
 	} catch (err: any) {
 		res.status(500).json({ error: err.message });
@@ -53,306 +28,224 @@ router.get('/api/prompt_parts', async (req, res) => {
 });
 
 // Get prompt parts by project id
-router.get('/api/prompt_parts/:project_id', async (req, res) => {
-	const { project_id } = req.params;
-	try {
-		const promptParts: any[] = await db.all(
-			'SELECT * FROM prompt_parts WHERE project_id = ?',
-			[project_id]
-		);
-
-		// Add file content to each file prompt part
-		for (const promptPart of promptParts) {
-			if (promptPart.part_type === 'file') {
-				const project: any = await db.get(
-					'SELECT name FROM projects WHERE id = ?',
-					[project_id]
-				);
-				const p = path.join(
-					process.env.PROJECTS_ROOT as string,
-					project.name,
-					promptPart.name
-				);
-				promptPart.content = await readFileContents(p);
-			}
+router.get(
+	'/api/prompt_parts/:project_id',
+	check('project_id').isNumeric(),
+	validateRequest,
+	async (req, res) => {
+		const data = req.body;
+		try {
+			const promptParts = await helper.getPromptPartsByProjectId(
+				data.project_id
+			);
+			res.status(200).json(promptParts);
+		} catch (err: any) {
+			res.status(500).json({ error: err.message });
 		}
-
-		res.status(200).json(promptParts);
-	} catch (err: any) {
-		res.status(500).json({ error: err.message });
 	}
-});
+);
 
 // Get prompt part token count by id
-router.get('/api/prompt_parts/:id/token_count', async (req, res) => {
-	const { id } = req.params;
-	try {
-		const promptPart: any = await db.get(
-			'SELECT * FROM prompt_parts WHERE id = ?',
-			[id]
-		);
-		if (!promptPart) {
-			return res.status(404).json({ error: 'Prompt part not found' });
+router.get(
+	'/api/prompt_parts/:id/token_count',
+	check('id').isNumeric(),
+	validateRequest,
+	async (req, res) => {
+		const data = req.body;
+		try {
+			const promptPart = await helper.getPromptPartById(data.id);
+			if (!promptPart) {
+				return res.status(404).json({ error: 'Prompt part not found' });
+			}
+			if (promptPart.use_summary) {
+				return res
+					.status(200)
+					.json({ token_count: getTokenCount(promptPart.summary) });
+			}
+			res.status(200).json({ token_count: getTokenCount(promptPart.content) });
+		} catch (err: any) {
+			res.status(500).json({ error: err.message });
 		}
-		if (promptPart.use_summary) {
-			return res
-				.status(200)
-				.json({ token_count: getTokenCount(promptPart.summary) });
-		}
-		if (promptPart.part_type === 'file') {
-			const project: any = await db.get(
-				'SELECT name FROM projects WHERE id = ?',
-				[promptPart.project_id]
-			);
-			const p = path.join(
-				process.env.PROJECTS_ROOT as string,
-				project.name,
-				promptPart.name
-			);
-			promptPart.content = await readFileContents(p);
-		}
-		res.status(200).json({ token_count: getTokenCount(promptPart.content) });
-	} catch (err: any) {
-		res.status(500).json({ error: err.message });
 	}
-});
+);
 
-router.get('/api/prompt_parts/:id/generate_summary', async (req, res) => {
-	const { id } = req.params;
-	try {
-		const promptPart: any = await db.get(
-			'SELECT * FROM prompt_parts WHERE id = ?',
-			[+id]
-		);
-		if (!promptPart) {
-			return res.status(404).json({ error: 'Prompt part not found' });
+router.get(
+	'/api/prompt_parts/:id/generate_summary',
+	check('id').isNumeric(),
+	validateRequest,
+	async (req, res) => {
+		const data = req.body;
+		try {
+			const promptPart = await helper.getPromptPartById(data.id);
+			if (!promptPart) {
+				return res.status(404).json({ error: 'Prompt part not found' });
+			}
+			const summary = await summarize(promptPart);
+			console.log(summary);
+			res.status(200).json({ summary: summary.text });
+		} catch (err: any) {
+			res.status(500).json({ error: err.message });
 		}
-		if (promptPart.part_type === 'file') {
-			const project: any = await db.get(
-				'SELECT name FROM projects WHERE id = ?',
-				[promptPart.project_id]
-			);
-			const p = path.join(
-				process.env.PROJECTS_ROOT as string,
-				project.name,
-				promptPart.name
-			);
-			promptPart.content = await readFileContents(p);
-		}
-		const summary = await summarize(promptPart);
-		console.log(summary);
-		res.status(200).json({ summary: summary.text });
-	} catch (err: any) {
-		res.status(500).json({ error: err.message });
 	}
-});
+);
 
 // Create new prompt part
-router.post('/api/prompt_parts', async (req, res) => {
-	const { name, project_id, part_type } = req.body;
+router.post(
+	'/api/prompt_parts',
+	check(['name', 'part_type']).isString(),
+	check('project_id').isNumeric(),
+	check(['content', 'summary']).optional().isString(),
+	check(['use_summary', 'use_title']).optional().isBoolean(),
+	check('position').optional().isNumeric(),
+	validateRequest,
+	async (req, res) => {
+		const data = req.body;
 
-	const requiredFields = ['name', 'project_id', 'part_type'];
-	const optionalFields: (keyof Prompt_Part)[] = [
-		'use_summary',
-		'use_title',
-		'summary',
-		'content',
-		'included',
-		'position',
-	];
-
-	const missingFields = requiredFields.filter((field) => !(field in req.body));
-	if (missingFields.length > 0) {
-		return res
-			.status(400)
-			.json({ error: `Missing fields: ${missingFields.join(', ')}` });
-	}
-
-	try {
-		const existingPromptParts = await db.all(
-			'SELECT id FROM prompt_parts WHERE project_id = ?',
-			[project_id]
-		);
-		const position = existingPromptParts.length + 1;
-
-		let fileContents: string | undefined;
-		if (part_type === 'file') {
-			// if adding a file, it must exist
-			const project: any = await db.get(
-				'SELECT name FROM projects WHERE id = ?',
-				[project_id]
+		try {
+			const existingPromptParts = await helper.getPromptPartsByProjectId(
+				data.project_id
 			);
-			const p = getProjectPath(project.name, name);
-			if (!(await fileExists(p))) {
-				return res.status(404).json({ error: 'File not found' });
-			} else {
-				fileContents = await readFileContents(p);
-			}
-		}
+			let position = existingPromptParts.length + 1;
+			if (data.position) position = data.position;
 
+			let fileContents: string | undefined;
+			if (data.part_type === 'file') {
+				// if adding a file, it must exist
+				const p = await getProjectPathLookup(data.project_id, data.name);
+				if (!(await fileExists(p))) {
+					return res.status(404).json({ error: 'File not found' });
+				} else {
+					fileContents = await readFileContents(p);
+				}
+			}
+
+			const fieldsObj: Partial<Prompt_Part> = {
+				name: data.name,
+				project_id: data.project_id,
+				part_type: data.part_type,
+				position,
+				created_at: new Date() as any,
+				updated_at: new Date() as any,
+			};
+
+			const promptPart = await helper.createPromptPart(
+				data.project_id,
+				Object.assign(data, fieldsObj)
+			);
+			if (promptPart && data.part_type === 'file' && fileContents)
+				promptPart.content = fileContents;
+			res
+				.status(201)
+				.json({ message: 'Prompt part created successfully', promptPart });
+		} catch (err: any) {
+			res.status(500).json({ error: err.message });
+		}
+	}
+);
+
+// Update prompt part
+router.put(
+	'/api/prompt_parts/:id',
+	check('id').isNumeric(),
+	check('position').optional().isNumeric(),
+	check(['name', 'content', 'summary']).optional().isString(),
+	check(['use_summary', 'use_title', 'included']).optional().isBoolean(),
+	validateRequest,
+	async (req, res) => {
+		const data = req.body;
+		const { id, name, content } = data;
+
+		const optionalFields: (keyof Prompt_Part)[] = [
+			'name',
+			'content',
+			'summary',
+			'position',
+			'included',
+			'use_title',
+			'use_summary',
+		];
+
+		const promptPart = await helper.getPromptPartById(id);
+		if (!promptPart) {
+			return res.status(404).json({ error: 'Prompt part not found' });
+		}
 		const fieldsObj: Partial<Prompt_Part> = {
-			name,
-			project_id,
-			part_type,
-			position,
-			created_at: new Date() as any,
 			updated_at: new Date() as any,
 		};
 		for (const field of optionalFields) {
 			if (field in req.body) fieldsObj[field] = req.body[field];
 		}
 
-		const { sql, values } = insertStatement('prompt_parts', fieldsObj);
-
-		const q = await db.run(sql, values);
-		const promptPart: any = await db.get(
-			'SELECT * FROM prompt_parts WHERE id = ?',
-			[q.lastID]
-		);
-		if (part_type === 'file') promptPart.content = fileContents;
-		res
-			.status(201)
-			.json({ message: 'Prompt part created successfully', promptPart });
-	} catch (err: any) {
-		res.status(500).json({ error: err.message });
-	}
-});
-
-// Update prompt part
-router.put('/api/prompt_parts/:id', async (req, res) => {
-	const { id: idStr } = req.params;
-	const id = parseInt(idStr);
-	const { name, content } = req.body;
-
-	const optionalFields: (keyof Prompt_Part)[] = [
-		'name',
-		'content',
-		'summary',
-		'position',
-		'included',
-		'use_title',
-		'use_summary',
-	];
-
-	if (
-		!id &&
-		id !== 0 &&
-		optionalFields.every((field) => !(field in req.body))
-	) {
-		return res.status(400).json({ error: 'Missing required fields' });
-	}
-
-	const promptPart: any = await db.get(
-		'SELECT part_type, project_id, name FROM prompt_parts WHERE id = ?',
-		[id]
-	);
-
-	const fieldsObj: Partial<Prompt_Part> = {
-		updated_at: new Date() as any,
-	};
-	for (const field of optionalFields) {
-		if (field in req.body) fieldsObj[field] = req.body[field];
-	}
-
-	let fileContents: string | undefined;
-	if (promptPart.part_type === 'file') {
-		const project: any = await db.get(
-			'SELECT name FROM projects WHERE id = ?',
-			[promptPart.project_id]
-		);
-		if (name && name !== promptPart.name) {
-			console.log('Renaming file');
-			const oldPath = path.join(
-				process.env.PROJECTS_ROOT as string,
-				project.name,
-				promptPart.name
-			);
-			const newPath = path.join(
-				process.env.PROJECTS_ROOT as string,
-				project.name,
-				name
-			);
-			await renameFile(oldPath, newPath);
+		let fileContents: string | undefined;
+		if (promptPart.part_type === 'file') {
+			const projectBasePath = await getProjectPathLookup(promptPart.project_id);
+			if (name && name !== promptPart.name) {
+				console.log('Renaming file');
+				const oldPath = path.join(projectBasePath, promptPart.name);
+				const newPath = path.join(projectBasePath, name);
+				await renameFile(oldPath, newPath);
+			}
+			const p = path.join(projectBasePath, name || promptPart.name);
+			if (content) {
+				await writeFileContents(p, content);
+				fileContents = content;
+			} else {
+				fileContents = await readFileContents(p);
+			}
+			if (fieldsObj.content) delete fieldsObj.content;
 		}
-		const p = path.join(
-			process.env.PROJECTS_ROOT as string,
-			project.name,
-			name || promptPart.name
-		);
-		if (content) {
-			await writeFileContents(p, content);
-		} else {
-			fileContents = await readFileContents(p);
-		}
-		if (fieldsObj.content) delete fieldsObj.content;
-	}
 
-	try {
-		const { sql, values } = updateStatement('prompt_parts', fieldsObj, { id });
-
-		const q = await db.run(sql, ...values);
-		if (q.changes === 0) {
-			return res.status(404).json({ error: 'Prompt part not found' });
+		try {
+			await helper.updatePromptPart(id, fieldsObj);
+			const promptPart = (await helper.getPromptPartById(id)) as Prompt_Part;
+			if (promptPart.part_type === 'file')
+				promptPart.content = fileContents as string;
+			res
+				.status(200)
+				.json({ message: 'Prompt part updated successfully', promptPart });
+		} catch (err: any) {
+			res.status(500).json({ error: err.message });
 		}
-		const promptPart: any = await db.get(
-			'SELECT * FROM prompt_parts WHERE id = ?',
-			[id]
-		);
-		if (promptPart.part_type === 'file') promptPart.content = fileContents;
-		res
-			.status(200)
-			.json({ message: 'Prompt part updated successfully', promptPart });
-	} catch (err: any) {
-		res.status(500).json({ error: err.message });
 	}
-});
+);
 
 // Delete prompt part
-router.delete('/api/prompt_parts/:id', async (req, res) => {
-	const { id: idStr } = req.params;
-	const id = parseInt(idStr);
+router.delete(
+	'/api/prompt_parts/:id',
+	check('id').isNumeric(),
+	validateRequest,
+	async (req, res) => {
+		const data = req.body;
 
-	if (!id) {
-		return res.status(400).json({ error: 'Missing required fields' });
-	}
-
-	try {
-		const promptPart: any = await db.get(
-			'SELECT part_type, project_id, name FROM prompt_parts WHERE id = ?',
-			[id]
-		);
-		if (!promptPart) {
-			return res.status(404).json({ error: 'Prompt part not found' });
+		if (!data.id) {
+			return res.status(400).json({ error: 'Missing required fields' });
 		}
-		if (promptPart.part_type === 'file') {
-			const project: any = await db.get(
-				'SELECT name FROM projects WHERE id = ?',
-				[promptPart.project_id]
-			);
-			const p = path.join(
-				process.env.PROJECTS_ROOT as string,
-				project.name,
-				promptPart.name
-			);
-			if (await fileExists(p)) {
-				await deleteFile(p);
-				console.log('Deleted file', p);
+
+		try {
+			const promptPart = await helper.getPromptPartById(data.id);
+			if (!promptPart) {
+				return res.status(404).json({ error: 'Prompt part not found' });
 			}
-		}
+			if (promptPart.part_type === 'file') {
+				const p = await getProjectPathLookup(
+					promptPart.project_id,
+					promptPart.name
+				);
+				if (await fileExists(p)) {
+					await deleteFile(p);
+					console.log('Deleted file', p);
+				}
+			}
 
-		const { sql, values } = deleteStatement('prompt_parts', { id });
-		const q = await db.run(sql, ...values);
-		if (q.changes === 0) {
-			return res.status(404).json({ error: 'Prompt part not found' });
+			await helper.deletePromptPart(data.id);
+			res
+				.status(200)
+				.json({ message: 'Prompt part deleted successfully', promptPart });
+		} catch (err: any) {
+			console.log(err);
+			res.status(500).json({ error: err.message });
 		}
-
-		res
-			.status(200)
-			.json({ message: 'Prompt part deleted successfully', promptPart });
-	} catch (err: any) {
-		console.log(err);
-		res.status(500).json({ error: err.message });
 	}
-});
+);
 
 export default router;
