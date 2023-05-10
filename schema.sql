@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS prompt_parts (
 	content TEXT DEFAULT '',
 	summary TEXT DEFAULT '',
 	included BOOLEAN DEFAULT 1,
+	use_title BOOLEAN DEFAULT 1,
 	use_summary BOOLEAN DEFAULT 0,
 	part_type VARCHAR(25), -- 'file' or 'snippet'
 	position INTEGER,
