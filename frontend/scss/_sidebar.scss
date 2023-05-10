@@ -44,6 +44,16 @@
 
 			input[type='checkbox'] {
 			}
+			.indicator {
+				// color: #222;
+				padding: 0 5px;
+			}
+			.title-indicator {
+				font-size: 0.9em;
+				font-weight: bold;
+				font-family: monospace;
+				color: #222;
+			}
 			.prompt-part-name {
 				flex: 1;
 				margin: 0 5px;

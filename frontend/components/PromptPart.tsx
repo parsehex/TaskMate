@@ -1,5 +1,11 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+	faFile,
+	faHeading,
+	faBookOpen,
+} from '@fortawesome/free-solid-svg-icons';
 import { Prompt_Part } from '../../types';
 import { getTokenCount, updatePromptPart } from '../api';
 import EditableName from './EditableName';
@@ -100,10 +106,25 @@ const PromptPart: React.FC<PromptPartProps> = ({
 						handleNameChange(newName);
 					}}
 				/>
+				{promptPart.use_title && (
+					<span
+						className="indicator title-indicator"
+						title="Includes the title"
+					>
+						T
+					</span>
+				)}
 			</div>
 
+			{promptPart.use_summary && (
+				<span className="indicator" title="Uses the summary">
+					<FontAwesomeIcon icon={faBookOpen} />
+				</span>
+			)}
 			{promptPart.part_type === 'file' && (
-				<span className="file-indicator">File</span>
+				<span className="indicator" title="Is a file">
+					<FontAwesomeIcon icon={faFile} />
+				</span>
 			)}
 			<TokenCountDisplay tokenCount={tokenCount} small={true} />
 		</li>
