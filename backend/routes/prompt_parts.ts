@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path';
+import { Prompt_Part } from '../../types/index.js';
 import { db } from '../db/index.js';
 import {
 	insertStatement,
@@ -150,8 +151,21 @@ router.get('/api/prompt_parts/:id/generate_summary', async (req, res) => {
 router.post('/api/prompt_parts', async (req, res) => {
 	const { name, project_id, part_type } = req.body;
 
-	if (!name || !project_id || !part_type) {
-		return res.status(400).json({ error: 'Missing required fields' });
+	const requiredFields = ['name', 'project_id', 'part_type'];
+	const optionalFields: (keyof Prompt_Part)[] = [
+		'use_summary',
+		'use_title',
+		'summary',
+		'content',
+		'included',
+		'position',
+	];
+
+	const missingFields = requiredFields.filter((field) => !(field in req.body));
+	if (missingFields.length > 0) {
+		return res
+			.status(400)
+			.json({ error: `Missing fields: ${missingFields.join(', ')}` });
 	}
 
 	try {
@@ -176,14 +190,19 @@ router.post('/api/prompt_parts', async (req, res) => {
 			}
 		}
 
-		const { sql, values } = insertStatement('prompt_parts', {
+		const fieldsObj: Partial<Prompt_Part> = {
 			name,
 			project_id,
 			part_type,
 			position,
-			created_at: new Date(),
-			updated_at: new Date(),
-		});
+			created_at: new Date() as any,
+			updated_at: new Date() as any,
+		};
+		for (const field of optionalFields) {
+			if (field in req.body) fieldsObj[field] = req.body[field];
+		}
+
+		const { sql, values } = insertStatement('prompt_parts', fieldsObj);
 
 		const q = await db.run(sql, values);
 		const promptPart: any = await db.get(
@@ -203,18 +222,22 @@ router.post('/api/prompt_parts', async (req, res) => {
 router.put('/api/prompt_parts/:id', async (req, res) => {
 	const { id: idStr } = req.params;
 	const id = parseInt(idStr);
-	const { name, content, summary, position, included, use_title, use_summary } =
-		req.body;
+	const { name, content } = req.body;
+
+	const optionalFields: (keyof Prompt_Part)[] = [
+		'name',
+		'content',
+		'summary',
+		'position',
+		'included',
+		'use_title',
+		'use_summary',
+	];
 
 	if (
-		(!id && id !== 0) ||
-		(!name &&
-			!content &&
-			!summary &&
-			!Number.isInteger(position) &&
-			included === undefined &&
-			use_summary === undefined &&
-			use_title === undefined)
+		!id &&
+		id !== 0 &&
+		optionalFields.every((field) => !(field in req.body))
 	) {
 		return res.status(400).json({ error: 'Missing required fields' });
 	}
@@ -224,15 +247,13 @@ router.put('/api/prompt_parts/:id', async (req, res) => {
 		[id]
 	);
 
-	const fieldsObj = {
-		name,
-		content,
-		summary,
-		position,
-		included,
-		use_title,
-		use_summary,
+	const fieldsObj: Partial<Prompt_Part> = {
+		updated_at: new Date() as any,
 	};
+	for (const field of optionalFields) {
+		if (field in req.body) fieldsObj[field] = req.body[field];
+	}
+
 	let fileContents: string | undefined;
 	if (promptPart.part_type === 'file') {
 		const project: any = await db.get(
@@ -263,18 +284,8 @@ router.put('/api/prompt_parts/:id', async (req, res) => {
 		} else {
 			fileContents = await readFileContents(p);
 		}
-		delete fieldsObj.content;
+		if (fieldsObj.content) delete fieldsObj.content;
 	}
-
-	if (!name) delete fieldsObj.name;
-	if (!Number.isInteger(position)) delete fieldsObj.position;
-	if (included === undefined) delete fieldsObj.included;
-	if (use_summary === undefined) delete fieldsObj.use_summary;
-	if (use_title === undefined) delete fieldsObj.use_title;
-	if (!content) delete fieldsObj.content;
-	if (!summary) delete fieldsObj.summary;
-
-	(fieldsObj as any).updated_at = new Date();
 
 	try {
 		const { sql, values } = updateStatement('prompt_parts', fieldsObj, { id });

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Prompt_Part } from '../../types';
-import PromptPart from './PromptPart';
+import PromptPart from './PromptPart/PromptPart';
 import { createPromptPart, updatePromptPart, updatePromptParts } from '../api';
 import SelectCheckbox from './SelectCheckbox';
 
@@ -83,7 +83,7 @@ const PromptPartsList: React.FC<PromptPartsListProps> = ({
 	};
 
 	const handleNewSnippetClick = async () => {
-		const newPromptPart = (await createPromptPart(selectedProjectId))
+		const newPromptPart = (await createPromptPart(selectedProjectId, {}))
 			?.promptPart;
 		if (!newPromptPart) return;
 		setPromptParts([...promptParts, newPromptPart]);
@@ -104,7 +104,9 @@ const PromptPartsList: React.FC<PromptPartsListProps> = ({
 					<PromptPart
 						key={promptPart.id}
 						promptPart={promptPart}
+						promptParts={promptParts}
 						setPromptPart={setPromptPart}
+						setPromptParts={setPromptParts}
 						onSelect={setSelectedPromptPart}
 						onCheckboxChange={onCheckboxChange}
 						movePromptPart={movePromptPart}

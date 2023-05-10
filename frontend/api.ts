@@ -95,23 +95,34 @@ interface PromptPartCreateResponse {
 	promptPart: Prompt_Part;
 }
 export const createPromptPart = async (
-	selectedProjectId: number | null
+	selectedProjectId: number | null,
+	newPromptPart: Partial<Prompt_Part>
 ): Promise<PromptPartCreateResponse | void> => {
 	if (!selectedProjectId) return;
-	const name = 'New Snippet';
+	const name = 'New Snippet' || newPromptPart.name;
 	const response = await fetch(`/api/prompt_parts`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({
+			...newPromptPart,
 			name,
 			project_id: selectedProjectId,
-			part_type: 'snippet',
 		}),
 	});
 	if (response.ok) {
 		const res = await response.json();
 		res.promptPart = convertBooleans(res.promptPart, PromptPartBooleanColumns);
 		return res;
+	}
+};
+
+export const deletePromptPart = async (id: number): Promise<void> => {
+	const response = await fetch(`/api/prompt_parts/${id}`, {
+		method: 'DELETE',
+	});
+	if (!response.ok) {
+		const { error } = await response.json();
+		throw new Error(error);
 	}
 };
 

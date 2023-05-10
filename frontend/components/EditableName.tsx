@@ -1,13 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle, Ref } from 'react';
 
 interface EditableNameProps {
 	name: string;
 	onNameChange: (newName: string) => void;
 }
 
-const EditableName: React.FC<EditableNameProps> = ({ name, onNameChange }) => {
+export interface EditableNameRef {
+	triggerEdit: () => void;
+}
+
+const EditableName: React.ForwardRefRenderFunction<
+	EditableNameRef,
+	EditableNameProps
+> = ({ name, onNameChange }, ref) => {
 	const [isEditing, setIsEditing] = useState(false);
 	const [newName, setNewName] = useState(name);
+
+	const triggerEdit = () => {
+		setIsEditing(true);
+	};
+
+	useImperativeHandle(ref, () => ({
+		triggerEdit,
+	}));
 
 	const handleEdit = () => {
 		setIsEditing(true);
@@ -48,4 +63,4 @@ const EditableName: React.FC<EditableNameProps> = ({ name, onNameChange }) => {
 	);
 };
 
-export default EditableName;
+export default forwardRef(EditableName);
