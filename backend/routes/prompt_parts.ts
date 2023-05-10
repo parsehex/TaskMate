@@ -93,6 +93,11 @@ router.get('/api/prompt_parts/:id/token_count', async (req, res) => {
 		if (!promptPart) {
 			return res.status(404).json({ error: 'Prompt part not found' });
 		}
+		if (promptPart.use_summary) {
+			return res
+				.status(200)
+				.json({ token_count: getTokenCount(promptPart.summary) });
+		}
 		if (promptPart.part_type === 'file') {
 			const project: any = await db.get(
 				'SELECT name FROM projects WHERE id = ?',
