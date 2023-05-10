@@ -13,6 +13,7 @@ export interface Prompt_Part {
 	content: string;
 	summary: string;
 	included: boolean;
+	use_title: boolean;
 	use_summary: boolean;
 	part_type: 'file' | 'snippet';
 	position: number;

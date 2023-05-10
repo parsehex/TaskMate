@@ -1,7 +1,9 @@
 import { Project, Prompt_Part } from './types';
 
+const PromptPartBooleanColumns = ['included', 'use_title', 'use_summary'];
+
 // helper function to convert sqlite's 0/1 to boolean based on column names
-const convertBooleans = (obj: any, ...columns: string[]): any => {
+const convertBooleans = (obj: any, columns: string[]): any => {
 	for (const column of columns) {
 		if (obj[column] === undefined) continue;
 		if (obj[column] === 0) obj[column] = false;
@@ -22,13 +24,13 @@ export const fetchPromptParts = async (
 		const response = await fetch('/api/prompt_parts');
 		const parts = await response.json();
 		return parts.map((part: any) =>
-			convertBooleans(part, 'included', 'use_summary')
+			convertBooleans(part, PromptPartBooleanColumns)
 		);
 	}
 	const response = await fetch(`/api/prompt_parts/${selectedProjectId}`);
 	const parts = await response.json();
 	return parts.map((part: any) =>
-		convertBooleans(part, 'included', 'use_summary')
+		convertBooleans(part, PromptPartBooleanColumns)
 	);
 };
 
@@ -67,7 +69,7 @@ export const updatePromptPart = async (
 		body: JSON.stringify(data),
 	});
 	const res = await response.json();
-	res.promptPart = convertBooleans(res.promptPart, 'included', 'use_summary');
+	res.promptPart = convertBooleans(res.promptPart, PromptPartBooleanColumns);
 	return res;
 };
 
@@ -78,7 +80,10 @@ export const updatePromptParts = async (
 	const updatedPromptParts = await Promise.all(
 		ids.map(async (id, i) => {
 			const res = await updatePromptPart(id, promptParts[i]);
-			res.promptPart = convertBooleans(res.promptPart, 'included');
+			res.promptPart = convertBooleans(
+				res.promptPart,
+				PromptPartBooleanColumns
+			);
 			return res.promptPart;
 		})
 	);
@@ -105,7 +110,7 @@ export const createPromptPart = async (
 	});
 	if (response.ok) {
 		const res = await response.json();
-		res.promptPart = convertBooleans(res.promptPart, 'included');
+		res.promptPart = convertBooleans(res.promptPart, PromptPartBooleanColumns);
 		return res;
 	}
 };

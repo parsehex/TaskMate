@@ -34,6 +34,7 @@ const createPreviewPromptPart = (content: string) => {
 		included: false,
 		project_id: -1,
 		use_summary: false,
+		use_title: false,
 	} as Prompt_Part;
 };
 

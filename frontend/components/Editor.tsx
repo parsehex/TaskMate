@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import MonacoEditor, { useMonaco, Monaco } from '@monaco-editor/react';
+import MonacoEditor from '@monaco-editor/react';
 import { Prompt_Part } from '../types';
 import { generateSummary, getTokenCount, updatePromptPart } from '../api';
 import { detectFileLanguage } from '../utils';
@@ -26,7 +26,13 @@ const Editor: React.FC<EditorProps> = ({
 	const [activeTab, setActiveTab] = useState<'content' | 'summary'>(
 		promptPart.use_summary ? 'summary' : 'content'
 	);
+
 	const [useSummary, setUseSummary] = useState(promptPart.use_summary);
+	const [useTitle, setUseTitle] = useState(promptPart.use_title);
+	const setOption = {
+		useSummary: setUseSummary,
+		useTitle: setUseTitle,
+	};
 
 	useEffect(() => {
 		if (!promptPart) return;
@@ -37,6 +43,7 @@ const Editor: React.FC<EditorProps> = ({
 			setSummary(promptPart.summary);
 		}
 		setUseSummary(promptPart.use_summary);
+		setUseTitle(promptPart.use_title);
 		setIsSaved(true);
 	}, [promptPart]);
 
@@ -101,14 +108,18 @@ const Editor: React.FC<EditorProps> = ({
 		setIsSaved(value === promptPart.summary);
 		onContentChange && onContentChange(value);
 	};
-	const handleUseSummaryChange = async (event) => {
+	const handleOptionChange = async (
+		value: boolean,
+		type: 'useTitle' | 'useSummary'
+	) => {
 		if (!promptPart || promptPart.id < 0) return;
-		const useSummary = event.target.checked;
-		const updatedPromptPart = (
-			await updatePromptPart(promptPart.id, {
-				use_summary: useSummary,
-			})
-		).promptPart;
+		const data: any = {};
+		if (type === 'useSummary') data.use_summary = value;
+		else if (type === 'useTitle') data.use_title = value;
+		setOption[type](value);
+
+		const updatedPromptPart = (await updatePromptPart(promptPart.id, data))
+			.promptPart;
 		// console.log(useSummary, updatedPromptPart.use_summary);
 		setPromptPart(updatedPromptPart);
 	};
@@ -163,11 +174,20 @@ const Editor: React.FC<EditorProps> = ({
 							type="checkbox"
 							checked={useSummary}
 							onChange={(event) => {
-								handleUseSummaryChange(event);
-								setUseSummary(event.target.checked);
+								handleOptionChange(event.target.checked, 'useSummary');
 							}}
 						/>
 						Use summary
+					</label>
+					<label>
+						<input
+							type="checkbox"
+							checked={useTitle}
+							onChange={(event) => {
+								handleOptionChange(event.target.checked, 'useTitle');
+							}}
+						/>
+						Use title
 					</label>
 				</div>
 			</div>

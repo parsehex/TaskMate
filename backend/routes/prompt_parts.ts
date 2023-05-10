@@ -174,7 +174,6 @@ router.post('/api/prompt_parts', async (req, res) => {
 		const { sql, values } = insertStatement('prompt_parts', {
 			name,
 			project_id,
-			content: '',
 			part_type,
 			position,
 			created_at: new Date(),
@@ -199,7 +198,8 @@ router.post('/api/prompt_parts', async (req, res) => {
 router.put('/api/prompt_parts/:id', async (req, res) => {
 	const { id: idStr } = req.params;
 	const id = parseInt(idStr);
-	const { name, content, summary, position, included, use_summary } = req.body;
+	const { name, content, summary, position, included, use_title, use_summary } =
+		req.body;
 
 	if (
 		(!id && id !== 0) ||
@@ -208,7 +208,8 @@ router.put('/api/prompt_parts/:id', async (req, res) => {
 			!summary &&
 			!Number.isInteger(position) &&
 			included === undefined &&
-			use_summary === undefined)
+			use_summary === undefined &&
+			use_title === undefined)
 	) {
 		return res.status(400).json({ error: 'Missing required fields' });
 	}
@@ -218,7 +219,15 @@ router.put('/api/prompt_parts/:id', async (req, res) => {
 		[id]
 	);
 
-	const fieldsObj = { name, content, summary, position, included, use_summary };
+	const fieldsObj = {
+		name,
+		content,
+		summary,
+		position,
+		included,
+		use_title,
+		use_summary,
+	};
 	let fileContents: string | undefined;
 	if (promptPart.part_type === 'file') {
 		const project: any = await db.get(
@@ -256,6 +265,7 @@ router.put('/api/prompt_parts/:id', async (req, res) => {
 	if (!Number.isInteger(position)) delete fieldsObj.position;
 	if (included === undefined) delete fieldsObj.included;
 	if (use_summary === undefined) delete fieldsObj.use_summary;
+	if (use_title === undefined) delete fieldsObj.use_title;
 	if (!content) delete fieldsObj.content;
 	if (!summary) delete fieldsObj.summary;
 
