@@ -4,7 +4,11 @@ export const makePrompt = (includedPromptParts: Prompt_Part[]): string => {
 	return includedPromptParts
 		.map((part) => {
 			let content = '';
-			if (part.use_title) content += part.name + ':\n';
+			if (part.use_title) {
+				content += part.name;
+				if (part.use_summary) content += ' (summary)';
+				content += ':\n';
+			}
 			if (part.use_summary) {
 				content += part.summary;
 			} else {
