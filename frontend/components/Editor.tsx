@@ -45,6 +45,7 @@ const Editor: React.FC<EditorProps> = ({
 		setUseSummary(promptPart.use_summary);
 		setUseTitle(promptPart.use_title);
 		setIsSaved(true);
+		setActiveTab(promptPart.use_summary ? 'summary' : 'content');
 	}, [promptPart]);
 
 	useEffect(() => {
