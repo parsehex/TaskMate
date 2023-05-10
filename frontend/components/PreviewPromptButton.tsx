@@ -14,11 +14,16 @@ const PreviewPromptButton: React.FC<PreviewButtonProps> = ({
 	setSelectedPromptPart,
 }) => {
 	const handlePreviewClick = () => {
-		setReadOnly(true);
-
 		const previewContent = makePrompt(promptParts);
+
+		// do some basic checks to prevent previewing mistakenly large prompts
+		if (previewContent.length > 10000) {
+			console.log('Blocked preview');
+			return;
+		}
 		const previewPromptPart = createPreviewPromptPart(previewContent);
 
+		setReadOnly(true);
 		setSelectedPromptPart(previewPromptPart);
 	};
 
