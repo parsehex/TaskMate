@@ -1,20 +1,18 @@
 #root .app .left-sidebar {
 	flex: 1;
-	max-width: calc(100% / 3);
-	padding: 10px 0;
 	border-right: 1px solid #ccc;
 	background-color: #fff;
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
 	display: flex;
 	flex-direction: column;
+	height: 100%;
+	min-height: 0;
 
 	.project-selector {
 		display: flex;
 		align-items: center;
 		margin-bottom: 10px;
+		padding: 10px;
+		border-bottom: 1px solid #ccc;
 
 		select {
 			flex: 1;
@@ -22,8 +20,8 @@
 		}
 	}
 
-	.select-all-parts {
-		font-size: 0.85em;
+	.prompt-options {
+		padding: 0 10px;
 	}
 
 	div.prompt-parts-list-container {
@@ -31,9 +29,14 @@
 		flex-direction: column;
 		flex: 1;
 		overflow: hidden;
+		margin-top: 5px;
+
+		.prompt-parts-list-options {
+			padding: 3px 10px;
+		}
 	}
 
-	ul.prompt-parts-list {
+	div.prompt-parts-list-container > ul.prompt-parts-list {
 		padding: 0;
 		margin: 0;
 		list-style: none;
@@ -92,4 +95,7 @@
 
 #root .app .right-sidebar {
 	flex: 2;
+	background-color: #fff;
+	height: 100%;
+	min-height: 0;
 }

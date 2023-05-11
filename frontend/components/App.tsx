@@ -87,7 +87,7 @@ export const App: React.FC = () => {
 						selectedProjectId={selectedProjectId}
 						setSelectedProjectId={setSelectedProjectId}
 					/>
-					<div>
+					<div className="prompt-options">
 						<CopyPromptButton
 							promptParts={includedPromptParts}
 							selectedProjectId={selectedProjectId}

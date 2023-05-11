@@ -1,15 +1,15 @@
 #root .app .editor {
-	flex: 2;
-	padding: 20px;
 	background-color: #fff;
-	overflow-y: auto;
-	margin-left: calc(100% / 3);
 	display: flex;
 	flex-direction: column;
 	height: 100%;
 
+	& > *:not(section) {
+		padding: 10px;
+	}
+
 	h2 {
-		margin-top: 0;
+		margin: 0;
 		form {
 			display: inline-block;
 		}
