@@ -85,6 +85,7 @@ export const usePromptPartState = ({
 
 	const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
 		onCheckboxChange(event, promptPart);
+		event.stopPropagation();
 	};
 	const handleCheckboxClick = (event: MouseEvent<HTMLInputElement>) => {
 		event.stopPropagation();

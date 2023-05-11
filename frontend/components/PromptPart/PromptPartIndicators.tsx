@@ -11,7 +11,7 @@ interface PromptPartIndicatorsProps {
 const PromptPartIndicators: React.FC<PromptPartIndicatorsProps> = ({
 	promptPart,
 }) => (
-	<>
+	<span>
 		{promptPart.use_summary && (
 			<span className="indicator" title="Uses the summary">
 				<FontAwesomeIcon icon={faBookOpen} color="orange" />
@@ -22,7 +22,7 @@ const PromptPartIndicators: React.FC<PromptPartIndicatorsProps> = ({
 				<FontAwesomeIcon icon={faFile} />
 			</span>
 		)}
-	</>
+	</span>
 );
 
 export default PromptPartIndicators;

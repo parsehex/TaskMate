@@ -90,28 +90,30 @@ const PromptPart: React.FC<PromptPartProps> = ({
 				setPromptPart={setPromptPart}
 				setPromptParts={setPromptParts}
 			/>
-			<div className="flex-1">
-				<PromptPartCheckbox
-					isIncluded={promptPart.included}
-					handleCheckboxChange={handleCheckboxChange}
-					handleCheckboxClick={handleCheckboxClick}
-				/>
-				<EditableName
-					ref={editableNameRef}
-					name={promptPart.name}
-					onNameChange={handleNameChange}
-				/>
-				{promptPart.use_title && (
-					<span
-						className="indicator title-indicator"
-						title="Includes the title"
-					>
-						T
-					</span>
-				)}
-			</div>
+			<main>
+				<div>
+					<PromptPartCheckbox
+						isIncluded={promptPart.included}
+						handleCheckboxChange={handleCheckboxChange}
+						handleCheckboxClick={handleCheckboxClick}
+					/>
+					<EditableName
+						ref={editableNameRef}
+						name={promptPart.name}
+						onNameChange={handleNameChange}
+					/>
+					{promptPart.use_title && (
+						<span
+							className="indicator title-indicator"
+							title="Includes the title"
+						>
+							T
+						</span>
+					)}
+				</div>
 
-			<PromptPartIndicators promptPart={promptPart} />
+				<PromptPartIndicators promptPart={promptPart} />
+			</main>
 
 			<TokenCountDisplay tokenCount={tokenCount} small={true} />
 		</li>
