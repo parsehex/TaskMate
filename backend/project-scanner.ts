@@ -2,14 +2,11 @@ import fs from 'fs-extra';
 import path from 'path';
 import { Dirent } from 'fs';
 import { db } from './db/index.js';
-import {
-	deleteStatement,
-	insertStatement,
-	updateStatement,
-} from './db/sql-utils.js';
+import { insertStatement } from './db/sql-utils.js';
 import { fileExists } from './fs-utils.js';
 import { shouldIgnorePath, getProjectPath } from './path-utils.js';
 import { DefaultIgnoreFiles } from './const.js';
+import { deletePromptPart } from './db/helper/prompt_parts.js';
 
 async function createPromptPartsForProject(
 	projectId: number,
@@ -82,10 +79,7 @@ async function watchProjectFolder(projectId: number, projectName: string) {
 			);
 
 			if (existingPromptPart.length) {
-				const { sql, values } = deleteStatement('prompt_parts', {
-					id: existingPromptPart[0].id,
-				});
-				await db.run(sql, values);
+				await deletePromptPart(existingPromptPart[0].id);
 				console.log(
 					`Removed prompt part: ${fileName} from project: ${projectName}`
 				);
