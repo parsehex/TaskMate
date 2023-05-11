@@ -4,11 +4,12 @@
 	padding: 10px 0;
 	border-right: 1px solid #ccc;
 	background-color: #fff;
-	overflow-y: auto;
 	position: absolute;
 	top: 0;
 	bottom: 0;
 	left: 0;
+	display: flex;
+	flex-direction: column;
 
 	.project-selector {
 		display: flex;
@@ -25,10 +26,19 @@
 		font-size: 0.85em;
 	}
 
+	div.prompt-parts-list-container {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		overflow: hidden;
+	}
+
 	ul.prompt-parts-list {
 		padding: 0;
 		margin: 0;
 		list-style: none;
+		flex: 1;
+		overflow-y: auto;
 
 		li.prompt-part {
 			display: flex;
@@ -48,7 +58,6 @@
 			input[type='checkbox'] {
 			}
 			.indicator {
-				// color: #222;
 				padding: 0 5px;
 			}
 			.title-indicator {

@@ -90,7 +90,7 @@ const PromptPartsList: React.FC<PromptPartsListProps> = ({
 	};
 
 	return (
-		<div>
+		<div className="prompt-parts-list-container">
 			<div>
 				<SelectCheckbox
 					label="Select All"
