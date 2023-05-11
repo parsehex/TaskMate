@@ -29,6 +29,13 @@
 	}
 	.options {
 		display: inline-block;
+
+		label {
+			padding: 2px 5px;
+			&:hover {
+				background-color: #eaeaea;
+			}
+		}
 	}
 
 	section {

@@ -11,12 +11,14 @@ const PromptPartCheckbox: React.FC<PromptPartCheckboxProps> = ({
 	handleCheckboxChange,
 	handleCheckboxClick,
 }) => (
-	<input
-		type="checkbox"
-		checked={!!isIncluded}
-		onChange={handleCheckboxChange}
-		onClick={handleCheckboxClick}
-	/>
+	<label>
+		<input
+			type="checkbox"
+			checked={!!isIncluded}
+			onChange={handleCheckboxChange}
+			onClick={handleCheckboxClick}
+		/>
+	</label>
 );
 
 export default PromptPartCheckbox;
