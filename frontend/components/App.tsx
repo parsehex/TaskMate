@@ -80,8 +80,8 @@ export const App: React.FC = () => {
 
 	return (
 		<div className="app">
-			<main className="app-main">
-				<div className="sidebar">
+			<main>
+				<div className="left-sidebar">
 					<ProjectSelector
 						projects={projects}
 						selectedProjectId={selectedProjectId}

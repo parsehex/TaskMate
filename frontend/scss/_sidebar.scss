@@ -1,4 +1,4 @@
-#root .app .sidebar {
+#root .app .left-sidebar {
 	flex: 1;
 	max-width: calc(100% / 3);
 	padding: 10px 0;
@@ -88,4 +88,8 @@
 			}
 		}
 	}
+}
+
+#root .app .right-sidebar {
+	flex: 2;
 }
