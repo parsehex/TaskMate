@@ -38,14 +38,20 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
 
 	return (
 		<div className="project-selector">
-			<select value={selectedProjectId || ''} onChange={handleProjectSelection}>
-				<option value="">Select a project</option>
-				{projects.map((project) => (
-					<option key={project.id} value={project.id}>
-						{project.name}
-					</option>
-				))}
-			</select>
+			<label>
+				Project:{' '}
+				<select
+					value={selectedProjectId || ''}
+					onChange={handleProjectSelection}
+				>
+					<option value="">Select a project</option>
+					{projects.map((project) => (
+						<option key={project.id} value={project.id}>
+							{project.name}
+						</option>
+					))}
+				</select>
+			</label>
 			<button className="edit-project" onClick={handleEditProjectClick}>
 				Edit Project
 			</button>
