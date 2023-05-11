@@ -80,9 +80,6 @@ export const App: React.FC = () => {
 
 	return (
 		<div className="app">
-			<header className="app-header">
-				<h1>Pair Programming Prompt Builder</h1>
-			</header>
 			<main className="app-main">
 				<div className="sidebar">
 					<ProjectSelector
