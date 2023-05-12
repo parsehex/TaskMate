@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { FileNode, PromptPartsListProps } from './PromptPartsList';
-import File from './File';
 import PromptPart from './PromptPart/PromptPart';
 
 interface DirectoryProps extends PromptPartsListProps {
@@ -36,8 +35,12 @@ const Directory: React.FC<DirectoryProps> = ({
 
 	return (
 		<li>
-			<div onClick={handleToggle}>
-				{node.name} ({includedFileCount} included files)
+			<div onClick={handleToggle} className="directory">
+				{node.children && <span>{isCollapsed ? '▶' : '▼'}</span>}
+				{node.name}
+				{includedFileCount > 0 && (
+					<span className="badge">{includedFileCount}</span>
+				)}
 			</div>
 			{!isCollapsed && node.children && (
 				<ul>

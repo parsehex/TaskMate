@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Prompt_Part } from '../../types';
 import PromptPart from './PromptPart/PromptPart';
 import Directory from './Directory';
-import File from './File';
 import { createPromptPart, updatePromptPart, updatePromptParts } from '../api';
 import SelectCheckbox from './SelectCheckbox';
 

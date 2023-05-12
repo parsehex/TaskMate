@@ -15,6 +15,12 @@
 		list-style: none;
 		flex: 1;
 		overflow-y: auto;
+		.directory {
+			cursor: pointer;
+			&:hover {
+				background-color: #ddd;
+			}
+		}
 	}
 }
 
