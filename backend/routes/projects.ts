@@ -56,12 +56,13 @@ router.post(
 router.put(
 	'/api/projects/:id',
 	check('id').isNumeric(),
+	check(['name', 'description', 'ignore_files']).optional(),
 	validateRequest,
 	async (req, res) => {
 		const { id, name, description, ignore_files } = req.body;
 
-		if (!id || (!name && !description && !ignore_files)) {
-			return res.status(400).json({ error: 'Missing required fields' });
+		if (!name && !description && !ignore_files) {
+			return res.status(400).json({ error: 'Must update at least one field' });
 		}
 
 		const directories = await getDirectories();
