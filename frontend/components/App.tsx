@@ -9,6 +9,7 @@ import PreviewPromptButton from './PreviewPromptButton';
 import CopyPromptButton from './CopyPromptButton';
 import TokenCountDisplay from './TokenCountDisplay';
 import { makePrompt } from '../utils';
+import { Tooltip } from 'react-tooltip';
 
 export const App: React.FC = () => {
 	const [projects, setProjects] = useState<Project[]>([]);
@@ -120,6 +121,7 @@ export const App: React.FC = () => {
 					)}
 				</div>
 			</main>
+			<Tooltip id="previewButton" />
 		</div>
 	);
 };

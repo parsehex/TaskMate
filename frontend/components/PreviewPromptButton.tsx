@@ -1,4 +1,5 @@
 import React from 'react';
+import { Tooltip } from 'react-tooltip';
 import { Prompt_Part } from '../../types';
 import { makePrompt } from '../utils';
 
@@ -27,7 +28,21 @@ const PreviewPromptButton: React.FC<PreviewButtonProps> = ({
 		setSelectedPromptPart(previewPromptPart);
 	};
 
-	return <button onClick={handlePreviewClick}>Preview</button>;
+	return (
+		<>
+			<button
+				data-tooltip-id="previewButton"
+				data-tooltip-html={promptParts
+					.map((part) => '- ' + part.name)
+					.join('<br>')}
+				data-tooltip-delay-show={0}
+				data-data-tooltip-place="bottom"
+				onClick={handlePreviewClick}
+			>
+				Preview
+			</button>
+		</>
+	);
 };
 
 const createPreviewPromptPart = (content: string) => {

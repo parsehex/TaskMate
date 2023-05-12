@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import '@szhsin/react-menu/dist/index.css';
+import 'react-tooltip/dist/react-tooltip.css';
 import './scss/style.scss';
 import { App } from './components/App';
 
