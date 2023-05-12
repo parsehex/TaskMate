@@ -186,6 +186,8 @@ const PromptPartsList: React.FC<PromptPartsListProps> = ({
 							/>
 						</li>
 					))}
+			</ul>
+			<ul className="prompt-parts-list">
 				{fileHierarchy.children?.map((node, index) => (
 					<li key={node.path}>
 						{node.promptPart ? (
