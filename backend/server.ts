@@ -27,7 +27,7 @@ export const startServer = async () => {
 	app.use(cors());
 	app.use(express.json());
 
-	const staticPath = path.join(__dirname, '..');
+	const staticPath = path.join(__dirname, '../frontend');
 	app.use(express.static(staticPath));
 
 	app.use(projectsRouter);
