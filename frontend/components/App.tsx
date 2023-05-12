@@ -1,5 +1,7 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faClose } from '@fortawesome/free-solid-svg-icons';
 import Editor from './Editor';
 import { Project, Prompt_Part } from '../../types';
 import { fetchProjects, fetchPromptParts, getTokenCount } from '../api';
@@ -112,6 +114,14 @@ export const App: React.FC = () => {
 					/>
 				</div>
 				<div className="right-sidebar">
+					{selectedPromptPart && (
+						<button
+							className="close-button"
+							onClick={() => setSelectedPromptPart(null)}
+						>
+							<FontAwesomeIcon icon={faClose} />
+						</button>
+					)}
 					{selectedPromptPart && (
 						<Editor
 							promptPart={selectedPromptPart}
