@@ -92,14 +92,17 @@ router.get(
 // Create new prompt part
 router.post(
 	'/api/prompt_parts',
-	check(['name', 'part_type']).isString(),
+	check(['name']).isString(),
 	check('project_id').isNumeric(),
+	// part_type = 'snippet' | 'file', default = 'snippet'
+	check('part_type').optional().isIn(['snippet', 'file']),
 	check(['content', 'summary']).optional().isString(),
 	check(['use_summary', 'use_title']).optional().isBoolean(),
 	check('position').optional().isNumeric(),
 	validateRequest,
 	async (req, res) => {
 		const data = req.body;
+		if (!data.part_type) data.part_type = 'snippet';
 
 		try {
 			const existingPromptParts = await helper.getPromptPartsByProjectId(
