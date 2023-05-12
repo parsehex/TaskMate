@@ -1,19 +1,16 @@
 import React from 'react';
-import { Tooltip } from 'react-tooltip';
 import { Prompt_Part } from '../../types';
 import { makePrompt } from '../utils';
+import { useStore } from '../state';
 
-interface PreviewButtonProps {
-	promptParts: Prompt_Part[];
-	setReadOnly: (readOnly: boolean) => void;
-	setSelectedPromptPart: (promptPart: Prompt_Part | null) => void;
-}
-
-const PreviewPromptButton: React.FC<PreviewButtonProps> = ({
-	promptParts,
-	setReadOnly,
-	setSelectedPromptPart,
-}) => {
+const PreviewPromptButton: React.FC = () => {
+	const [promptParts, setReadOnly, setSelectedPromptPart] = useStore(
+		(state) => [
+			state.promptParts,
+			state.setReadOnly,
+			state.setSelectedPromptPart,
+		]
+	);
 	const handlePreviewClick = () => {
 		const previewContent = makePrompt(promptParts);
 

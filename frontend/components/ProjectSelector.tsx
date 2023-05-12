@@ -1,30 +1,16 @@
 import React, { useState } from 'react';
-import { Project } from '../../types';
+import { useStore } from '../state';
 import ProjectSettingsModal from './ProjectSettingsModal';
 
-interface ProjectSelectorProps {
-	projects: Project[];
-	selectedProjectId: number | null;
-	setSelectedProjectId: (id: number) => void;
-}
-
-const ProjectSelector: React.FC<ProjectSelectorProps> = ({
-	projects,
-	selectedProjectId,
-	setSelectedProjectId,
-}) => {
-	const [showSettingsModal, setShowSettingsModal] = useState(false);
-	const selectedProject = projects.find(
-		(project) => project.id === selectedProjectId
+const ProjectSelector: React.FC = () => {
+	const [projects, selectedProjectId, setSelectedProjectId] = useStore(
+		(state) => [
+			state.projects,
+			state.selectedProjectId,
+			state.setSelectedProjectId,
+		]
 	);
-
-	const handleEditProjectClick = () => {
-		setShowSettingsModal(true);
-	};
-
-	const handleCloseSettingsModal = () => {
-		setShowSettingsModal(false);
-	};
+	const [showSettingsModal, setShowSettingsModal] = useState(false);
 
 	const handleProjectSelection = (
 		event: React.ChangeEvent<HTMLSelectElement>
@@ -32,7 +18,6 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
 		const projectId = Number(event.target.value);
 		setSelectedProjectId(projectId);
 
-		// Store the selected project ID in localStorage
 		localStorage.setItem('selectedProjectId', projectId.toString());
 	};
 
@@ -52,13 +37,19 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
 					))}
 				</select>
 			</label>
-			<button className="edit-project" onClick={handleEditProjectClick}>
+			<button
+				className="edit-project"
+				onClick={() => {
+					setShowSettingsModal(true);
+				}}
+			>
 				Edit Project
 			</button>
 			<ProjectSettingsModal
-				project={selectedProject as Project}
-				onClose={handleCloseSettingsModal}
-				isOpen={showSettingsModal && !!selectedProject}
+				isOpen={showSettingsModal && selectedProjectId !== null}
+				onClose={() => {
+					setShowSettingsModal(false);
+				}}
 			/>
 		</div>
 	);

@@ -1,19 +1,12 @@
 import { useState, useEffect, useRef, ChangeEvent, MouseEvent } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { Prompt_Part } from '../../../types';
-import {
-	createPromptPart,
-	deletePromptPart,
-	getTokenCount,
-	updatePromptPart,
-} from '../../api';
+import { getTokenCount, updatePromptPart } from '../../api';
+import { useStore } from '../../state';
 
 interface UsePromptPartStateProps {
 	promptPart: Prompt_Part;
-	promptParts: Prompt_Part[];
 	onSelect: (promptPart: Prompt_Part) => void;
-	setPromptPart: (promptPart: Prompt_Part) => void;
-	setPromptParts: (promptParts: Prompt_Part[]) => void;
 	onCheckboxChange: (
 		event: React.ChangeEvent<HTMLInputElement>,
 		promptPart: Prompt_Part
@@ -24,14 +17,12 @@ interface UsePromptPartStateProps {
 
 export const usePromptPartState = ({
 	promptPart,
-	promptParts,
 	onSelect,
-	setPromptPart,
-	setPromptParts,
 	onCheckboxChange,
 	movePromptPart,
 	index,
 }: UsePromptPartStateProps) => {
+	const setPromptPart = useStore((state) => state.setPromptPart);
 	const returnObj = { isDragging: false };
 	const ref = useRef<HTMLLIElement>(null);
 	const [menuOpen, setMenuOpen] = useState(false);

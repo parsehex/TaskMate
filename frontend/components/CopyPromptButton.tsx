@@ -1,23 +1,24 @@
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCopy } from '@fortawesome/free-solid-svg-icons';
 import { Prompt_Part } from '../../types';
 import { makePrompt } from '../utils';
 import { fetchPromptParts } from '../api';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCopy } from '@fortawesome/free-solid-svg-icons';
+import { useStore } from '../state';
 
 interface CopyPromptButtonProps {
-	promptParts: Prompt_Part[];
-	selectedProjectId: number | null;
-	setPromptParts: (promptParts: Prompt_Part[]) => void;
+	promptParts?: Prompt_Part[];
 	label?: string;
 }
 
 const CopyPromptButton: React.FC<CopyPromptButtonProps> = ({
 	promptParts,
-	selectedProjectId,
-	setPromptParts,
 	label = 'Copy Prompt',
 }) => {
+	const [selectedProjectId, setPromptParts] = useStore((state) => [
+		state.selectedProjectId,
+		state.setPromptParts,
+	]);
 	const copyPromptToClipboard = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
 		e.stopPropagation();
@@ -28,6 +29,9 @@ const CopyPromptButton: React.FC<CopyPromptButtonProps> = ({
 			});
 		}
 
+		if (!promptParts) {
+			promptParts = useStore((state) => state.promptParts);
+		}
 		const prompt = makePrompt(promptParts);
 		if (!navigator.clipboard) {
 			try {

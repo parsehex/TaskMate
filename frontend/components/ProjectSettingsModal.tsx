@@ -1,29 +1,43 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Project } from '../../types';
 import { updateProject } from '../api';
+import { useStore } from '../state';
 
 interface ProjectSettingsModalProps {
-	project: Project;
 	onClose: () => void;
 	isOpen: boolean;
 }
 
 const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
-	project,
 	onClose,
 	isOpen,
 }) => {
-	const [description, setDescription] = useState(project?.description || '');
-	const [ignoredPaths, setIgnoredPaths] = useState(project?.ignore_files || '');
+	const [projects, selectedProjectId] = useStore((state) => [
+		state.projects,
+		state.selectedProjectId,
+	]);
+	let selectedProject: Project | undefined;
+	const findSelectedProject = () => {
+		selectedProject = projects.find(
+			(project) => project.id === selectedProjectId
+		);
+	};
+	findSelectedProject();
+	const [description, setDescription] = useState(
+		selectedProject?.description || ''
+	);
+	const [ignoredPaths, setIgnoredPaths] = useState(
+		selectedProject?.ignore_files || ''
+	);
 	const dialog = useRef<HTMLDialogElement>(null);
 
 	useEffect(() => {
-		setDescription(project?.description || '');
-		setIgnoredPaths(project?.ignore_files || '');
-	}, [project]);
+		setDescription(selectedProject?.description || '');
+		setIgnoredPaths(selectedProject?.ignore_files || '');
+	}, [selectedProject]);
 
 	useEffect(() => {
-		if (isOpen) {
+		if (isOpen && selectedProject) {
 			dialog.current?.showModal();
 		} else {
 			dialog.current?.close();
@@ -32,7 +46,8 @@ const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
 
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		await updateProject(project.id, {
+		if (!selectedProject) return;
+		await updateProject(selectedProject.id, {
 			description,
 			ignore_files: ignoredPaths,
 		});

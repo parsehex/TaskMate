@@ -3,12 +3,10 @@ import { ControlledMenu, MenuItem, ClickEvent } from '@szhsin/react-menu';
 import { Prompt_Part } from '../../../types';
 import { EditableNameRef } from '../EditableName';
 import { createPromptPart, deletePromptPart } from '../../api';
+import { useStore } from '../../state';
 
 interface PromptPartContextMenuProps {
 	promptPart: Prompt_Part;
-	promptParts: Prompt_Part[];
-	setPromptPart: (promptPart: Prompt_Part) => void;
-	setPromptParts: (promptParts: Prompt_Part[]) => void;
 	menuOpen: boolean;
 	setMenuOpen: (open: boolean) => void;
 	anchorRef: React.RefObject<HTMLElement>;
@@ -17,14 +15,16 @@ interface PromptPartContextMenuProps {
 
 const PromptPartContextMenu: React.FC<PromptPartContextMenuProps> = ({
 	promptPart,
-	promptParts,
-	setPromptPart,
-	setPromptParts,
 	menuOpen,
 	setMenuOpen,
 	anchorRef,
 	editableNameRef,
 }) => {
+	const [promptParts, setPromptParts, setPromptPart] = useStore((state) => [
+		state.promptParts,
+		state.setPromptParts,
+		state.setPromptPart,
+	]);
 	const handleMenuIgnoreFile = () => {
 		// get project
 		// update project's ignore_file to include this file's name

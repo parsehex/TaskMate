@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Prompt_Part } from '../../types';
+import { createPromptPart, updatePromptPart, updatePromptParts } from '../api';
+import { useStore } from '../state';
 import PromptPart from './PromptPart/PromptPart';
 import Directory from './Directory';
-import { createPromptPart, updatePromptPart, updatePromptParts } from '../api';
 import SelectCheckbox from './SelectCheckbox';
 
 export interface PromptPartsListProps {
@@ -77,14 +78,20 @@ const createFileHierarchy = (promptParts: Prompt_Part[]): FileNode => {
 	return root;
 };
 
-const PromptPartsList: React.FC<PromptPartsListProps> = ({
-	selectedProjectId,
-	promptParts,
-	setPromptPart,
-	setPromptParts,
-	selectedPromptPart,
-	setSelectedPromptPart,
-}) => {
+const PromptPartsList: React.FC = () => {
+	const [
+		promptParts,
+		setPromptParts,
+		selectedProjectId,
+		selectedPromptPart,
+		setSelectedPromptPart,
+	] = useStore((state) => [
+		state.promptParts,
+		state.setPromptParts,
+		state.selectedProjectId,
+		state.selectedPromptPart,
+		state.setSelectedPromptPart,
+	]);
 	const movePromptPart = async (dragIndex: number, hoverIndex: number) => {
 		const dragPromptPart = promptParts[dragIndex];
 		const updatedPromptParts = [...promptParts];
@@ -155,13 +162,9 @@ const PromptPartsList: React.FC<PromptPartsListProps> = ({
 
 	const fileHierarchy = createFileHierarchy(promptParts);
 	const otherProps = {
-		promptParts,
-		setPromptPart,
-		setPromptParts,
 		onSelect: setSelectedPromptPart,
 		onCheckboxChange,
 		movePromptPart,
-		selectedPromptPart,
 	};
 	return (
 		<div className="prompt-parts-list-container">

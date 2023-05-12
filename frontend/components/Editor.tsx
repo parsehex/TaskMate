@@ -1,34 +1,31 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import MonacoEditor from '@monaco-editor/react';
-import { Prompt_Part } from '../../types';
 import { generateSummary, getTokenCount, updatePromptPart } from '../api';
+import { useStore } from '../state';
 import { detectFileLanguage } from '../utils';
 import EditableName from './EditableName';
 import TokenCountDisplay from './TokenCountDisplay';
 
 interface EditorProps {
-	promptPart: Prompt_Part;
-	setPromptPart: (promptPart: Prompt_Part) => void;
-	readOnly: boolean;
 	onContentChange?: (content: string) => void;
 }
 
-const Editor: React.FC<EditorProps> = ({
-	promptPart,
-	setPromptPart,
-	readOnly,
-	onContentChange,
-}) => {
-	const [content, setContent] = useState(promptPart.content || '');
+const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
+	const [promptPart, setPromptPart, readOnly] = useStore((state) => [
+		state.selectedPromptPart,
+		state.setPromptPart,
+		state.readOnly,
+	]);
+	const [content, setContent] = useState(promptPart?.content || '');
 	const [tokenCount, setTokenCount] = useState(0);
 	const [isSaved, setIsSaved] = useState(true);
-	const [summary, setSummary] = useState(promptPart.summary || '');
+	const [summary, setSummary] = useState(promptPart?.summary || '');
 	const [activeTab, setActiveTab] = useState<'content' | 'summary'>(
-		promptPart.use_summary ? 'summary' : 'content'
+		promptPart?.use_summary ? 'summary' : 'content'
 	);
 
-	const [useSummary, setUseSummary] = useState(promptPart.use_summary);
-	const [useTitle, setUseTitle] = useState(promptPart.use_title);
+	const [useSummary, setUseSummary] = useState(promptPart?.use_summary);
+	const [useTitle, setUseTitle] = useState(promptPart?.use_title);
 	const setOption = {
 		useSummary: setUseSummary,
 		useTitle: setUseTitle,
@@ -76,17 +73,19 @@ const Editor: React.FC<EditorProps> = ({
 
 	const handleNameChange = async (event) => {
 		const newName = event.target.value;
-		if (newName !== promptPart.name) {
-			promptPart = (await updatePromptPart(promptPart.id, { name: newName }))
-				.promptPart;
-			setPromptPart(promptPart);
+		if (!promptPart || promptPart.id < 0) return;
+		if (newName !== promptPart?.name) {
+			const updatedPromptPart = (
+				await updatePromptPart(promptPart.id, { name: newName })
+			).promptPart;
+			setPromptPart(updatedPromptPart);
 		}
 	};
 
 	const handleChange = (value: string | undefined, ev: any) => {
 		if (!value) return;
 		setContent(value);
-		setIsSaved(value === promptPart.content);
+		setIsSaved(value === promptPart?.content);
 		onContentChange && onContentChange(value);
 	};
 
@@ -106,7 +105,7 @@ const Editor: React.FC<EditorProps> = ({
 	const handleSummaryChange = (value: string | undefined, ev: any) => {
 		if (!value) return;
 		setSummary(value);
-		setIsSaved(value === promptPart.summary);
+		setIsSaved(value === promptPart?.summary);
 		onContentChange && onContentChange(value);
 	};
 	const handleOptionChange = async (
@@ -144,7 +143,7 @@ const Editor: React.FC<EditorProps> = ({
 			<h2>
 				{readOnly ? '' : 'Editing: '}
 				<EditableName
-					name={promptPart.name}
+					name={promptPart?.name || ''}
 					onNameChange={(newName) => {
 						handleNameChange(newName);
 					}}
@@ -194,7 +193,9 @@ const Editor: React.FC<EditorProps> = ({
 			</div>
 			<MonacoEditor
 				width="100%"
-				language={detectFileLanguage(promptPart, activeTab)}
+				language={
+					promptPart ? detectFileLanguage(promptPart, activeTab) : 'plaintext'
+				}
 				theme="vs-dark"
 				value={activeTab === 'content' ? content : summary}
 				onChange={activeTab === 'content' ? handleChange : handleSummaryChange}

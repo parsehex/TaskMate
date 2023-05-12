@@ -1,13 +1,4 @@
 import React, { useRef } from 'react';
-import { useDrag, useDrop } from 'react-dnd';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-	faFile,
-	faHeading,
-	faBookOpen,
-} from '@fortawesome/free-solid-svg-icons';
-import { Menu, MenuButton, ControlledMenu, MenuItem } from '@szhsin/react-menu';
-
 import { Prompt_Part } from '../../../types';
 import EditableName, { EditableNameRef } from '../EditableName';
 import CopyPromptButton from '../CopyPromptButton';
@@ -19,10 +10,7 @@ import PromptPartIndicators from './PromptPartIndicators';
 
 interface PromptPartProps {
 	promptPart: Prompt_Part;
-	promptParts: Prompt_Part[];
 	onSelect: (promptPart: Prompt_Part) => void;
-	setPromptPart: (promptPart: Prompt_Part) => void;
-	setPromptParts: (promptParts: Prompt_Part[]) => void;
 	onCheckboxChange: (
 		event: React.ChangeEvent<HTMLInputElement>,
 		promptPart: Prompt_Part
@@ -34,10 +22,7 @@ interface PromptPartProps {
 
 const PromptPart: React.FC<PromptPartProps> = ({
 	promptPart,
-	promptParts,
 	onSelect,
-	setPromptPart,
-	setPromptParts,
 	onCheckboxChange,
 	movePromptPart,
 	index,
@@ -58,10 +43,7 @@ const PromptPart: React.FC<PromptPartProps> = ({
 		tokenCount,
 	} = usePromptPartState({
 		promptPart,
-		promptParts,
 		onSelect,
-		setPromptPart,
-		setPromptParts,
 		onCheckboxChange,
 		movePromptPart,
 		index,
@@ -82,14 +64,11 @@ const PromptPart: React.FC<PromptPartProps> = ({
 			}}
 		>
 			<PromptPartContextMenu
+				promptPart={promptPart}
 				menuOpen={menuOpen}
 				setMenuOpen={setMenuOpen}
 				anchorRef={ref}
 				editableNameRef={editableNameRef}
-				promptPart={promptPart}
-				promptParts={promptParts}
-				setPromptPart={setPromptPart}
-				setPromptParts={setPromptParts}
 			/>
 			<main>
 				<div>
@@ -125,12 +104,7 @@ const PromptPart: React.FC<PromptPartProps> = ({
 
 				<span>
 					<PromptPartIndicators promptPart={promptPart} />
-					<CopyPromptButton
-						promptParts={[promptPart]}
-						selectedProjectId={null}
-						setPromptParts={null as any}
-						label=""
-					/>
+					<CopyPromptButton promptParts={[promptPart]} label="" />
 				</span>
 			</main>
 
