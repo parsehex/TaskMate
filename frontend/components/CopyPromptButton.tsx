@@ -2,20 +2,27 @@ import React from 'react';
 import { Prompt_Part } from '../../types';
 import { makePrompt } from '../utils';
 import { fetchPromptParts } from '../api';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCopy } from '@fortawesome/free-solid-svg-icons';
 
 interface CopyPromptButtonProps {
 	promptParts: Prompt_Part[];
 	selectedProjectId: number | null;
 	setPromptParts: (promptParts: Prompt_Part[]) => void;
+	label?: string;
 }
 
 const CopyPromptButton: React.FC<CopyPromptButtonProps> = ({
 	promptParts,
 	selectedProjectId,
 	setPromptParts,
+	label = 'Copy Prompt',
 }) => {
-	const copyPromptToClipboard = () => {
+	const copyPromptToClipboard = (e: React.MouseEvent<HTMLButtonElement>) => {
+		e.preventDefault();
+		e.stopPropagation();
 		if (selectedProjectId) {
+			// refresh parts
 			fetchPromptParts(selectedProjectId).then((promptParts) => {
 				setPromptParts(promptParts);
 			});
@@ -52,7 +59,12 @@ const CopyPromptButton: React.FC<CopyPromptButtonProps> = ({
 		}
 	};
 
-	return <button onClick={copyPromptToClipboard}>Copy Prompt</button>;
+	return (
+		<button onClick={copyPromptToClipboard}>
+			{label !== '' ? label : ''}
+			{label === '' ? <FontAwesomeIcon icon={faCopy} /> : ''}
+		</button>
+	);
 };
 
 export default CopyPromptButton;

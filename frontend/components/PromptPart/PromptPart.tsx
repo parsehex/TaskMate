@@ -10,6 +10,7 @@ import { Menu, MenuButton, ControlledMenu, MenuItem } from '@szhsin/react-menu';
 
 import { Prompt_Part } from '../../../types';
 import EditableName, { EditableNameRef } from '../EditableName';
+import CopyPromptButton from '../CopyPromptButton';
 import TokenCountDisplay from '../TokenCountDisplay';
 import { usePromptPartState } from './usePromptPartState';
 import PromptPartContextMenu from './PromptPartContextMenu';
@@ -122,7 +123,15 @@ const PromptPart: React.FC<PromptPartProps> = ({
 					)}
 				</div>
 
-				<PromptPartIndicators promptPart={promptPart} />
+				<span>
+					<PromptPartIndicators promptPart={promptPart} />
+					<CopyPromptButton
+						promptParts={[promptPart]}
+						selectedProjectId={null}
+						setPromptParts={null as any}
+						label=""
+					/>
+				</span>
 			</main>
 
 			<TokenCountDisplay tokenCount={tokenCount} small={true} />
