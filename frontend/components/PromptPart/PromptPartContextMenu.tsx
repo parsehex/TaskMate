@@ -11,7 +11,7 @@ interface PromptPartContextMenuProps {
 	setPromptParts: (promptParts: Prompt_Part[]) => void;
 	menuOpen: boolean;
 	setMenuOpen: (open: boolean) => void;
-	anchorRef: React.RefObject<HTMLLIElement>;
+	anchorRef: React.RefObject<HTMLElement>;
 	editableNameRef: React.RefObject<EditableNameRef>;
 }
 
@@ -101,9 +101,12 @@ const PromptPartContextMenu: React.FC<PromptPartContextMenuProps> = ({
 			portal={true}
 			onItemClick={handleItemClick}
 		>
-			<MenuItem value="rename">Rename</MenuItem>
 			{promptPart.part_type === 'file' && (
 				<MenuItem value="ignore-file">Ignore File</MenuItem>
+			)}
+
+			{promptPart.part_type === 'snippet' && (
+				<MenuItem value="rename">Rename</MenuItem>
 			)}
 			{promptPart.part_type === 'snippet' && (
 				<MenuItem value="duplicate">Duplicate</MenuItem>

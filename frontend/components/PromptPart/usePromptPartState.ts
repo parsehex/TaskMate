@@ -32,6 +32,7 @@ export const usePromptPartState = ({
 	movePromptPart,
 	index,
 }: UsePromptPartStateProps) => {
+	const returnObj = { isDragging: false };
 	const ref = useRef<HTMLLIElement>(null);
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [tokenCount, setTokenCount] = useState(0);
@@ -43,27 +44,29 @@ export const usePromptPartState = ({
 		});
 	}, [promptPart]);
 
-	const [, drop] = useDrop({
-		accept: 'prompt-part',
-		drop: (item: any, monitor) => {
-			if (!ref.current) return;
-			const dragIndex = item.index;
-			const hoverIndex = index;
-			if (dragIndex === hoverIndex) return;
-			movePromptPart(dragIndex, hoverIndex);
-			item.index = hoverIndex;
-		},
-	});
+	if (promptPart.part_type === 'snippet') {
+		const [, drop] = useDrop({
+			accept: 'prompt-part',
+			drop: (item: any, monitor) => {
+				if (!ref.current) return;
+				const dragIndex = item.index;
+				const hoverIndex = index;
+				if (dragIndex === hoverIndex) return;
+				movePromptPart(dragIndex, hoverIndex);
+				item.index = hoverIndex;
+			},
+		});
+		const [{ isDragging }, drag] = useDrag({
+			item: { type: 'prompt-part', id: promptPart.id, index },
+			collect: (monitor) => ({
+				isDragging: monitor.isDragging(),
+			}),
+			type: 'prompt-part',
+		});
+		returnObj['isDragging'] = isDragging;
 
-	const [{ isDragging }, drag] = useDrag({
-		item: { type: 'prompt-part', id: promptPart.id, index },
-		collect: (monitor) => ({
-			isDragging: monitor.isDragging(),
-		}),
-		type: 'prompt-part',
-	});
-
-	drag(drop(ref));
+		drag(drop(ref));
+	}
 
 	const handleContextMenu = (e: MouseEvent) => {
 		e.preventDefault();
@@ -94,12 +97,12 @@ export const usePromptPartState = ({
 	return {
 		menuOpen,
 		setMenuOpen,
-		isDragging,
 		handleContextMenu,
 		handleOnSelect,
 		handleNameChange,
 		handleCheckboxChange,
 		handleCheckboxClick,
 		tokenCount,
+		...returnObj,
 	};
 };

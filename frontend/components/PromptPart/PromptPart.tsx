@@ -42,7 +42,7 @@ const PromptPart: React.FC<PromptPartProps> = ({
 	index,
 	selected,
 }) => {
-	const ref = useRef<HTMLLIElement>(null);
+	const ref = useRef<HTMLDivElement>(null);
 	const editableNameRef = useRef<EditableNameRef>(null);
 
 	const {
@@ -67,7 +67,7 @@ const PromptPart: React.FC<PromptPartProps> = ({
 	});
 
 	return (
-		<li
+		<div
 			ref={ref}
 			className={[
 				'prompt-part',
@@ -97,11 +97,21 @@ const PromptPart: React.FC<PromptPartProps> = ({
 						handleCheckboxChange={handleCheckboxChange}
 						handleCheckboxClick={handleCheckboxClick}
 					/>
-					<EditableName
-						ref={editableNameRef}
-						name={promptPart.name}
-						onNameChange={handleNameChange}
-					/>
+
+					{promptPart.part_type !== 'file' && (
+						<EditableName
+							ref={editableNameRef}
+							name={promptPart.name}
+							onNameChange={handleNameChange}
+						/>
+					)}
+					{/* show file name if file (show rightmost name) */}
+					{promptPart.part_type === 'file' && (
+						<span className="file-name">
+							{promptPart.name.split('/').pop()}
+						</span>
+					)}
+
 					{promptPart.use_title && (
 						<span
 							className="indicator title-indicator"
@@ -116,7 +126,7 @@ const PromptPart: React.FC<PromptPartProps> = ({
 			</main>
 
 			<TokenCountDisplay tokenCount={tokenCount} small={true} />
-		</li>
+		</div>
 	);
 };
 

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Prompt_Part } from '../../types';
 import PromptPart from './PromptPart/PromptPart';
+import Directory from './Directory';
+import File from './File';
 import { createPromptPart, updatePromptPart, updatePromptParts } from '../api';
 import SelectCheckbox from './SelectCheckbox';
 
-interface PromptPartsListProps {
+export interface PromptPartsListProps {
 	selectedProjectId: number | null;
 	promptParts: Prompt_Part[];
 	setPromptPart: (promptPart: Prompt_Part) => void;
@@ -12,6 +14,69 @@ interface PromptPartsListProps {
 	selectedPromptPart: Prompt_Part | null;
 	setSelectedPromptPart: (promptPart: Prompt_Part) => void;
 }
+
+export interface FileNode {
+	name: string;
+	path: string;
+	children?: FileNode[];
+	promptPart?: Prompt_Part;
+}
+
+const createFileHierarchy = (promptParts: Prompt_Part[]): FileNode => {
+	const root: FileNode = { name: 'root', path: '' };
+
+	for (let promptPart of promptParts) {
+		if (promptPart.part_type === 'file') {
+			let currentNode = root;
+			const directories = promptPart.name.split('/');
+
+			for (let i = 0; i < directories.length; i++) {
+				const directory = directories[i];
+
+				let childNode = currentNode.children?.find(
+					(child) => child.name === directory
+				);
+
+				if (!childNode) {
+					childNode = {
+						name: directory,
+						path: directories.slice(0, i + 1).join('/'),
+					};
+					if (!currentNode.children) currentNode.children = [];
+					currentNode.children.push(childNode);
+				}
+
+				if (i === directories.length - 1) {
+					childNode.promptPart = promptPart;
+				}
+
+				currentNode = childNode;
+			}
+		}
+	}
+
+	// Define a recursive function to sort the tree.
+	const sortTree = (node: FileNode) => {
+		if (node.children) {
+			// Sort children so that directories come before files.
+			node.children.sort((a, b) => {
+				if (a.children && !b.children) return -1;
+				if (!a.children && b.children) return 1;
+				return 0;
+			});
+
+			// Recursively sort subdirectories.
+			for (let child of node.children) {
+				sortTree(child);
+			}
+		}
+	};
+
+	// Sort the root node (and by extension, the entire tree).
+	sortTree(root);
+
+	return root;
+};
 
 const PromptPartsList: React.FC<PromptPartsListProps> = ({
 	selectedProjectId,
@@ -89,6 +154,16 @@ const PromptPartsList: React.FC<PromptPartsListProps> = ({
 		setPromptParts([...promptParts, newPromptPart]);
 	};
 
+	const fileHierarchy = createFileHierarchy(promptParts);
+	const otherProps = {
+		promptParts,
+		setPromptPart,
+		setPromptParts,
+		onSelect: setSelectedPromptPart,
+		onCheckboxChange,
+		movePromptPart,
+		selectedPromptPart,
+	};
 	return (
 		<div className="prompt-parts-list-container">
 			<div className="prompt-parts-list-options">
@@ -100,19 +175,31 @@ const PromptPartsList: React.FC<PromptPartsListProps> = ({
 				<button onClick={handleNewSnippetClick}>+ Snippet</button>
 			</div>
 			<ul className="prompt-parts-list">
-				{promptParts.map((promptPart, index) => (
-					<PromptPart
-						key={promptPart.id}
-						promptPart={promptPart}
-						promptParts={promptParts}
-						setPromptPart={setPromptPart}
-						setPromptParts={setPromptParts}
-						onSelect={setSelectedPromptPart}
-						onCheckboxChange={onCheckboxChange}
-						movePromptPart={movePromptPart}
-						index={index}
-						selected={selectedPromptPart?.id === promptPart.id}
-					/>
+				{promptParts
+					.filter((v) => v.part_type === 'snippet')
+					.map((part, index) => (
+						<li key={part.name}>
+							<PromptPart
+								promptPart={part}
+								index={index}
+								selected={selectedPromptPart?.id === part.id}
+								{...otherProps}
+							/>
+						</li>
+					))}
+				{fileHierarchy.children?.map((node, index) => (
+					<li key={node.path}>
+						{node.promptPart ? (
+							<PromptPart
+								promptPart={node.promptPart}
+								index={index}
+								selected={selectedPromptPart?.id === node.promptPart.id}
+								{...otherProps}
+							/>
+						) : (
+							<Directory node={node} index={index} {...(otherProps as any)} />
+						)}
+					</li>
 				))}
 			</ul>
 		</div>
