@@ -5,6 +5,7 @@ import PromptPart from './PromptPart/PromptPart';
 interface DirectoryProps extends PromptPartsListProps {
 	node: FileNode;
 	index: number;
+	path: string;
 }
 
 const countIncludedFiles = (node: FileNode): number => {
@@ -26,6 +27,7 @@ const countIncludedFiles = (node: FileNode): number => {
 const Directory: React.FC<DirectoryProps> = ({
 	node,
 	index,
+	path,
 	...otherProps
 }) => {
 	const [isCollapsed, setIsCollapsed] = useState(true);
@@ -34,7 +36,7 @@ const Directory: React.FC<DirectoryProps> = ({
 	const includedFileCount = countIncludedFiles(node);
 
 	return (
-		<li>
+		<>
 			<div onClick={handleToggle} className="directory">
 				{node.children && <span>{isCollapsed ? '▶' : '▼'}</span>}
 				{node.name}
@@ -48,6 +50,7 @@ const Directory: React.FC<DirectoryProps> = ({
 						<>
 							{childNode.promptPart ? (
 								<PromptPart
+									key={path + '/' + childNode.promptPart.name}
 									promptPart={childNode.promptPart}
 									index={thisIndex}
 									selected={
@@ -57,13 +60,19 @@ const Directory: React.FC<DirectoryProps> = ({
 									{...(otherProps as any)}
 								/>
 							) : (
-								<Directory index={thisIndex} node={childNode} {...otherProps} />
+								<Directory
+									index={thisIndex}
+									key={path + '/' + childNode.name}
+									path={path + '/' + childNode.name}
+									node={childNode}
+									{...otherProps}
+								/>
 							)}
 						</>
 					))}
 				</ul>
 			)}
-		</li>
+		</>
 	);
 };
 

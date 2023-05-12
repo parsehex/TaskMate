@@ -198,7 +198,12 @@ const PromptPartsList: React.FC<PromptPartsListProps> = ({
 								{...otherProps}
 							/>
 						) : (
-							<Directory node={node} index={index} {...(otherProps as any)} />
+							<Directory
+								node={node}
+								index={index}
+								path={node.path}
+								{...(otherProps as any)}
+							/>
 						)}
 					</li>
 				))}
