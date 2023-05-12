@@ -6,7 +6,7 @@ import { useStore } from '../state';
 const PreviewPromptButton: React.FC = () => {
 	const [promptParts, setReadOnly, setSelectedPromptPart] = useStore(
 		(state) => [
-			state.promptParts,
+			state.includedPromptParts,
 			state.setReadOnly,
 			state.setSelectedPromptPart,
 		]

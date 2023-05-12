@@ -19,6 +19,9 @@ const CopyPromptButton: React.FC<CopyPromptButtonProps> = ({
 		state.selectedProjectId,
 		state.setPromptParts,
 	]);
+	if (!promptParts) {
+		promptParts = useStore((state) => state.includedPromptParts);
+	}
 	const copyPromptToClipboard = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
 		e.stopPropagation();
@@ -29,9 +32,6 @@ const CopyPromptButton: React.FC<CopyPromptButtonProps> = ({
 			});
 		}
 
-		if (!promptParts) {
-			promptParts = useStore((state) => state.promptParts);
-		}
 		const prompt = makePrompt(promptParts);
 		if (!navigator.clipboard) {
 			try {
