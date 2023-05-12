@@ -177,7 +177,12 @@ const PromptPartsList: React.FC<PromptPartsListProps> = ({
 				{promptParts
 					.filter((v) => v.part_type === 'snippet')
 					.map((part, index) => (
-						<li key={part.name}>
+						<li
+							key={
+								// (console.log(part.name) as any) ||
+								part.name
+							}
+						>
 							<PromptPart
 								promptPart={part}
 								index={index}
@@ -189,7 +194,12 @@ const PromptPartsList: React.FC<PromptPartsListProps> = ({
 			</ul>
 			<ul className="prompt-parts-list">
 				{fileHierarchy.children?.map((node, index) => (
-					<li key={node.path}>
+					<li
+						key={
+							// (console.log(node.path) as any) ||
+							'file-' + node.path
+						}
+					>
 						{node.promptPart ? (
 							<PromptPart
 								promptPart={node.promptPart}

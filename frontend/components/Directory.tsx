@@ -50,7 +50,10 @@ const Directory: React.FC<DirectoryProps> = ({
 						<>
 							{childNode.promptPart ? (
 								<PromptPart
-									key={path + '/' + childNode.promptPart.name}
+									key={
+										// (console.log(childNode.promptPart.name) as any) ||
+										path + '/' + childNode.promptPart.name
+									}
 									promptPart={childNode.promptPart}
 									index={thisIndex}
 									selected={
@@ -62,7 +65,10 @@ const Directory: React.FC<DirectoryProps> = ({
 							) : (
 								<Directory
 									index={thisIndex}
-									key={path + '/' + childNode.name}
+									key={
+										// (console.log(childNode.name) as any) ||
+										'dircetory-' + path + '/' + childNode.name
+									}
 									path={path + '/' + childNode.name}
 									node={childNode}
 									{...otherProps}
