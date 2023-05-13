@@ -66,3 +66,25 @@ export const createPromptPart = async (
 export const deletePromptPart = async (id: number) => {
 	return await db.run('DELETE FROM prompt_parts WHERE id = ?', [id]);
 };
+
+export const sortPromptParts = async (project_id: number) => {
+	let promptParts: Prompt_Part[] = await db.all(
+		'SELECT * FROM prompt_parts WHERE project_id = ?',
+		[project_id]
+	);
+
+	promptParts.sort((a, b) => {
+		if (a.part_type === 'snippet' && b.part_type === 'file') return -1;
+		if (a.part_type === 'file' && b.part_type === 'snippet') return 1;
+
+		return a.position - b.position;
+	});
+
+	// Update positions in the database
+	for (let i = 0; i < promptParts.length; i++) {
+		const part = promptParts[i];
+		if (part.position !== i) {
+			await updatePromptPart(part.id, { position: i });
+		}
+	}
+};

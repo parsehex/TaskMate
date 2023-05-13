@@ -7,6 +7,9 @@ import { fileExists } from './fs-utils.js';
 import { shouldIgnorePath, getProjectPath } from './path-utils.js';
 import { DefaultIgnoreFiles } from './const.js';
 import { deletePromptPart } from './db/helper/prompt_parts.js';
+import {
+	sortPromptParts,
+} from './db/helper/prompt_parts.js';
 
 async function createPromptPartsForProject(
 	projectId: number,
@@ -129,6 +132,8 @@ export async function scanProjectsRoot() {
 				projectId = existingProject[0].id;
 				console.log('Found existing project:', projectName);
 			}
+			console.log('Sorting prompt parts for project:', projectName);
+			await sortPromptParts(projectId);
 
 			await watchProjectFolder(projectId, projectName);
 			await createPromptPartsForProject(projectId, projectName);
