@@ -48,13 +48,15 @@ const Directory: React.FC<DirectoryProps> = ({
 			{!isCollapsed && node.children && (
 				<ul>
 					{node.children.map((childNode, thisIndex) => (
-						<>
+						<React.Fragment
+							key={
+								childNode.promptPart
+									? path + '/' + childNode.promptPart.name
+									: 'directory-' + path + '/' + childNode.name
+							}
+						>
 							{childNode.promptPart ? (
 								<PromptPart
-									key={
-										// (console.log(childNode.promptPart.name) as any) ||
-										path + '/' + childNode.promptPart.name
-									}
 									promptPart={childNode.promptPart}
 									index={thisIndex}
 									selected={
@@ -66,16 +68,12 @@ const Directory: React.FC<DirectoryProps> = ({
 							) : (
 								<Directory
 									index={thisIndex}
-									key={
-										// (console.log(childNode.name) as any) ||
-										'dircetory-' + path + '/' + childNode.name
-									}
 									path={path + '/' + childNode.name}
 									node={childNode}
 									{...otherProps}
 								/>
 							)}
-						</>
+						</React.Fragment>
 					))}
 				</ul>
 			)}
