@@ -1,6 +1,7 @@
 import { Prompt_Part } from '../types';
 
-export const makePrompt = (includedPromptParts: Prompt_Part[]): string => {
+export const makePrompt = (includedPromptParts?: Prompt_Part[]): string => {
+	if (!includedPromptParts) return '';
 	return includedPromptParts
 		.map((part) => {
 			let content = '';
