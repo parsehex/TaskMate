@@ -47,6 +47,7 @@ const PromptPart: React.FC<PromptPartProps> = ({
 		onCheckboxChange,
 		movePromptPart,
 		index,
+		ref,
 	});
 
 	return (

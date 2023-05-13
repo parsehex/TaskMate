@@ -13,6 +13,7 @@ interface UsePromptPartStateProps {
 	) => void;
 	movePromptPart: (dragIndex: number, hoverIndex: number) => void;
 	index: number;
+	ref: React.RefObject<HTMLDivElement>;
 }
 
 export const usePromptPartState = ({
@@ -21,10 +22,10 @@ export const usePromptPartState = ({
 	onCheckboxChange,
 	movePromptPart,
 	index,
+	ref,
 }: UsePromptPartStateProps) => {
 	const setPromptPart = useStore((state) => state.setPromptPart);
 	const returnObj = { isDragging: false };
-	const ref = useRef<HTMLLIElement>(null);
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [tokenCount, setTokenCount] = useState(0);
 
@@ -38,12 +39,12 @@ export const usePromptPartState = ({
 	if (promptPart.part_type === 'snippet') {
 		const [, drop] = useDrop({
 			accept: 'prompt-part',
-			drop: (item: any, monitor) => {
+			drop: async (item: any, monitor) => {
 				if (!ref.current) return;
 				const dragIndex = item.index;
 				const hoverIndex = index;
 				if (dragIndex === hoverIndex) return;
-				movePromptPart(dragIndex, hoverIndex);
+				await movePromptPart(dragIndex, hoverIndex);
 				item.index = hoverIndex;
 			},
 		});
