@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { FileNode, PromptPartsListProps } from './PromptPartsList';
+import { PromptPartsListProps } from './PromptPartsList';
 import PromptPart from './PromptPart/PromptPart';
+import { FileNode } from '../file-hierarchy';
 
 interface DirectoryProps extends PromptPartsListProps {
 	node: FileNode;

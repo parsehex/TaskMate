@@ -5,6 +5,7 @@ import { useStore } from '../state';
 import PromptPart from './PromptPart/PromptPart';
 import Directory from './Directory';
 import SelectCheckbox from './SelectCheckbox';
+import { createFileHierarchy } from '../file-hierarchy';
 
 export interface PromptPartsListProps {
 	selectedProjectId: number | null;
@@ -14,69 +15,6 @@ export interface PromptPartsListProps {
 	selectedPromptPart: Prompt_Part | null;
 	setSelectedPromptPart: (promptPart: Prompt_Part) => void;
 }
-
-export interface FileNode {
-	name: string;
-	path: string;
-	children?: FileNode[];
-	promptPart?: Prompt_Part;
-}
-
-const createFileHierarchy = (promptParts: Prompt_Part[]): FileNode => {
-	const root: FileNode = { name: 'root', path: '' };
-
-	for (let promptPart of promptParts) {
-		if (promptPart.part_type === 'file') {
-			let currentNode = root;
-			const directories = promptPart.name.split('/');
-
-			for (let i = 0; i < directories.length; i++) {
-				const directory = directories[i];
-
-				let childNode = currentNode.children?.find(
-					(child) => child.name === directory
-				);
-
-				if (!childNode) {
-					childNode = {
-						name: directory,
-						path: directories.slice(0, i + 1).join('/'),
-					};
-					if (!currentNode.children) currentNode.children = [];
-					currentNode.children.push(childNode);
-				}
-
-				if (i === directories.length - 1) {
-					childNode.promptPart = promptPart;
-				}
-
-				currentNode = childNode;
-			}
-		}
-	}
-
-	// Define a recursive function to sort the tree.
-	const sortTree = (node: FileNode) => {
-		if (node.children) {
-			// Sort children so that directories come before files.
-			node.children.sort((a, b) => {
-				if (a.children && !b.children) return -1;
-				if (!a.children && b.children) return 1;
-				return 0;
-			});
-
-			// Recursively sort subdirectories.
-			for (let child of node.children) {
-				sortTree(child);
-			}
-		}
-	};
-
-	// Sort the root node (and by extension, the entire tree).
-	sortTree(root);
-
-	return root;
-};
 
 const PromptPartsList: React.FC = () => {
 	const [
