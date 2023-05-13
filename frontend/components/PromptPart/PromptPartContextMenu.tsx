@@ -48,6 +48,13 @@ const PromptPartContextMenu: React.FC<PromptPartContextMenuProps> = ({
 		if (!createdPromptPart) return;
 		setPromptPart(createdPromptPart.promptPart);
 	};
+	const handleMenuUseSummary = async () => {
+		const part = { ...promptPart };
+		part.use_summary = !part.use_summary;
+		const updatedPromptPart = await updatePromptPart(part.id, part);
+		if (!updatedPromptPart) return;
+		setPromptPart(updatedPromptPart.promptPart);
+	};
 	const handleMenuUseTitle = async () => {
 		const part = { ...promptPart };
 		part.use_title = !part.use_title;
@@ -72,6 +79,7 @@ const PromptPartContextMenu: React.FC<PromptPartContextMenuProps> = ({
 			| 'rename'
 			| 'ignore-file'
 			| 'duplicate'
+			| 'use-summary'
 			| 'use-title'
 			| 'move-to-top'
 			| 'move-to-bottom'
@@ -85,6 +93,9 @@ const PromptPartContextMenu: React.FC<PromptPartContextMenuProps> = ({
 				break;
 			case 'duplicate':
 				handleMenuDuplicate();
+				break;
+			case 'use-summary':
+				handleMenuUseSummary();
 				break;
 			case 'use-title':
 				handleMenuUseTitle();
@@ -126,6 +137,7 @@ const PromptPartContextMenu: React.FC<PromptPartContextMenuProps> = ({
 			{promptPart.part_type === 'snippet' && (
 				<MenuItem value="duplicate">Duplicate</MenuItem>
 			)}
+			<MenuItem value="use-summary">Use Summary</MenuItem>
 			<MenuItem value="use-title">Use Title</MenuItem>
 			<MenuItem value="move-to-top">Move to Top</MenuItem>
 			<MenuItem value="move-to-bottom">Move to Bottom</MenuItem>
