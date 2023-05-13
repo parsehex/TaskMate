@@ -4,7 +4,6 @@ import { createPromptPart, updatePromptPart, updatePromptParts } from '../api';
 import { useStore } from '../state';
 import PromptPart from './PromptPart/PromptPart';
 import Directory from './Directory';
-import SelectCheckbox from './SelectCheckbox';
 import { createFileHierarchy } from '../file-hierarchy';
 
 export interface PromptPartsListProps {
@@ -48,33 +47,6 @@ const PromptPartsList: React.FC = () => {
 		setPromptParts(updatedPromptParts);
 	};
 
-	const [selectAll, setSelectAll] = useState(false);
-	useEffect(() => {
-		if (promptParts.length > 0) {
-			const allChecked = promptParts.every((part) => part.included);
-			setSelectAll(allChecked);
-		}
-	}, [promptParts]);
-
-	const handleSelectAllChange = async (
-		event: React.ChangeEvent<HTMLInputElement>
-	) => {
-		const isChecked = event.target.checked;
-		setSelectAll(isChecked);
-
-		const updatedParts: Prompt_Part[] = [];
-
-		for (const promptPart of promptParts) {
-			const updatedPart = (
-				await updatePromptPart(promptPart.id, {
-					included: isChecked,
-				})
-			).promptPart;
-			updatedParts.push(updatedPart);
-		}
-		setPromptParts(updatedParts);
-	};
-
 	const onCheckboxChange = async (
 		event: React.ChangeEvent<HTMLInputElement>,
 		promptPart: Prompt_Part
@@ -99,6 +71,7 @@ const PromptPartsList: React.FC = () => {
 	};
 
 	const fileHierarchy = createFileHierarchy(promptParts);
+	console.log(fileHierarchy);
 	const otherProps = {
 		onSelect: setSelectedPromptPart,
 		onCheckboxChange,
@@ -107,11 +80,6 @@ const PromptPartsList: React.FC = () => {
 	return (
 		<div className="prompt-parts-list-container">
 			<div className="prompt-parts-list-options">
-				<SelectCheckbox
-					label="Select All"
-					select={selectAll}
-					setSelect={handleSelectAllChange}
-				/>
 				<button onClick={handleNewSnippetClick}>+ Snippet</button>
 			</div>
 			<ul className="prompt-parts-list">

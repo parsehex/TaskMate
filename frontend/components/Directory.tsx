@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { updatePromptPart } from '../api';
+import { FileNode } from '../file-hierarchy';
+import { useStore } from '../state';
 import { PromptPartsListProps } from './PromptPartsList';
 import PromptPart from './PromptPart/PromptPart';
-import { FileNode } from '../file-hierarchy';
 
 interface DirectoryProps extends PromptPartsListProps {
 	node: FileNode;
@@ -25,16 +27,64 @@ const countIncludedFiles = (node: FileNode): number => {
 	return count;
 };
 
+const countFileNodes = (count: number, node: FileNode): number => {
+	if (node.promptPart) {
+		count++;
+	}
+
+	if (node.children) {
+		for (let child of node.children) {
+			count = countFileNodes(count, child);
+		}
+	}
+
+	return count;
+};
+
 const Directory: React.FC<DirectoryProps> = ({
 	node,
 	index,
 	path,
 	...otherProps
 }) => {
+	const [setPromptPart] = useStore((state) => [state.setPromptPart]);
 	const [isCollapsed, setIsCollapsed] = useState(true);
+	const [selectAll, setSelectAll] = useState(false);
 
 	const handleToggle = () => setIsCollapsed(!isCollapsed);
 	const includedFileCount = countIncludedFiles(node);
+	// count node cildren recursively that have promptPart
+	const fileCount = node.children?.reduce(countFileNodes, 0) || 0;
+
+	useEffect(() => {
+		if (includedFileCount === 0 || includedFileCount < fileCount) {
+			setSelectAll(false); // Enable Select All
+		} else if (includedFileCount > 0) {
+			setSelectAll(true); // Enable Deselect All
+		} else {
+			setSelectAll(false);
+		}
+	}, [includedFileCount]);
+
+	const toggleIncludedForAll = async (node: FileNode, included: boolean) => {
+		if (node.promptPart && node.promptPart.included !== included) {
+			const part = { ...node.promptPart };
+			part.included = included;
+			const updatedPromptPart = await updatePromptPart(part.id, part);
+			setPromptPart(updatedPromptPart.promptPart);
+		}
+
+		if (node.children) {
+			for (let child of node.children) {
+				await toggleIncludedForAll(child, included);
+			}
+		}
+	};
+	const handleSelectAllChange = async (e: React.MouseEvent) => {
+		e.stopPropagation();
+		setSelectAll(!selectAll);
+		await toggleIncludedForAll(node, !selectAll);
+	};
 
 	return (
 		<>
@@ -44,6 +94,13 @@ const Directory: React.FC<DirectoryProps> = ({
 				{includedFileCount > 0 && (
 					<span className="badge">{includedFileCount}</span>
 				)}
+				<button
+					className="select-all"
+					onClick={handleSelectAllChange}
+					title={selectAll ? 'Deselect All' : 'Select All'}
+				>
+					{selectAll ? '-' : '+'}
+				</button>
 			</div>
 			{!isCollapsed && node.children && (
 				<ul>
