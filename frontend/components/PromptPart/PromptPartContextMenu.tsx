@@ -137,8 +137,22 @@ const PromptPartContextMenu: React.FC<PromptPartContextMenuProps> = ({
 			{promptPart.part_type === 'snippet' && (
 				<MenuItem value="duplicate">Duplicate</MenuItem>
 			)}
-			<MenuItem value="use-summary">Use Summary</MenuItem>
-			<MenuItem value="use-title">Use Title</MenuItem>
+			{promptPart.summary && (
+				<MenuItem
+					type="checkbox"
+					value="use-summary"
+					checked={promptPart.use_summary}
+				>
+					Use Summary
+				</MenuItem>
+			)}
+			<MenuItem
+				type="checkbox"
+				value="use-title"
+				checked={promptPart.use_title}
+			>
+				Use Title
+			</MenuItem>
 			<MenuItem value="move-to-top">Move to Top</MenuItem>
 			<MenuItem value="move-to-bottom">Move to Bottom</MenuItem>
 			<MenuItem value="delete">Delete</MenuItem>
