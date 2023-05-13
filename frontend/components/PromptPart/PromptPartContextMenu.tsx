@@ -2,7 +2,11 @@ import React from 'react';
 import { ControlledMenu, MenuItem, ClickEvent } from '@szhsin/react-menu';
 import { Prompt_Part } from '../../../types';
 import { EditableNameRef } from '../EditableName';
-import { createPromptPart, deletePromptPart } from '../../api';
+import {
+	createPromptPart,
+	deletePromptPart,
+	updatePromptPart,
+} from '../../api';
 import { useStore } from '../../state';
 
 interface PromptPartContextMenuProps {
@@ -44,6 +48,13 @@ const PromptPartContextMenu: React.FC<PromptPartContextMenuProps> = ({
 		if (!createdPromptPart) return;
 		setPromptPart(createdPromptPart.promptPart);
 	};
+	const handleMenuUseTitle = async () => {
+		const part = { ...promptPart };
+		part.use_title = !part.use_title;
+		const updatedPromptPart = await updatePromptPart(part.id, part);
+		if (!updatedPromptPart) return;
+		setPromptPart(updatedPromptPart.promptPart);
+	};
 	const handleMenuMoveToTop = () => {};
 	const handleMenuMoveToBottom = () => {};
 	const handleMenuDelete = async () => {
@@ -61,6 +72,7 @@ const PromptPartContextMenu: React.FC<PromptPartContextMenuProps> = ({
 			| 'rename'
 			| 'ignore-file'
 			| 'duplicate'
+			| 'use-title'
 			| 'move-to-top'
 			| 'move-to-bottom'
 			| 'delete' = e.value;
@@ -73,6 +85,9 @@ const PromptPartContextMenu: React.FC<PromptPartContextMenuProps> = ({
 				break;
 			case 'duplicate':
 				handleMenuDuplicate();
+				break;
+			case 'use-title':
+				handleMenuUseTitle();
 				break;
 			case 'move-to-top':
 				handleMenuMoveToTop();
@@ -111,6 +126,7 @@ const PromptPartContextMenu: React.FC<PromptPartContextMenuProps> = ({
 			{promptPart.part_type === 'snippet' && (
 				<MenuItem value="duplicate">Duplicate</MenuItem>
 			)}
+			<MenuItem value="use-title">Use Title</MenuItem>
 			<MenuItem value="move-to-top">Move to Top</MenuItem>
 			<MenuItem value="move-to-bottom">Move to Bottom</MenuItem>
 			<MenuItem value="delete">Delete</MenuItem>
