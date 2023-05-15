@@ -3,7 +3,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCopy } from '@fortawesome/free-solid-svg-icons';
 import { Prompt_Part } from '../../types';
 import { makePrompt } from '../utils';
-import { fetchPromptParts } from '../api';
+import { fetchFiles } from '../api/files';
+import { fetchSnippets } from '../api/snippets';
 import { useStore } from '../state';
 
 interface CopyPromptButtonProps {
@@ -15,9 +16,10 @@ const CopyPromptButton: React.FC<CopyPromptButtonProps> = ({
 	promptParts,
 	label = 'Copy Prompt',
 }) => {
-	const [selectedProjectId, setPromptParts] = useStore((state) => [
+	const [selectedProjectId, setFiles, setSnippets] = useStore((state) => [
 		state.selectedProjectId,
-		state.setPromptParts,
+		state.setFiles,
+		state.setSnippets,
 	]);
 	if (!promptParts) {
 		promptParts = useStore((state) => state.includedPromptParts);
@@ -27,8 +29,11 @@ const CopyPromptButton: React.FC<CopyPromptButtonProps> = ({
 		e.stopPropagation();
 		if (selectedProjectId) {
 			// refresh parts
-			fetchPromptParts(selectedProjectId).then((promptParts) => {
-				setPromptParts(promptParts);
+			fetchFiles(selectedProjectId).then((promptParts) => {
+				setFiles(promptParts);
+			});
+			fetchSnippets(selectedProjectId).then((snippets) => {
+				setSnippets(snippets);
 			});
 		}
 

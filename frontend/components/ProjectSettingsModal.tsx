@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Project } from '../../types';
-import { updateProject } from '../api';
+import { updateProject } from '../api/projects';
 import { useStore } from '../state';
 
 interface ProjectSettingsModalProps {
