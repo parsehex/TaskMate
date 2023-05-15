@@ -6,20 +6,12 @@ import { validateRequest } from '../express.js';
 import { getTokenCount } from '../tokenizer.js';
 import { getProjectPathLookup } from '../path-utils.js';
 import { readFileContents } from '../fs-utils.js';
+import { summarize } from '../openai.js';
 
 const router = express.Router();
 
-router.post('/api/count_tokens', async (req, res) => {
-	const { text } = req.body;
-	if (!text) {
-		res.status(200).json({ token_count: 0 });
-		return;
-	}
-	const token_count = getTokenCount(text);
-	res.status(200).json({ token_count });
-});
 router.get(
-	'/api/snippets/:id/token_count',
+	'/api/snippets/:id/generate_summary',
 	check('id').isNumeric(),
 	validateRequest,
 	async (req, res) => {
@@ -28,15 +20,15 @@ router.get(
 			if (!snippet) {
 				return res.status(404).json({ error: 'Snippet not found' });
 			}
-			const token_count = getTokenCount(snippet.content);
-			res.status(200).json({ token_count });
+			const data = await summarize(snippet);
+			res.status(200).json({ data });
 		} catch (err: any) {
 			res.status(500).json({ error: err.message });
 		}
 	}
 );
 router.get(
-	'/api/files/:id/token_count',
+	'/api/files/:id/generate_summary',
 	check('id').isNumeric(),
 	validateRequest,
 	async (req, res) => {
@@ -47,8 +39,8 @@ router.get(
 			}
 			const p = await getProjectPathLookup(file.project_id, file.name);
 			const content = await readFileContents(p);
-			const token_count = getTokenCount(content);
-			res.status(200).json({ token_count });
+			const data = await summarize({ ...file, content });
+			res.status(200).json({ data });
 		} catch (err: any) {
 			res.status(500).json({ error: err.message });
 		}

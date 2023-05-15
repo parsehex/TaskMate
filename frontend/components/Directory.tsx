@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { updatePromptPart } from '../api';
+import { updateFile } from '../api/files';
 import { FileNode } from '../file-hierarchy';
 import { useStore } from '../state';
-import { PromptPartsListProps } from './PromptPartsList';
-import PromptPart from './PromptPart/PromptPart';
+import File from './File/File';
 
-interface DirectoryProps extends PromptPartsListProps {
+interface DirectoryProps {
 	node: FileNode;
 	index: number;
 	path: string;
@@ -41,13 +40,11 @@ const countFileNodes = (count: number, node: FileNode): number => {
 	return count;
 };
 
-const Directory: React.FC<DirectoryProps> = ({
-	node,
-	index,
-	path,
-	...otherProps
-}) => {
-	const [setPromptPart] = useStore((state) => [state.setPromptPart]);
+const Directory: React.FC<DirectoryProps> = ({ node, index, path }) => {
+	const [setFile, selectedPromptPart] = useStore((state) => [
+		state.setFile,
+		state.selectedPromptPart,
+	]);
 	const [isCollapsed, setIsCollapsed] = useState(true);
 	const [selectAll, setSelectAll] = useState(false);
 
@@ -68,10 +65,10 @@ const Directory: React.FC<DirectoryProps> = ({
 
 	const toggleIncludedForAll = async (node: FileNode, included: boolean) => {
 		if (node.promptPart && node.promptPart.included !== included) {
-			const part = { ...node.promptPart };
-			part.included = included;
-			const updatedPromptPart = await updatePromptPart(part.id, part);
-			setPromptPart(updatedPromptPart.promptPart);
+			const data = { ...node.promptPart };
+			data.included = included;
+			const newFile = await updateFile(data.id, data);
+			setFile(newFile);
 		}
 
 		if (node.children) {
@@ -113,21 +110,16 @@ const Directory: React.FC<DirectoryProps> = ({
 							}
 						>
 							{childNode.promptPart ? (
-								<PromptPart
-									promptPart={childNode.promptPart}
+								<File
+									file={childNode.promptPart}
 									index={thisIndex}
-									selected={
-										otherProps.selectedPromptPart?.id ===
-										childNode.promptPart.id
-									}
-									{...(otherProps as any)}
+									selected={selectedPromptPart?.id === childNode.promptPart.id}
 								/>
 							) : (
 								<Directory
 									index={thisIndex}
 									path={path + '/' + childNode.name}
 									node={childNode}
-									{...otherProps}
 								/>
 							)}
 						</React.Fragment>

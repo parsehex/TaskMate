@@ -126,35 +126,35 @@ export const deletePromptPart = async (id: number): Promise<void> => {
 	}
 };
 
-interface GetTokenCountOptions {
-	text?: string;
-	promptPartId?: number;
-}
-interface GetTokenCountResponse {
-	token_count: number;
-}
-export const getTokenCount = async (
-	options: GetTokenCountOptions
-): Promise<GetTokenCountResponse> => {
-	const { text, promptPartId } = options;
-	if (text) {
-		const response = await fetch('/api/count_tokens', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({ text }),
-		});
-		return await response.json();
-	} else if (promptPartId) {
-		const response = await fetch(
-			`/api/prompt_parts/${promptPartId}/token_count`
-		);
-		return await response.json();
-	} else {
-		return { token_count: 0 };
-	}
-};
+// interface GetTokenCountOptions {
+// 	text?: string;
+// 	promptPartId?: number;
+// }
+// interface GetTokenCountResponse {
+// 	token_count: number;
+// }
+// export const getTokenCount = async (
+// 	options: GetTokenCountOptions
+// ): Promise<GetTokenCountResponse> => {
+// 	const { text, promptPartId } = options;
+// 	if (text) {
+// 		const response = await fetch('/api/count_tokens', {
+// 			method: 'POST',
+// 			headers: {
+// 				'Content-Type': 'application/json',
+// 			},
+// 			body: JSON.stringify({ text }),
+// 		});
+// 		return await response.json();
+// 	} else if (promptPartId) {
+// 		const response = await fetch(
+// 			`/api/prompt_parts/${promptPartId}/token_count`
+// 		);
+// 		return await response.json();
+// 	} else {
+// 		return { token_count: 0 };
+// 	}
+// };
 
 interface GenerateSummaryResponse {
 	summary: string;

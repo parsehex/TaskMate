@@ -1,19 +1,23 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import MonacoEditor from '@monaco-editor/react';
-import { generateSummary, getTokenCount, updatePromptPart } from '../api';
+import { Prompt_Part, Snippet, isSnippet } from '../../types';
+import { updateSnippet } from '../api/snippets';
 import { useStore } from '../state';
 import { detectFileLanguage } from '../utils';
 import EditableName from './EditableName';
 import TokenCountDisplay from './TokenCountDisplay';
+import { generateSummary, getTokenCount } from '../api/utils';
+import { updateFile } from '../api/files';
 
 interface EditorProps {
 	onContentChange?: (content: string) => void;
 }
 
 const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
-	const [promptPart, setPromptPart, readOnly] = useStore((state) => [
+	const [promptPart, setFile, setSnippet, readOnly] = useStore((state) => [
 		state.selectedPromptPart,
-		state.setPromptPart,
+		state.setFile,
+		state.setSnippet,
 		state.readOnly,
 	]);
 	const [content, setContent] = useState(promptPart?.content || '');
@@ -34,7 +38,7 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 	useEffect(() => {
 		if (!promptPart) return;
 		if (!content || promptPart.content !== content) {
-			setContent(promptPart.content);
+			promptPart.content && setContent(promptPart.content);
 		}
 		if (!summary || promptPart.summary !== summary) {
 			setSummary(promptPart.summary);
@@ -75,10 +79,10 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 		const newName = event.target.value;
 		if (!promptPart || promptPart.id < 0) return;
 		if (newName !== promptPart?.name) {
-			const updatedPromptPart = (
-				await updatePromptPart(promptPart.id, { name: newName })
-			).promptPart;
-			setPromptPart(updatedPromptPart);
+			const setFunc = isSnippet(promptPart) ? setSnippet : setFile;
+			const updateFunc = isSnippet(promptPart) ? updateSnippet : updateFile;
+			const updatedPart = await updateFunc(promptPart.id, { name: newName });
+			setFunc(updatedPart as any);
 		}
 	};
 
@@ -91,13 +95,13 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 
 	const handleSave = async () => {
 		if (promptPart && promptPart.id >= 0) {
-			const updatedPromptPart = (
-				await updatePromptPart(promptPart.id, {
-					content,
-					summary,
-				})
-			).promptPart;
-			setPromptPart(updatedPromptPart);
+			const data: any = {};
+			if (activeTab === 'content') data.content = content;
+			else if (activeTab === 'summary') data.summary = summary;
+			const setFunc = isSnippet(promptPart) ? setSnippet : setFile;
+			const updateFunc = isSnippet(promptPart) ? updateSnippet : updateFile;
+			const updatedPart = await updateFunc(promptPart.id, data);
+			setFunc(updatedPart as any);
 		}
 		setIsSaved(true);
 	};
@@ -117,17 +121,18 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 		if (type === 'useSummary') data.use_summary = value;
 		else if (type === 'useTitle') data.use_title = value;
 		setOption[type](value);
-
-		const updatedPromptPart = (await updatePromptPart(promptPart.id, data))
-			.promptPart;
-		// console.log(useSummary, updatedPromptPart.use_summary);
-		setPromptPart(updatedPromptPart);
+		const setFunc = isSnippet(promptPart) ? setSnippet : setFile;
+		const updateFunc = isSnippet(promptPart) ? updateSnippet : updateFile;
+		const updatedPart = await updateFunc(promptPart.id, data);
+		setFunc(updatedPart as any);
 	};
 
 	const handleGenerateSummary = async () => {
 		if (promptPart && promptPart.id >= 0) {
-			const summary = (await generateSummary(promptPart.id)).summary;
-			setSummary(summary);
+			const data: any = {};
+			if (activeTab === 'content') data.content = content;
+			else if (activeTab === 'summary') data.summary = summary;
+			setSummary((await generateSummary(data)).data);
 			setIsSaved(false);
 			setActiveTab('summary');
 		}

@@ -4,7 +4,7 @@ import { makePrompt } from '../utils';
 import { useStore } from '../state';
 
 const PreviewPromptButton: React.FC = () => {
-	const [promptParts, setReadOnly, setSelectedPromptPart] = useStore(
+	const [includedPromptParts, setReadOnly, setSelectedPromptPart] = useStore(
 		(state) => [
 			state.includedPromptParts,
 			state.setReadOnly,
@@ -12,7 +12,7 @@ const PreviewPromptButton: React.FC = () => {
 		]
 	);
 	const handlePreviewClick = () => {
-		const previewContent = makePrompt(promptParts);
+		const previewContent = makePrompt(includedPromptParts);
 
 		// do some basic checks to prevent previewing mistakenly large prompts
 		if (previewContent.length > 10000) {
@@ -29,7 +29,7 @@ const PreviewPromptButton: React.FC = () => {
 		<>
 			<button
 				data-tooltip-id="previewButton"
-				data-tooltip-html={promptParts
+				data-tooltip-html={includedPromptParts
 					.map((part) => '- ' + part.name)
 					.join('<br>')}
 				data-tooltip-delay-show={0}

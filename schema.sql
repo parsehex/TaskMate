@@ -1,14 +1,12 @@
--- Projects
 CREATE TABLE IF NOT EXISTS projects (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	name VARCHAR(255) UNIQUE NOT NULL,
 	description TEXT,
 	ignore_files TEXT,
-	created_at TIMESTAMP
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Prompt Parts
-CREATE TABLE IF NOT EXISTS prompt_parts (
+CREATE TABLE IF NOT EXISTS snippets (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	project_id INTEGER,
 	name VARCHAR(255),
@@ -17,15 +15,28 @@ CREATE TABLE IF NOT EXISTS prompt_parts (
 	included BOOLEAN DEFAULT 1,
 	use_title BOOLEAN DEFAULT 1,
 	use_summary BOOLEAN DEFAULT 0,
-	part_type VARCHAR(25), -- 'file' or 'snippet'
+	type VARCHAR(25),
 	position INTEGER,
-	created_at TIMESTAMP,
-	updated_at TIMESTAMP,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY (project_id) REFERENCES projects (id),
 	UNIQUE (project_id, name)
 );
 
--- Schema versions
+CREATE TABLE IF NOT EXISTS files (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	project_id INTEGER,
+	name VARCHAR(255),
+	summary TEXT DEFAULT '',
+	included BOOLEAN DEFAULT 1,
+	use_title BOOLEAN DEFAULT 1,
+	use_summary BOOLEAN DEFAULT 0,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY (project_id) REFERENCES projects (id),
+	UNIQUE (project_id, name)
+);
+
 CREATE TABLE IF NOT EXISTS schema_versions (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	version INTEGER UNIQUE NOT NULL,

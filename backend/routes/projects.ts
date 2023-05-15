@@ -46,7 +46,7 @@ router.post(
 			const project = await helper.createProject(name);
 			res
 				.status(201)
-				.json({ message: 'Project created successfully', project });
+				.json({ message: 'Project created successfully', data: project });
 		} catch (err: any) {
 			res.status(500).json({ error: err.message });
 		}
@@ -75,7 +75,9 @@ router.put(
 			if (!project) {
 				return res.status(404).json({ error: 'Project not found' });
 			}
-			res.status(200).json({ message: 'Project updated successfully' });
+			res
+				.status(200)
+				.json({ message: 'Project updated successfully', data: project });
 		} catch (err: any) {
 			res.status(500).json({ error: err.message });
 		}

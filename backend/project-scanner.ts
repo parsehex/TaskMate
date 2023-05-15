@@ -1,28 +1,21 @@
 import fs from 'fs-extra';
 import path from 'path';
 import { Dirent } from 'fs';
-import { db } from './db/index.js';
-import { insertStatement } from './db/sql-utils.js';
+import * as projectHelper from './db/helper/projects.js';
+import * as fileHelper from './db/helper/files.js';
 import { fileExists } from './fs-utils.js';
 import { shouldIgnorePath, getProjectPath } from './path-utils.js';
 import { DefaultIgnoreFiles } from './const.js';
-import { deletePromptPart } from './db/helper/prompt_parts.js';
-import {
-	sortPromptParts,
-} from './db/helper/prompt_parts.js';
 
-async function createPromptPartsForProject(
+async function createFilesForProject(
 	projectId: number,
 	projectName: string,
 	folderPath = ''
 ) {
 	const projectPath = getProjectPath(projectName, folderPath);
 
-	const project: any[] = await db.all(
-		'SELECT ignore_files FROM projects WHERE id = ?',
-		[projectId]
-	);
-	const ignoreFiles = project.length ? JSON.parse(project[0].ignore_files) : [];
+	const project = await projectHelper.getProjectById(projectId, 'ignore_files');
+	const ignoreFiles = project ? JSON.parse(project.ignore_files) : [];
 
 	const items: Dirent[] = await fs.readdir(projectPath, {
 		withFileTypes: true,
@@ -37,28 +30,23 @@ async function createPromptPartsForProject(
 		}
 
 		if (item.isFile()) {
-			const existingPromptParts: any[] = await db.all(
-				'SELECT id FROM prompt_parts WHERE project_id = ? AND name = ?',
-				[projectId, itemPath]
-			);
+			// const existingPromptParts: any[] = await db.all(
+			// 	'SELECT id FROM prompt_parts WHERE project_id = ? AND name = ?',
+			// 	[projectId, itemPath]
+			// );
+			const existingFiles = await fileHelper.getFiles('id', {
+				project_id: projectId,
+				name: itemPath,
+			});
 
-			if (!existingPromptParts.length) {
-				const { sql, values } = insertStatement('prompt_parts', {
-					project_id: projectId,
-					name: itemPath,
-					content: '',
-					part_type: 'file',
-					position: existingPromptParts.length,
-					created_at: new Date(),
-					updated_at: new Date(),
-				});
-				await db.run(sql, values);
+			if (!existingFiles.length) {
+				await fileHelper.createFile(projectId, { name: itemPath });
 				console.log(
 					`Added prompt part: ${itemPath} in project: ${projectName}`
 				);
 			}
 		} else if (item.isDirectory()) {
-			await createPromptPartsForProject(projectId, projectName, itemPath);
+			await createFilesForProject(projectId, projectName, itemPath);
 		}
 	}
 }
@@ -76,15 +64,19 @@ async function watchProjectFolder(projectId: number, projectName: string) {
 
 		if (!fileExistsFlag) {
 			// File does not exist, it means it was deleted or renamed
-			const existingPromptPart: any[] = await db.all(
-				'SELECT id FROM prompt_parts WHERE project_id = ? AND name = ?',
-				[projectId, fileName]
-			);
+			// const existingFile: any[] = await db.all(
+			// 	'SELECT id FROM files WHERE project_id = ? AND name = ?',
+			// 	[projectId, fileName]
+			// );
+			const existingFile = await fileHelper.getFiles('id', {
+				project_id: projectId,
+				name: fileName,
+			});
 
-			if (existingPromptPart.length) {
-				await deletePromptPart(existingPromptPart[0].id);
+			if (existingFile.length) {
+				await fileHelper.deleteFile(existingFile[0].id);
 				console.log(
-					`Removed prompt part: ${fileName} from project: ${projectName}`
+					`Removed file from db: ${fileName} from project: ${projectName}`
 				);
 			}
 
@@ -111,32 +103,35 @@ export async function scanProjectsRoot() {
 
 		for (const dir of directories) {
 			const projectName = dir.name;
-			const existingProject: any[] = await db.all(
-				'SELECT id FROM projects WHERE name = ?',
-				[projectName]
-			);
+			// const existingProject: any[] = await db.all(
+			// 	'SELECT id FROM projects WHERE name = ?',
+			// 	[projectName]
+			// );
+			const existingProject = await projectHelper.getProjects('id', {
+				name: projectName,
+			});
 
 			let projectId: number;
 
 			if (!existingProject.length) {
-				const { sql, values } = insertStatement('projects', {
-					name: projectName,
-					description: '',
-					ignore_files: JSON.stringify(DefaultIgnoreFiles),
-					created_at: new Date(),
-				});
-				const { lastID } = await db.run(sql, values);
-				projectId = lastID;
+				// const { sql, values } = insertStatement('projects', {
+				// 	name: projectName,
+				// 	description: '',
+				// 	ignore_files: JSON.stringify(DefaultIgnoreFiles),
+				// 	created_at: new Date().toISOString(),
+				// });
+				// const { lastID } = await db.run(sql, values);
+				// projectId = lastID;
+				const project = await projectHelper.createProject(projectName);
+				projectId = project.id;
 				console.log(`Added project: ${projectName}`);
 			} else {
 				projectId = existingProject[0].id;
 				console.log('Found existing project:', projectName);
 			}
-			console.log('Sorting prompt parts for project:', projectName);
-			await sortPromptParts(projectId);
 
 			await watchProjectFolder(projectId, projectName);
-			await createPromptPartsForProject(projectId, projectName);
+			await createFilesForProject(projectId, projectName);
 			console.log('Scanned project:', projectName);
 		}
 	} catch (error) {

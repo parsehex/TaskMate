@@ -1,4 +1,4 @@
-import { Prompt_Part } from '../types';
+import { File, Prompt_Part } from '../types';
 
 export interface FileNode {
 	name: string;
@@ -7,36 +7,34 @@ export interface FileNode {
 	promptPart?: Prompt_Part;
 }
 
-export const createFileHierarchy = (promptParts: Prompt_Part[]): FileNode => {
+export const createFileHierarchy = (files: File[]): FileNode => {
 	const root: FileNode = { name: 'root', path: '' };
 
-	for (let promptPart of promptParts) {
-		if (promptPart.part_type === 'file') {
-			let currentNode = root;
-			const directories = promptPart.name.split('/');
+	for (let file of files) {
+		let currentNode = root;
+		const directories = file.name.split('/');
 
-			for (let i = 0; i < directories.length; i++) {
-				const directory = directories[i];
+		for (let i = 0; i < directories.length; i++) {
+			const directory = directories[i];
 
-				let childNode = currentNode.children?.find(
-					(child) => child.name === directory
-				);
+			let childNode = currentNode.children?.find(
+				(child) => child.name === directory
+			);
 
-				if (!childNode) {
-					childNode = {
-						name: directory,
-						path: directories.slice(0, i + 1).join('/'),
-					};
-					if (!currentNode.children) currentNode.children = [];
-					currentNode.children.push(childNode);
-				}
-
-				if (i === directories.length - 1) {
-					childNode.promptPart = promptPart;
-				}
-
-				currentNode = childNode;
+			if (!childNode) {
+				childNode = {
+					name: directory,
+					path: directories.slice(0, i + 1).join('/'),
+				};
+				if (!currentNode.children) currentNode.children = [];
+				currentNode.children.push(childNode);
 			}
+
+			if (i === directories.length - 1) {
+				childNode.promptPart = file;
+			}
+
+			currentNode = childNode;
 		}
 	}
 

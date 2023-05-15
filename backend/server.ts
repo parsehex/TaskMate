@@ -3,7 +3,9 @@ import cors from 'cors';
 import path from 'path';
 // import Router from 'express-static-gzip';
 import projectsRouter from './routes/projects.js';
-import promptsRouter from './routes/prompt_parts.js';
+import snippetsRouter from './routes/snippets.js';
+import filesRouter from './routes/files.js';
+import summaryRouter from './routes/summary.js';
 import tokenCountRouter from './routes/token_count.js';
 import { initializeDatabase } from './db/index.js';
 import { scanProjectsRoot } from './project-scanner.js';
@@ -31,7 +33,9 @@ export const startServer = async () => {
 	app.use(express.static(staticPath));
 
 	app.use(projectsRouter);
-	app.use(promptsRouter);
+	app.use(snippetsRouter);
+	app.use(filesRouter);
+	app.use(summaryRouter);
 	app.use(tokenCountRouter);
 
 	// app.use('/', Router(staticPath, { enableBrotli: true }));

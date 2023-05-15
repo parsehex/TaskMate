@@ -1,10 +1,11 @@
 import { create } from 'zustand';
-import { Project, Prompt_Part } from '../types';
+import { Project, Prompt_Part, Snippet, File } from '../types';
 
 interface State {
 	projects: Project[];
 	selectedProjectId: number | null;
-	promptParts: Prompt_Part[];
+	files: File[];
+	snippets: Snippet[];
 	selectedPromptPart: Prompt_Part | null;
 	includedPromptParts: Prompt_Part[];
 	promptTokenCount: number;
@@ -12,8 +13,10 @@ interface State {
 
 	setProjects: (projects: Project[]) => void;
 	setSelectedProjectId: (projectId: number | null) => void;
-	setPromptParts: (promptParts: Prompt_Part[]) => void;
-	setPromptPart: (promptPart: Prompt_Part) => void;
+	setFiles: (files: File[]) => void;
+	setFile: (file: File) => void;
+	setSnippets: (snippets: Snippet[]) => void;
+	setSnippet: (snippet: Snippet) => void;
 	setSelectedPromptPart: (promptPart: Prompt_Part | null) => void;
 	setIncludedPromptParts: (promptParts: Prompt_Part[]) => void;
 	setPromptTokenCount: (tokenCount: number) => void;
@@ -23,7 +26,8 @@ interface State {
 export const useStore = create<State>((set) => ({
 	projects: [],
 	selectedProjectId: null,
-	promptParts: [],
+	files: [],
+	snippets: [],
 	includedPromptParts: [],
 	selectedPromptPart: null,
 	promptTokenCount: 0,
@@ -31,12 +35,19 @@ export const useStore = create<State>((set) => ({
 
 	setProjects: (projects) => set({ projects }),
 	setSelectedProjectId: (projectId) => set({ selectedProjectId: projectId }),
-	setPromptParts: (promptParts) => set({ promptParts }),
-	setPromptPart: (promptPart) => {
-		const promptParts = [...useStore.getState().promptParts];
-		const index = promptParts.findIndex((part) => part.id === promptPart.id);
-		promptParts[index] = promptPart;
-		set({ promptParts });
+	setFiles: (files) => set({ files }),
+	setFile: (file) => {
+		const files = [...useStore.getState().files];
+		const index = files.findIndex((f) => f.id === file.id);
+		files[index] = file;
+		set({ files });
+	},
+	setSnippets: (snippets) => set({ snippets }),
+	setSnippet: (snippet) => {
+		const snippets = [...useStore.getState().snippets];
+		const index = snippets.findIndex((s) => s.id === snippet.id);
+		snippets[index] = snippet;
+		set({ snippets });
 	},
 	setSelectedPromptPart: (promptPart) =>
 		set({ selectedPromptPart: promptPart }),

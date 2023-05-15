@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Tooltip } from 'react-tooltip';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClose } from '@fortawesome/free-solid-svg-icons';
-import { fetchProjects, fetchPromptParts, getTokenCount } from '../api';
+import { fetchProjects } from '../api/projects';
 import { useStore } from '../state';
 import { makePrompt } from '../utils';
 import CopyPromptButton from './CopyPromptButton';
@@ -11,22 +11,27 @@ import ProjectSelector from './ProjectSelector';
 import PromptPartsList from './PromptPartsList';
 import PreviewPromptButton from './PreviewPromptButton';
 import TokenCountDisplay from './TokenCountDisplay';
+import { fetchSnippets } from '../api/snippets';
+import { fetchFiles } from '../api/files';
+import { getTokenCount } from '../api/utils';
 
 export const App: React.FC = () => {
 	const {
 		selectedProjectId,
-		promptParts,
+		snippets,
+		files,
 		selectedPromptPart,
 		includedPromptParts,
 		promptTokenCount,
 
 		setProjects,
+		setFiles,
+		setSnippets,
 		setSelectedPromptPart,
 		setSelectedProjectId,
 		setPromptTokenCount,
 		setIncludedPromptParts,
 		setReadOnly,
-		setPromptParts,
 	} = useStore((state) => state);
 
 	useEffect(() => {
@@ -40,8 +45,11 @@ export const App: React.FC = () => {
 
 	useEffect(() => {
 		if (selectedProjectId) {
-			fetchPromptParts(selectedProjectId).then((promptParts) => {
-				setPromptParts(promptParts);
+			fetchSnippets(selectedProjectId).then((newSnippets) => {
+				setSnippets(newSnippets);
+			});
+			fetchFiles(selectedProjectId).then((newFiles) => {
+				setFiles(newFiles);
 			});
 		}
 		if (selectedPromptPart?.id !== -1) {
@@ -56,17 +64,23 @@ export const App: React.FC = () => {
 	}, [selectedPromptPart]);
 
 	useEffect(() => {
-		const prompt = makePrompt(includedPromptParts);
-		getTokenCount({ text: prompt }).then((data) => {
+		const text = makePrompt(includedPromptParts);
+		getTokenCount({ text }).then((data) => {
 			setPromptTokenCount(data.token_count);
 		});
 	}, [includedPromptParts]);
 
 	const updateIncludedPromptParts = () => {
-		if (promptParts.length > 0) {
-			const includedPromptParts = promptParts.filter((part) => part.included);
-			setIncludedPromptParts(includedPromptParts);
+		let includedPromptParts: any[] = [];
+		if (snippets.length > 0) {
+			const arr = snippets.filter((part) => part.included);
+			includedPromptParts = includedPromptParts.concat(arr);
 		}
+		if (files.length > 0) {
+			const arr = files.filter((part) => part.included);
+			includedPromptParts = includedPromptParts.concat(arr);
+		}
+		setIncludedPromptParts(includedPromptParts);
 	};
 
 	useEffect(() => {
@@ -74,7 +88,7 @@ export const App: React.FC = () => {
 		if (selectedPromptPart?.id !== -1) {
 			setReadOnly(false);
 		}
-	}, [promptParts]);
+	}, [snippets, files]);
 
 	return (
 		<div className="app">

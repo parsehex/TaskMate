@@ -1,24 +1,25 @@
 import React from 'react';
 
-interface PromptPartCheckboxProps {
-	isIncluded: boolean;
+interface CheckboxProps {
+	checked: boolean;
+	label?: string;
 	handleCheckboxChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 	handleCheckboxClick: (event: React.MouseEvent<HTMLInputElement>) => void;
 }
 
-const PromptPartCheckbox: React.FC<PromptPartCheckboxProps> = ({
-	isIncluded,
+export const Checkbox: React.FC<CheckboxProps> = ({
+	checked,
+	label,
 	handleCheckboxChange,
 	handleCheckboxClick,
 }) => (
 	<label onClick={handleCheckboxClick as any}>
+		{label}
 		<input
 			type="checkbox"
-			checked={!!isIncluded}
+			checked={!!checked}
 			onChange={handleCheckboxChange}
 			onClick={handleCheckboxClick}
 		/>
 	</label>
 );
-
-export default PromptPartCheckbox;
