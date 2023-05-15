@@ -130,9 +130,9 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 	const handleGenerateSummary = async () => {
 		if (promptPart && promptPart.id >= 0) {
 			const data: any = {};
-			if (activeTab === 'content') data.content = content;
-			else if (activeTab === 'summary') data.summary = summary;
-			setSummary((await generateSummary(data)).data);
+			if (isSnippet(promptPart)) data.snippetId = promptPart.id;
+			else data.fileId = promptPart.id;
+			setSummary((await generateSummary(data)).data.text);
 			setIsSaved(false);
 			setActiveTab('summary');
 		}

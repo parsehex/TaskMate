@@ -28,7 +28,8 @@ router.get(
 			if (!snippet) {
 				return res.status(404).json({ error: 'Snippet not found' });
 			}
-			const token_count = getTokenCount(snippet.content);
+			const content = snippet.use_summary ? snippet.summary : snippet.content;
+			const token_count = getTokenCount(content);
 			res.status(200).json({ token_count });
 		} catch (err: any) {
 			res.status(500).json({ error: err.message });
@@ -46,7 +47,9 @@ router.get(
 				return res.status(404).json({ error: 'File not found' });
 			}
 			const p = await getProjectPathLookup(file.project_id, file.name);
-			const content = await readFileContents(p);
+			const content = file.use_summary
+				? file.summary
+				: await readFileContents(p);
 			const token_count = getTokenCount(content);
 			res.status(200).json({ token_count });
 		} catch (err: any) {

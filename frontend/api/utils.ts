@@ -35,20 +35,20 @@ interface GenerateSummaryOptions {
 	snippetId?: number;
 }
 interface GenerateSummaryResponse {
-	data: string;
+	data: { text: string };
 }
 export const generateSummary = async (
 	options: GenerateSummaryOptions
 ): Promise<GenerateSummaryResponse> => {
 	const { fileId, snippetId } = options;
 	if (fileId) {
-		const response = await fetch(`/api/file/${fileId}/generate_summary`);
+		const response = await fetch(`/api/files/${fileId}/generate_summary`);
 		return await response.json();
 	} else if (snippetId) {
-		const response = await fetch(`/api/snippet/${snippetId}/generate_summary`);
+		const response = await fetch(`/api/snippets/${snippetId}/generate_summary`);
 		return await response.json();
 	} else {
-		return { data: '' };
+		return { data: { text: '' } };
 	}
 };
 

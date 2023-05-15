@@ -24,15 +24,17 @@ const CopyPromptButton: React.FC<CopyPromptButtonProps> = ({
 	if (!promptParts) {
 		promptParts = useStore((state) => state.includedPromptParts);
 	}
-	const copyPromptToClipboard = (e: React.MouseEvent<HTMLButtonElement>) => {
+	const copyPromptToClipboard = async (
+		e: React.MouseEvent<HTMLButtonElement>
+	) => {
 		e.preventDefault();
 		e.stopPropagation();
 		if (selectedProjectId) {
 			// refresh parts
-			fetchFiles(selectedProjectId).then((promptParts) => {
+			await fetchFiles(selectedProjectId).then((promptParts) => {
 				setFiles(promptParts);
 			});
-			fetchSnippets(selectedProjectId).then((snippets) => {
+			await fetchSnippets(selectedProjectId).then((snippets) => {
 				setSnippets(snippets);
 			});
 		}

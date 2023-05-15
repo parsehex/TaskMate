@@ -80,7 +80,7 @@ router.put(
 		const { id } = req.body;
 		const file = req.body as Partial<File>;
 		try {
-			const updatedFile = await helper.updateFile(+id, file);
+			let updatedFile = await helper.updateFile(+id, file);
 			const p = await getProjectPathLookup(updatedFile.project_id, file.name);
 			if (file.name && !(await fs.pathExists(p))) {
 				return res.status(400).json({ error: 'File does not exist' });
@@ -92,6 +92,7 @@ router.put(
 				await fs.rename(oldPath, newPath);
 			}
 			if (file.content) await fs.writeFile(p, file.content);
+			else updatedFile = (await resolveFileContent(updatedFile)) as File;
 
 			res
 				.status(200)

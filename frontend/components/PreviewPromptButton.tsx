@@ -2,16 +2,39 @@ import React from 'react';
 import { Prompt_Part } from '../../types';
 import { makePrompt } from '../utils';
 import { useStore } from '../state';
+import { fetchFiles } from '../api/files';
+import { fetchSnippets } from '../api/snippets';
 
 const PreviewPromptButton: React.FC = () => {
-	const [includedPromptParts, setReadOnly, setSelectedPromptPart] = useStore(
-		(state) => [
-			state.includedPromptParts,
-			state.setReadOnly,
-			state.setSelectedPromptPart,
-		]
-	);
-	const handlePreviewClick = () => {
+	const [
+		includedPromptParts,
+		setReadOnly,
+		setSelectedPromptPart,
+		selectedProjectId,
+		setFiles,
+		setSnippets,
+	] = useStore((state) => [
+		state.includedPromptParts,
+		state.setReadOnly,
+		state.setSelectedPromptPart,
+		state.selectedProjectId,
+		state.setFiles,
+		state.setSnippets,
+	]);
+	const handlePreviewClick = async (e, refreshed = false) => {
+		if (selectedProjectId && !refreshed) {
+			// refresh parts
+			Promise.all([
+				fetchFiles(selectedProjectId),
+				fetchSnippets(selectedProjectId),
+			]).then(([promptParts, snippets]) => {
+				setFiles(promptParts);
+				setSnippets(snippets);
+				handlePreviewClick(e, true);
+			});
+			return;
+		}
+
 		const previewContent = makePrompt(includedPromptParts);
 
 		// do some basic checks to prevent previewing mistakenly large prompts
