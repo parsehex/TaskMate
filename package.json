@@ -19,7 +19,7 @@
 	"scripts": {
 		"f:reset": "rimraf dist/frontend && rimraf .parcel-cache",
 		"f:dev": "parcel watch",
-		"f:build": "parcel build frontend/index.html",
+		"f:build": "parcel build",
 		"b:reset": "rimraf dist/backend",
 		"b:dev": "tsc -p backend --watch",
 		"b:watch": "nodemon -r dotenv/config --watch dist/backend dist/backend/index.js",
