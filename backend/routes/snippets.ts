@@ -1,6 +1,6 @@
 import express from 'express';
 import { check } from 'express-validator';
-import { Snippet } from '../../types/index.js';
+import { Snippet } from '../../shared/types/index.js';
 import * as helper from '../db/helper/snippets.js';
 import { validateRequest } from '../express.js';
 

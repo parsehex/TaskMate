@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import MonacoEditor from '@monaco-editor/react';
-import { Prompt_Part, Snippet, isSnippet } from '../../types';
+import { Prompt_Part, Snippet, isSnippet } from '../../shared/types';
+import { updateFile } from '../api/files';
 import { updateSnippet } from '../api/snippets';
+import { generateSummary, getTokenCount } from '../api/utils';
 import { useStore } from '../state';
 import { detectFileLanguage } from '../utils';
 import EditableName from './EditableName';
 import TokenCountDisplay from './TokenCountDisplay';
-import { generateSummary, getTokenCount } from '../api/utils';
-import { updateFile } from '../api/files';
 
 interface EditorProps {
 	onContentChange?: (content: string) => void;

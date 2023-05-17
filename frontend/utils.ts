@@ -1,4 +1,4 @@
-import { Prompt_Part } from '../types';
+import { Prompt_Part } from '../shared/types';
 
 export const makePrompt = (includedPromptParts?: Prompt_Part[]): string => {
 	if (!includedPromptParts) return '';

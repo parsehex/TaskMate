@@ -1,6 +1,6 @@
 import React from 'react';
 import { ControlledMenu, MenuItem, ClickEvent } from '@szhsin/react-menu';
-import { File } from '../../../types';
+import { File } from '../../../shared/types';
 import { deleteFile, updateFile } from '../../api/files';
 import { useStore } from '../../state';
 

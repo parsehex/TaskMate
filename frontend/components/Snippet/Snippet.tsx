@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Snippet } from '../../../types';
+import { Snippet } from '../../../shared/types';
 import EditableName, { EditableNameRef } from '../EditableName';
 import CopyPromptButton from '../CopyPromptButton';
 import TokenCountDisplay from '../TokenCountDisplay';

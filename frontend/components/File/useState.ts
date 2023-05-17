@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, ChangeEvent, MouseEvent } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { File } from '../../../types';
+import { File } from '../../../shared/types';
 import { updateFile } from '../../api/files';
 import { useStore } from '../../state';
 import { getTokenCount } from '../../api/utils';

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Project, Prompt_Part, Snippet, File } from '../types';
+import { Project, Prompt_Part, Snippet, File } from '../shared/types';
 
 interface State {
 	projects: Project[];

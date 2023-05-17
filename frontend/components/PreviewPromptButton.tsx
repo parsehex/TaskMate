@@ -1,5 +1,5 @@
 import React from 'react';
-import { Prompt_Part } from '../../types';
+import { Prompt_Part } from '../../shared/types';
 import { makePrompt } from '../utils';
 import { useStore } from '../state';
 import { fetchFiles } from '../api/files';

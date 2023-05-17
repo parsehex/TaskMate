@@ -1,4 +1,4 @@
-import { Snippet } from '../../../types/index.js';
+import { Snippet } from '../../../shared/types/index.js';
 import { db } from '../index.js';
 import { insertStatement, updateStatement } from '../sql-utils.js';
 

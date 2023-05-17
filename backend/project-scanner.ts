@@ -30,10 +30,6 @@ async function createFilesForProject(
 		}
 
 		if (item.isFile()) {
-			// const existingPromptParts: any[] = await db.all(
-			// 	'SELECT id FROM prompt_parts WHERE project_id = ? AND name = ?',
-			// 	[projectId, itemPath]
-			// );
 			const existingFiles = await fileHelper.getFiles('id', {
 				project_id: projectId,
 				name: itemPath,
@@ -41,9 +37,7 @@ async function createFilesForProject(
 
 			if (!existingFiles.length) {
 				await fileHelper.createFile(projectId, { name: itemPath });
-				console.log(
-					`Added prompt part: ${itemPath} in project: ${projectName}`
-				);
+				console.log(`Added file: ${itemPath} to project: ${projectName}`);
 			}
 		} else if (item.isDirectory()) {
 			await createFilesForProject(projectId, projectName, itemPath);
@@ -64,10 +58,6 @@ async function watchProjectFolder(projectId: number, projectName: string) {
 
 		if (!fileExistsFlag) {
 			// File does not exist, it means it was deleted or renamed
-			// const existingFile: any[] = await db.all(
-			// 	'SELECT id FROM files WHERE project_id = ? AND name = ?',
-			// 	[projectId, fileName]
-			// );
 			const existingFile = await fileHelper.getFiles('id', {
 				project_id: projectId,
 				name: fileName,
@@ -103,10 +93,6 @@ export async function scanProjectsRoot() {
 
 		for (const dir of directories) {
 			const projectName = dir.name;
-			// const existingProject: any[] = await db.all(
-			// 	'SELECT id FROM projects WHERE name = ?',
-			// 	[projectName]
-			// );
 			const existingProject = await projectHelper.getProjects('id', {
 				name: projectName,
 			});

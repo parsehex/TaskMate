@@ -1,6 +1,6 @@
 import React from 'react';
 import { ControlledMenu, MenuItem, ClickEvent } from '@szhsin/react-menu';
-import { File } from '../../../types';
+import { File } from '../../../shared/types';
 import {
 	deleteSnippet,
 	updateSnippet,

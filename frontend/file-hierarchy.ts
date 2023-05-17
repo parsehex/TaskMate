@@ -1,4 +1,4 @@
-import { File, Prompt_Part } from '../types';
+import { File, Prompt_Part } from '../shared/types';
 
 export interface FileNode {
 	name: string;

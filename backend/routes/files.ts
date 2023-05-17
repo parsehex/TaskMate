@@ -1,11 +1,11 @@
+import path from 'path';
 import express from 'express';
 import { check } from 'express-validator';
 import fs from 'fs-extra';
-import { File } from '../../types/index.js';
+import { File } from '../../shared/types/index.js';
 import * as helper from '../db/helper/files.js';
 import { validateRequest } from '../express.js';
 import { getProjectPathLookup } from '../path-utils.js';
-import path from 'path';
 
 const router = express.Router();
 
@@ -60,7 +60,9 @@ router.post(
 			}
 
 			const newFile = await helper.createFile(+project_id, { name });
-			await fs.writeFile(p, '');
+			if (!(await fs.pathExists(p))) {
+				await fs.writeFile(p, '');
+			}
 			res
 				.status(201)
 				.json({ message: 'File created successfully', data: newFile });
