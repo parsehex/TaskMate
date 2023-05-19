@@ -44,7 +44,7 @@ export const App: React.FC = () => {
 	}, []);
 
 	useEffect(() => {
-		if (selectedProjectId) {
+		if (selectedProjectId !== null && Number.isInteger(selectedProjectId)) {
 			fetchSnippets(selectedProjectId).then((newSnippets) => {
 				setSnippets(newSnippets);
 			});

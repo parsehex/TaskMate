@@ -7,7 +7,7 @@ import { getTokenCount } from '../../api/utils';
 
 interface UseSnippetStateProps {
 	snippet: Snippet;
-	move: (dragIndex: number, hoverIndex: number) => void;
+	move: (dragIndex: number, hoverIndex: number) => Promise<void>;
 	index: number;
 	ref: React.RefObject<HTMLDivElement>;
 }
@@ -33,7 +33,6 @@ export const useSnippetState = ({
 			const dragIndex = item.index;
 			const hoverIndex = index;
 			if (dragIndex === hoverIndex) return;
-			console.log(dragIndex, hoverIndex);
 			await move(dragIndex, hoverIndex);
 			item.index = hoverIndex;
 		},

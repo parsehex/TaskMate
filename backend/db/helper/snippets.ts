@@ -17,6 +17,7 @@ export const getSnippets = async (
 			})
 			.join(' AND ');
 	}
+	sql += ' ORDER BY position ASC';
 	return await db.all(sql, values);
 };
 
@@ -31,7 +32,10 @@ export const getSnippetById = async (
 	id: number,
 	columns = '*'
 ): Promise<Snippet> => {
-	return await db.get(`SELECT ${columns} FROM snippets WHERE id = ?`, [id]);
+	return await db.get(
+		`SELECT ${columns} FROM snippets WHERE id = ? ORDER BY position ASC`,
+		[id]
+	);
 };
 
 export const updateSnippet = async (

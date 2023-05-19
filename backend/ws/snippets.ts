@@ -8,8 +8,9 @@ async function GET_SNIPPET(id: number) {
 
 async function GET_SNIPPETS(project_id: number | undefined) {
 	const where: any = {};
-	if (Number.isInteger(project_id)) where['project_id'] = project_id;
-	return await helper.getSnippets();
+	if (project_id !== null && Number.isInteger(project_id))
+		where['project_id'] = project_id;
+	return await helper.getSnippets('*', where);
 }
 
 async function CREATE_SNIPPET(project_id: number, snippet: Partial<Snippet>) {

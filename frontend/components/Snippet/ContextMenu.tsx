@@ -15,6 +15,7 @@ interface ContextMenuProps {
 	setMenuOpen: (open: boolean) => void;
 	anchorRef: React.RefObject<HTMLElement>;
 	editableNameRef: React.RefObject<EditableNameRef>;
+	move: (dragIndex: number, hoverIndex: number) => Promise<void>;
 }
 
 export const ContextMenu: React.FC<ContextMenuProps> = ({
@@ -23,6 +24,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
 	setMenuOpen,
 	anchorRef,
 	editableNameRef,
+	move,
 }) => {
 	const [snippets, setSnippets, setSnippet] = useStore((state) => [
 		state.snippets,
@@ -54,8 +56,18 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
 		if (!updatedSnippet) return;
 		setSnippet(updatedSnippet);
 	};
-	const handleMenuMoveUp = () => {};
-	const handleMenuMoveDown = () => {};
+	const handleMenuMoveUp = async () => {
+		const thisIndex = snippets.findIndex((s) => s.id === snippet.id);
+		const prevIndex = thisIndex - 1;
+		if (prevIndex < 0) return;
+		await move(thisIndex, prevIndex);
+	};
+	const handleMenuMoveDown = async () => {
+		const thisIndex = snippets.findIndex((s) => s.id === snippet.id);
+		const nextIndex = thisIndex + 1;
+		if (nextIndex >= snippets.length) return;
+		await move(thisIndex, nextIndex);
+	};
 	const handleMenuDelete = async () => {
 		const { id } = snippet;
 		await deleteSnippet(id);
