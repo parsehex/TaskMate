@@ -1,19 +1,32 @@
 import autobahn from 'autobahn';
 
-const port = +(process.env.WEBSOCKET_PORT as string) || 8081;
-
-const connection = new autobahn.Connection({
-	url: `ws://127.0.0.1:${port}`,
-	realm: 'realm1',
-});
-
+let connection: autobahn.Connection | null = null;
 let session: autobahn.Session | null = null;
 
-connection.onopen = function (s) {
-	session = s;
-};
+const port = +(process.env.WEBSOCKET_PORT as string) || 8181;
 
-connection.open();
+export async function initWebsocket() {
+	console.log(`Connecting to WebSocket on port ${port}`);
+
+	connection = new autobahn.Connection({
+		url: `ws://localhost:${port}/ws`,
+		realm: 'realm1',
+	});
+
+	session = await new Promise<autobahn.Session>((resolve, reject) => {
+		if (!connection) throw new Error('Connection is not initialized yet.');
+		connection.onopen = (s) => {
+			console.log('Connection opened!');
+			resolve(s);
+		};
+		connection.onclose = (reason, details) => {
+			console.error('Connection closed. Reason: ' + reason);
+			reject(new Error(reason));
+			return false;
+		};
+		connection.open();
+	});
+}
 
 export function getSession(): autobahn.Session {
 	if (session) {
