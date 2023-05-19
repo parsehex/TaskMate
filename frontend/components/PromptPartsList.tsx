@@ -51,9 +51,11 @@ const PromptPartsList: React.FC = () => {
 
 	const handleNewSnippetClick = async () => {
 		if (!selectedProjectId) return;
-		const newSnippet = await createSnippet(selectedProjectId, {});
+		// get new name based on existing names
+		const name = 'Snippet ' + (snippets.length + 1);
+		const newSnippet = await createSnippet(selectedProjectId, { name });
 		if (!newSnippet) return;
-		setSnippet(newSnippet);
+		setSnippets([...snippets, newSnippet]);
 	};
 
 	const fileHierarchy = createFileHierarchy(files);
