@@ -37,7 +37,7 @@ export interface File {
 }
 
 export function isSnippet(part: Prompt_Part): part is Snippet {
-	return 'type' in part && part.type === 'snippet';
+	return 'type' in part && 'content' in part;
 }
 export function isFile(part: Prompt_Part): part is Snippet {
 	return !('type' in part);
