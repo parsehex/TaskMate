@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { updateFile } from '../api/files';
+import { updateFile, updateFiles } from '../api/files';
 import { FileNode } from '../file-hierarchy';
 import { useStore } from '../state';
 import File from './File/File';
@@ -10,6 +10,19 @@ interface DirectoryProps {
 	path: string;
 }
 
+const getChildFiles = (node: FileNode) => {
+	const files: FileNode[] = [];
+	if (node.children) {
+		for (let child of node.children) {
+			if (child.promptPart) {
+				files.push(child);
+			} else {
+				files.push(...getChildFiles(child));
+			}
+		}
+	}
+	return files;
+};
 const countIncludedFiles = (node: FileNode): number => {
 	let count = 0;
 
@@ -41,8 +54,9 @@ const countFileNodes = (count: number, node: FileNode): number => {
 };
 
 const Directory: React.FC<DirectoryProps> = ({ node, index, path }) => {
-	const [setFile, selectedPromptPart] = useStore((state) => [
-		state.setFile,
+	const [files, setFiles, selectedPromptPart] = useStore((state) => [
+		state.files,
+		state.setFiles,
 		state.selectedPromptPart,
 	]);
 	const [isCollapsed, setIsCollapsed] = useState(true);
@@ -64,18 +78,24 @@ const Directory: React.FC<DirectoryProps> = ({ node, index, path }) => {
 	}, [includedFileCount]);
 
 	const toggleIncludedForAll = async (node: FileNode, included: boolean) => {
-		if (node.promptPart && node.promptPart.included !== included) {
-			const data = { ...node.promptPart };
-			data.included = included;
-			const newFile = await updateFile(data.id, data);
-			setFile(newFile);
-		}
-
-		if (node.children) {
-			for (let child of node.children) {
-				await toggleIncludedForAll(child, included);
-			}
-		}
+		const childrenFiles = getChildFiles(node);
+		const updatedFiles = await updateFiles(
+			childrenFiles.map((file) => ({
+				id: file.promptPart?.id,
+				included,
+			}))
+		);
+		setFiles(
+			files.map((file) => {
+				const updatedFile = updatedFiles.find(
+					(updatedFile) => updatedFile.id === file.id
+				);
+				if (updatedFile) {
+					return updatedFile;
+				}
+				return file;
+			})
+		);
 	};
 	const handleSelectAllChange = async (e: React.MouseEvent) => {
 		e.stopPropagation();
