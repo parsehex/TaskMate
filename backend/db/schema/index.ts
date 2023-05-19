@@ -26,11 +26,28 @@ export async function updateSchema(db: AsyncDatabase) {
 	await db.exec(schemaContent);
 
 	// Get the current schema version
-	const currentVersionResult: any = await db.get(
+	let currentVersionResult: any = await db.get(
 		'SELECT MAX(version) as version FROM schema_versions'
 	);
-	const currentVersion = currentVersionResult?.version || 0;
 
+	// If no version is present (new DB), set the version to the latest migration version
+	if (!currentVersionResult.version) {
+		const versions = (await fs.readdir(MIGRATIONS_DIR))
+			.map((v: string) => parseInt(v.split('v')[1].split('.')[0]))
+			.sort((a, b) => b - a);
+		const latestVersion = versions[0];
+
+		await db.run(
+			'INSERT INTO schema_versions (version, applied_at) VALUES (?, ?)',
+			[latestVersion, new Date()]
+		);
+		console.log(
+			`New database created, schema set to version: v${latestVersion}`
+		);
+		return;
+	}
+
+	const currentVersion = currentVersionResult.version;
 	console.log(`Current schema version: v${currentVersion}`);
 
 	// get latest version and backup if we're going to migrate
