@@ -5,11 +5,6 @@ import * as url from 'url';
 import { initializeDatabase } from './db/index.js';
 import { initWebsocket } from './ws/index.js';
 import { scanProjectsRoot } from './project-scanner.js';
-import projectsRouter from './routes/projects.js';
-import snippetsRouter from './routes/snippets.js';
-import filesRouter from './routes/files.js';
-import summaryRouter from './routes/summary.js';
-import tokenCountRouter from './routes/token_count.js';
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -34,12 +29,6 @@ export const startServer = async () => {
 
 	const staticPath = path.join(__dirname, '../frontend');
 	app.use(express.static(staticPath));
-
-	app.use(projectsRouter);
-	app.use(snippetsRouter);
-	app.use(filesRouter);
-	app.use(summaryRouter);
-	app.use(tokenCountRouter);
 
 	app.get('/', (req, res) => {
 		res.sendFile(path.join(staticPath, 'index.html'));
