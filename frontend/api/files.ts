@@ -17,11 +17,8 @@ export const updateFile = async (
 	return convertBooleans(res, FileBooleanColumns);
 };
 export const updateFiles = async (data: Partial<File>[]): Promise<File[]> => {
-	const newFiles: File[] = [];
-	for (const file of data) {
-		newFiles.push(await updateFile(file.id!, file));
-	}
-	return newFiles;
+	const res = await FilesHandlers.UPDATE_FILES(data);
+	return res.map((file: any) => convertBooleans(file, FileBooleanColumns));
 };
 
 export const createFile = async (

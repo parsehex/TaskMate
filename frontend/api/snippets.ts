@@ -21,11 +21,10 @@ export const updateSnippet = async (
 export const updateSnippets = async (
 	data: Partial<Snippet>[]
 ): Promise<Snippet[]> => {
-	const newSnippets: Snippet[] = [];
-	for (const snippet of data) {
-		newSnippets.push(await updateSnippet(snippet.id!, snippet));
-	}
-	return newSnippets;
+	const res = await SnippetsHandlers.UPDATE_SNIPPETS(data);
+	return res.map((snippet: any) =>
+		convertBooleans(snippet, SnippetBooleanColumns)
+	);
 };
 
 export const createSnippet = async (
