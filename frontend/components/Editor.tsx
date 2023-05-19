@@ -37,8 +37,8 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 
 	useEffect(() => {
 		if (!promptPart) return;
-		if (!content || promptPart.content !== content) {
-			promptPart.content && setContent(promptPart.content);
+		if (promptPart.content !== content) {
+			setContent(promptPart.content || '');
 		}
 		if (!summary || promptPart.summary !== summary) {
 			setSummary(promptPart.summary);
