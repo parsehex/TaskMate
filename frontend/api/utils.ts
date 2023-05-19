@@ -11,12 +11,11 @@ interface GetTokenCountResponse {
 export const getTokenCount = async (
 	options: GetTokenCountOptions
 ): Promise<GetTokenCountResponse> => {
-	const { text, fileId, snippetId } = options;
-	if (text !== undefined && fileId === undefined && snippetId === undefined) {
+	if (Object.keys(options).every((key) => options[key] === undefined)) {
+		return { token_count: 0 };
+	} else {
 		const token_count = await UtilsHandlers.GET_TOKEN_COUNT(options);
 		return { token_count };
-	} else {
-		return { token_count: 0 };
 	}
 };
 

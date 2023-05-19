@@ -14,13 +14,15 @@ import { getTokenCount } from '../tokenizer.js';
 async function GET_TOKEN_COUNT(payload: GetTokenCountMessage) {
 	// data.payload is an object containing either a text prop or a promptPartId prop
 	let content = '';
-	let token_count = 0;
-	if (payload.text) {
+	if (payload.text !== undefined) {
 		content = payload.text;
-	} else if (payload.snippetId) {
+	} else if (payload.snippetId !== undefined) {
 		const snippet = await getSnippetById(payload.snippetId);
-		content = snippet.use_summary ? snippet.summary : snippet.content;
-	} else if (payload.fileId) {
+		content += snippet.use_title
+			? snippet.name + (snippet.use_summary ? ' (summary)' : '') + ':\n'
+			: '';
+		content += snippet.use_summary ? snippet.summary : snippet.content;
+	} else if (payload.fileId !== undefined) {
 		const file = await getFileById(payload.fileId);
 		if (file.use_summary) {
 			content = file.summary;
@@ -29,6 +31,7 @@ async function GET_TOKEN_COUNT(payload: GetTokenCountMessage) {
 			content = await readFileContents(p);
 		}
 	}
+
 	return getTokenCount(content);
 }
 
