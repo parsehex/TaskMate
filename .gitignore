@@ -3,3 +3,5 @@ dist*
 .parcel-cache
 .env
 *.sqlite3
+crossbar/.crossbar/*
+!crossbar/.crossbar/config.json
