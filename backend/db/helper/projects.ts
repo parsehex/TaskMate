@@ -1,6 +1,6 @@
 import { Project } from '../../../shared/types/index.js';
 import { db } from '../index.js';
-import { updateStatement } from '../sql-utils.js';
+import { insertStatement, updateStatement } from '../sql-utils.js';
 
 export const getProjects = async (
 	columns = '*',
@@ -26,8 +26,14 @@ export const getProjectById = async (id: number, columns = '*') => {
 	);
 	return project;
 };
-export const createProject = async (name: string) => {
-	const q = await db.run('INSERT INTO projects (name) VALUES (?)', [name]);
+export const createProject = async ({ name, ...project }: Partial<Project>) => {
+	if (!name) throw new Error('Project name is required');
+	const fieldsObj: Partial<Project> & { name: string } = {
+		name,
+		...project,
+	};
+	const { sql, values } = insertStatement('projects', fieldsObj);
+	const q = await db.run(sql, values);
 	return (await db.get('SELECT * FROM projects WHERE id = ?', [
 		q.lastID,
 	])) as Project;

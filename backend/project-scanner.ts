@@ -100,15 +100,11 @@ export async function scanProjectsRoot() {
 			let projectId: number;
 
 			if (!existingProject.length) {
-				// const { sql, values } = insertStatement('projects', {
-				// 	name: projectName,
-				// 	description: '',
-				// 	ignore_files: JSON.stringify(DefaultIgnoreFiles),
-				// 	created_at: new Date().toISOString(),
-				// });
-				// const { lastID } = await db.run(sql, values);
-				// projectId = lastID;
-				const project = await projectHelper.createProject(projectName);
+				const project = await projectHelper.createProject({
+					name: projectName,
+					description: '',
+					ignore_files: JSON.stringify(DefaultIgnoreFiles),
+				});
 				projectId = project.id;
 				console.log(`Added project: ${projectName}`);
 			} else {
