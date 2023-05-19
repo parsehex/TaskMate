@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS projects (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	name VARCHAR(255) UNIQUE NOT NULL,
-	description TEXT,
-	ignore_files TEXT,
+	description TEXT DEFAULT '',
+	ignore_files TEXT DEFAULT '[]',
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
