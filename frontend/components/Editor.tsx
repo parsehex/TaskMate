@@ -75,8 +75,7 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 		};
 	}, [handleKeyPress]);
 
-	const handleNameChange = async (event) => {
-		const newName = event.target.value;
+	const handleNameChange = async (newName: string) => {
 		if (!promptPart || promptPart.id < 0) return;
 		if (newName !== promptPart?.name) {
 			const setFunc = isSnippet(promptPart) ? setSnippet : setFile;
