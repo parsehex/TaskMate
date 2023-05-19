@@ -42,7 +42,7 @@ export const updateFile = async (
 		...file,
 	};
 	if (file.id) delete fieldsObj.id;
-
+	if (file.content) delete fieldsObj.content;
 	const { sql, values } = updateStatement('files', fieldsObj, { id });
 	await db.run(sql, values);
 	return await getFileById(id);
@@ -58,6 +58,7 @@ export const createFile = async (
 		updated_at: new Date().toISOString(),
 	});
 	if (file.id) delete file.id;
+	if (file.content) delete file.content;
 	const result = await db.run(sql, values);
 	return await getFileById(result.lastID);
 };
