@@ -1,4 +1,10 @@
-import React, { useState, forwardRef, useImperativeHandle, Ref } from 'react';
+import React, {
+	useState,
+	forwardRef,
+	useImperativeHandle,
+	Ref,
+	useEffect,
+} from 'react';
 
 interface EditableNameProps {
 	name: string;
@@ -13,12 +19,20 @@ const EditableName: React.ForwardRefRenderFunction<
 	EditableNameRef,
 	EditableNameProps
 > = ({ name, onNameChange }, ref) => {
+	const inputRef = React.useRef<HTMLInputElement>(null);
 	const [isEditing, setIsEditing] = useState(false);
 	const [newName, setNewName] = useState(name);
 
 	const triggerEdit = () => {
 		setIsEditing(true);
 	};
+
+	useEffect(() => {
+		if (isEditing && inputRef.current) {
+			inputRef.current.focus();
+			inputRef.current.setSelectionRange(0, inputRef.current.value.length);
+		}
+	}, [isEditing]);
 
 	useImperativeHandle(ref, () => ({
 		triggerEdit,
@@ -48,6 +62,7 @@ const EditableName: React.ForwardRefRenderFunction<
 
 	return isEditing ? (
 		<input
+			ref={inputRef}
 			type="text"
 			className="editable-name"
 			value={newName}

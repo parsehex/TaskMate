@@ -29,3 +29,16 @@ body {
 .flex-1 {
 	flex: 1;
 }
+
+.editable-name {
+	user-select: none;
+	&:hover {
+		cursor: pointer;
+	}
+	input {
+		color: black;
+		background-color: white;
+		border: none;
+		outline: none;
+	}
+}
