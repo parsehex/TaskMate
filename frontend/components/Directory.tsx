@@ -64,11 +64,9 @@ const Directory: React.FC<DirectoryProps> = ({ node, index, path }) => {
 
 	const handleToggle = () => setIsCollapsed(!isCollapsed);
 	const includedFileCount = countIncludedFiles(node);
-	// count node cildren recursively that have promptPart
-	const fileCount = node.children?.reduce(countFileNodes, 0) || 0;
 
 	useEffect(() => {
-		if (includedFileCount === 0 || includedFileCount < fileCount) {
+		if (includedFileCount === 0) {
 			setSelectAll(false); // Enable Select All
 		} else if (includedFileCount > 0) {
 			setSelectAll(true); // Enable Deselect All
