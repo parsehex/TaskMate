@@ -35,7 +35,12 @@ export const App: React.FC = () => {
 	} = useStore((state) => state);
 
 	useEffect(() => {
-		fetchProjects().then((projects) => setProjects(projects));
+		fetchProjects().then((projects) => {
+			const sortedProjects = projects.sort((a, b) =>
+				a.name.localeCompare(b.name)
+			);
+			setProjects(sortedProjects);
+		});
 
 		const selectedProjectId = localStorage.getItem('selectedProjectId');
 		if (selectedProjectId) {
