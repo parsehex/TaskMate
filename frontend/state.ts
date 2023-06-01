@@ -10,6 +10,7 @@ interface State {
 	includedPromptParts: Prompt_Part[];
 	promptTokenCount: number;
 	readOnly: boolean;
+	isConnected: boolean;
 
 	setProjects: (projects: Project[]) => void;
 	setSelectedProjectId: (projectId: number | null) => void;
@@ -21,6 +22,7 @@ interface State {
 	setIncludedPromptParts: (promptParts: Prompt_Part[]) => void;
 	setPromptTokenCount: (tokenCount: number) => void;
 	setReadOnly: (readOnly: boolean) => void;
+	setIsConnected: (isConnected: boolean) => void;
 }
 
 export const useStore = create<State>((set) => ({
@@ -32,6 +34,7 @@ export const useStore = create<State>((set) => ({
 	selectedPromptPart: null,
 	promptTokenCount: 0,
 	readOnly: false,
+	isConnected: false,
 
 	setProjects: (projects) => set({ projects }),
 	setSelectedProjectId: (projectId) => set({ selectedProjectId: projectId }),
@@ -55,4 +58,5 @@ export const useStore = create<State>((set) => ({
 		set({ includedPromptParts: promptParts }),
 	setPromptTokenCount: (tokenCount) => set({ promptTokenCount: tokenCount }),
 	setReadOnly: (readOnly) => set({ readOnly }),
+	setIsConnected: (isConnected) => set({ isConnected }),
 }));

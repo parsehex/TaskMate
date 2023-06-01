@@ -1,4 +1,5 @@
 import autobahn from 'autobahn';
+import { useStore } from '../state';
 
 let connection: autobahn.Connection | null = null;
 let session: autobahn.Session | null = null;
@@ -17,10 +18,12 @@ export async function initWebsocket() {
 		if (!connection) throw new Error('Connection is not initialized yet.');
 		connection.onopen = (s) => {
 			console.log('Connection opened!');
+			useStore.getState().setIsConnected(true);
 			resolve(s);
 		};
 		connection.onclose = (reason, details) => {
 			console.error('Connection closed. Reason: ' + reason);
+			useStore.getState().setIsConnected(false);
 			reject(new Error(reason));
 			return false;
 		};

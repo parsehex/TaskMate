@@ -14,6 +14,7 @@ import TokenCountDisplay from './TokenCountDisplay';
 import { fetchSnippets } from '../api/snippets';
 import { fetchFiles } from '../api/files';
 import { getTokenCount } from '../api/utils';
+import Alert from './Alert';
 
 export const App: React.FC = () => {
 	const {
@@ -23,6 +24,7 @@ export const App: React.FC = () => {
 		selectedPromptPart,
 		includedPromptParts,
 		promptTokenCount,
+		isConnected,
 
 		setProjects,
 		setFiles,
@@ -97,6 +99,9 @@ export const App: React.FC = () => {
 
 	return (
 		<div className="app">
+			{!isConnected && (
+				<Alert message="Connection lost. Changes may not be saved!" />
+			)}
 			<main>
 				<div className="left-sidebar">
 					<ProjectSelector />
