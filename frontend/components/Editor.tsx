@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import MonacoEditor from '@monaco-editor/react';
 import { Prompt_Part, Snippet, isSnippet } from '../../shared/types';
 import { updateFile } from '../api/files';
@@ -14,12 +14,15 @@ interface EditorProps {
 }
 
 const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
-	const [promptPart, setFile, setSnippet, readOnly] = useStore((state) => [
-		state.selectedPromptPart,
-		state.setFile,
-		state.setSnippet,
-		state.readOnly,
-	]);
+	const [promptPart, setFile, setSnippet, readOnly, setReadOnly, isConnected] =
+		useStore((state) => [
+			state.selectedPromptPart,
+			state.setFile,
+			state.setSnippet,
+			state.readOnly,
+			state.setReadOnly,
+			state.isConnected,
+		]);
 	const [content, setContent] = useState(promptPart?.content || '');
 	const [tokenCount, setTokenCount] = useState(0);
 	const [isSaved, setIsSaved] = useState(true);
@@ -34,6 +37,24 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 		useSummary: setUseSummary,
 		useTitle: setUseTitle,
 	};
+
+	const readOnlyState = useRef({
+		restore: false,
+		oldValue: false,
+	});
+
+	useEffect(() => {
+		// If we're not connected, set the editor to read-only and save
+		// the old value so we can restore it after we reconnect.
+		if (!isConnected) {
+			readOnlyState.current.restore = true;
+			readOnlyState.current.oldValue = readOnly;
+			setReadOnly(true);
+		} else if (readOnlyState.current.restore) {
+			setReadOnly(readOnlyState.current.oldValue);
+			readOnlyState.current.restore = false;
+		}
+	}, [isConnected]);
 
 	useEffect(() => {
 		if (!promptPart) return;

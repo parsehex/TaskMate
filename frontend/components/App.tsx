@@ -36,6 +36,13 @@ export const App: React.FC = () => {
 		setReadOnly,
 	} = useStore((state) => state);
 
+	const setReadOnlyValue = () => {
+		let readOnly = false;
+		if (selectedPromptPart?.id === -1) readOnly = true;
+		if (!isConnected) readOnly = true;
+		setReadOnly(readOnly);
+	};
+
 	useEffect(() => {
 		fetchProjects().then((projects) => {
 			const sortedProjects = projects.sort((a, b) =>
@@ -59,15 +66,11 @@ export const App: React.FC = () => {
 				setFiles(newFiles);
 			});
 		}
-		if (selectedPromptPart?.id !== -1) {
-			setReadOnly(false);
-		}
+		if (selectedPromptPart?.id !== -1) setReadOnlyValue();
 	}, [selectedProjectId]);
 
 	useEffect(() => {
-		if (selectedPromptPart?.id !== -1) {
-			setReadOnly(false);
-		}
+		setReadOnlyValue();
 	}, [selectedPromptPart]);
 
 	useEffect(() => {
@@ -92,9 +95,7 @@ export const App: React.FC = () => {
 
 	useEffect(() => {
 		updateIncludedPromptParts();
-		if (selectedPromptPart?.id !== -1) {
-			setReadOnly(false);
-		}
+		if (selectedPromptPart?.id !== -1) setReadOnlyValue();
 	}, [snippets, files]);
 
 	return (
