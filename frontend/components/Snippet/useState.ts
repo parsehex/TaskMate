@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef, ChangeEvent, MouseEvent } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { Snippet } from '../../../types';
+import { Snippet } from '../../../shared/types';
 import { updateSnippet } from '../../api/snippets';
 import { useStore } from '../../state';
 import { getTokenCount } from '../../api/utils';
 
 interface UseSnippetStateProps {
 	snippet: Snippet;
-	move: (dragIndex: number, hoverIndex: number) => void;
+	move: (dragIndex: number, hoverIndex: number) => Promise<void>;
 	index: number;
 	ref: React.RefObject<HTMLDivElement>;
 }
@@ -33,7 +33,6 @@ export const useSnippetState = ({
 			const dragIndex = item.index;
 			const hoverIndex = index;
 			if (dragIndex === hoverIndex) return;
-			console.log(dragIndex, hoverIndex);
 			await move(dragIndex, hoverIndex);
 			item.index = hoverIndex;
 		},

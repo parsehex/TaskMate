@@ -1,25 +1,28 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import MonacoEditor from '@monaco-editor/react';
-import { Prompt_Part, Snippet, isSnippet } from '../../types';
+import { Prompt_Part, Snippet, isSnippet } from '../../shared/types';
+import { updateFile } from '../api/files';
 import { updateSnippet } from '../api/snippets';
+import { generateSummary, getTokenCount } from '../api/utils';
 import { useStore } from '../state';
 import { detectFileLanguage } from '../utils';
 import EditableName from './EditableName';
 import TokenCountDisplay from './TokenCountDisplay';
-import { generateSummary, getTokenCount } from '../api/utils';
-import { updateFile } from '../api/files';
 
 interface EditorProps {
 	onContentChange?: (content: string) => void;
 }
 
 const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
-	const [promptPart, setFile, setSnippet, readOnly] = useStore((state) => [
-		state.selectedPromptPart,
-		state.setFile,
-		state.setSnippet,
-		state.readOnly,
-	]);
+	const [promptPart, setFile, setSnippet, readOnly, setReadOnly, isConnected] =
+		useStore((state) => [
+			state.selectedPromptPart,
+			state.setFile,
+			state.setSnippet,
+			state.readOnly,
+			state.setReadOnly,
+			state.isConnected,
+		]);
 	const [content, setContent] = useState(promptPart?.content || '');
 	const [tokenCount, setTokenCount] = useState(0);
 	const [isSaved, setIsSaved] = useState(true);
@@ -35,10 +38,28 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 		useTitle: setUseTitle,
 	};
 
+	const readOnlyState = useRef({
+		restore: false,
+		oldValue: false,
+	});
+
+	useEffect(() => {
+		// If we're not connected, set the editor to read-only and save
+		// the old value so we can restore it after we reconnect.
+		if (!isConnected) {
+			readOnlyState.current.restore = true;
+			readOnlyState.current.oldValue = readOnly;
+			setReadOnly(true);
+		} else if (readOnlyState.current.restore) {
+			setReadOnly(readOnlyState.current.oldValue);
+			readOnlyState.current.restore = false;
+		}
+	}, [isConnected]);
+
 	useEffect(() => {
 		if (!promptPart) return;
-		if (!content || promptPart.content !== content) {
-			promptPart.content && setContent(promptPart.content);
+		if (promptPart.content !== content) {
+			setContent(promptPart.content || '');
 		}
 		if (!summary || promptPart.summary !== summary) {
 			setSummary(promptPart.summary);
@@ -75,8 +96,7 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 		};
 	}, [handleKeyPress]);
 
-	const handleNameChange = async (event) => {
-		const newName = event.target.value;
+	const handleNameChange = async (newName: string) => {
 		if (!promptPart || promptPart.id < 0) return;
 		if (newName !== promptPart?.name) {
 			const setFunc = isSnippet(promptPart) ? setSnippet : setFile;

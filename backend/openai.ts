@@ -1,8 +1,8 @@
+import path from 'path';
 import { ChatOpenAI } from 'langchain/chat_models/openai';
 import { HumanChatMessage, SystemChatMessage } from 'langchain/schema';
-import { Prompt_Part, isFile } from '../types/index.js';
+import { Prompt_Part, isFile } from '../shared/types/index.js';
 import { getProjectById } from './db/helper/projects.js';
-import path from 'path';
 
 const chat = new ChatOpenAI({
 	openAIApiKey: process.env.OPENAI_API_KEY as string,
@@ -41,18 +41,21 @@ const getPromptByFileType = (fileName: string, fileExtension: string) => {
 	}
 };
 
-export const summarize = async (promptPart: Prompt_Part) => {
+export const summarize = async (
+	name: string,
+	content: string,
+	isSummary = false
+) => {
 	let prompt =
 		'Summarize the following block of text in a succinct but information-dense way.';
-	if (isFile(promptPart)) {
-		const project = await getProjectById(promptPart.project_id, 'name');
-		const projectName = project.name;
-		const fileExtension = path.extname(promptPart.name);
-		prompt = getPromptByFileType(promptPart.name, fileExtension);
+	if (name.includes('.')) {
+		const fileExtension = path.extname(name);
+		prompt = getPromptByFileType(name, fileExtension);
 	}
-	const text = promptPart.use_summary ? promptPart.summary : promptPart.content;
 	const response = await chat.call([
-		new HumanChatMessage(prompt + '\n\n' + promptPart.name + ':' + text),
+		new HumanChatMessage(
+			prompt + '\n\n' + name + (isSummary ? ' (summary)' : '') + ':' + content
+		),
 	]);
 	console.log(response);
 	return response;

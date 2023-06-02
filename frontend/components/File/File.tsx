@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { File } from '../../../types';
+import { File } from '../../../shared/types';
 import CopyPromptButton from '../CopyPromptButton';
 import TokenCountDisplay from '../TokenCountDisplay';
 import { useFileState } from './useState';

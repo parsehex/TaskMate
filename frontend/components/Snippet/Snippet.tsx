@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Snippet } from '../../../types';
+import { Snippet } from '../../../shared/types';
 import EditableName, { EditableNameRef } from '../EditableName';
 import CopyPromptButton from '../CopyPromptButton';
 import TokenCountDisplay from '../TokenCountDisplay';
@@ -10,7 +10,7 @@ import { Indicators } from './Indicators';
 
 interface SnippetProps {
 	snippet: Snippet;
-	move: (dragIndex: number, hoverIndex: number) => void;
+	move: (dragIndex: number, hoverIndex: number) => Promise<void>;
 	index: number;
 	selected: boolean;
 }
@@ -61,6 +61,7 @@ const Snippet: React.FC<SnippetProps> = ({
 				setMenuOpen={setMenuOpen}
 				anchorRef={ref}
 				editableNameRef={editableNameRef}
+				move={move}
 			/>
 			<main>
 				<div>

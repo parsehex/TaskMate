@@ -1,22 +1,17 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
-// import Router from 'express-static-gzip';
-import projectsRouter from './routes/projects.js';
-import snippetsRouter from './routes/snippets.js';
-import filesRouter from './routes/files.js';
-import summaryRouter from './routes/summary.js';
-import tokenCountRouter from './routes/token_count.js';
-import { initializeDatabase } from './db/index.js';
-import { scanProjectsRoot } from './project-scanner.js';
 import * as url from 'url';
+import { initializeDatabase } from './db/index.js';
+import { initWebsocket } from './ws/index.js';
+import { scanProjectsRoot } from './project-scanner.js';
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 console.log('Starting server...');
 
 const app = express();
-const port = 8080;
+const port = +(process.env.SERVER_PORT as string) || 3000;
 
 export const startServer = async () => {
 	await initializeDatabase();
@@ -26,19 +21,14 @@ export const startServer = async () => {
 	await scanProjectsRoot();
 	console.log('Scanned projects root');
 
+	await initWebsocket();
+	console.log(`Connected to WebSocket on port ${process.env.WEBSOCKET_PORT}`);
+
 	app.use(cors());
 	app.use(express.json());
 
 	const staticPath = path.join(__dirname, '../frontend');
 	app.use(express.static(staticPath));
-
-	app.use(projectsRouter);
-	app.use(snippetsRouter);
-	app.use(filesRouter);
-	app.use(summaryRouter);
-	app.use(tokenCountRouter);
-
-	// app.use('/', Router(staticPath, { enableBrotli: true }));
 
 	app.get('/', (req, res) => {
 		res.sendFile(path.join(staticPath, 'index.html'));

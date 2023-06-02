@@ -29,3 +29,29 @@ body {
 .flex-1 {
 	flex: 1;
 }
+
+.editable-name {
+	user-select: none;
+	&:hover {
+		cursor: pointer;
+	}
+	input {
+		color: black;
+		background-color: white;
+		border: none;
+		outline: none;
+	}
+}
+
+.alert {
+	padding: 1rem;
+	margin-bottom: 1rem;
+	border: 1px solid transparent;
+	border-radius: 0.25rem;
+
+	&.alert-danger {
+		color: #721c24;
+		background-color: #f8d7da;
+		border-color: #f5c6cb;
+	}
+}

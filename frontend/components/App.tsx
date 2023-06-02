@@ -14,6 +14,7 @@ import TokenCountDisplay from './TokenCountDisplay';
 import { fetchSnippets } from '../api/snippets';
 import { fetchFiles } from '../api/files';
 import { getTokenCount } from '../api/utils';
+import Alert from './Alert';
 
 export const App: React.FC = () => {
 	const {
@@ -23,6 +24,7 @@ export const App: React.FC = () => {
 		selectedPromptPart,
 		includedPromptParts,
 		promptTokenCount,
+		isConnected,
 
 		setProjects,
 		setFiles,
@@ -34,8 +36,20 @@ export const App: React.FC = () => {
 		setReadOnly,
 	} = useStore((state) => state);
 
+	const setReadOnlyValue = () => {
+		let readOnly = false;
+		if (selectedPromptPart?.id === -1) readOnly = true;
+		if (!isConnected) readOnly = true;
+		setReadOnly(readOnly);
+	};
+
 	useEffect(() => {
-		fetchProjects().then((projects) => setProjects(projects));
+		fetchProjects().then((projects) => {
+			const sortedProjects = projects.sort((a, b) =>
+				a.name.localeCompare(b.name)
+			);
+			setProjects(sortedProjects);
+		});
 
 		const selectedProjectId = localStorage.getItem('selectedProjectId');
 		if (selectedProjectId) {
@@ -44,7 +58,7 @@ export const App: React.FC = () => {
 	}, []);
 
 	useEffect(() => {
-		if (selectedProjectId) {
+		if (selectedProjectId !== null && Number.isInteger(selectedProjectId)) {
 			fetchSnippets(selectedProjectId).then((newSnippets) => {
 				setSnippets(newSnippets);
 			});
@@ -52,15 +66,11 @@ export const App: React.FC = () => {
 				setFiles(newFiles);
 			});
 		}
-		if (selectedPromptPart?.id !== -1) {
-			setReadOnly(false);
-		}
+		if (selectedPromptPart?.id !== -1) setReadOnlyValue();
 	}, [selectedProjectId]);
 
 	useEffect(() => {
-		if (selectedPromptPart?.id !== -1) {
-			setReadOnly(false);
-		}
+		setReadOnlyValue();
 	}, [selectedPromptPart]);
 
 	useEffect(() => {
@@ -85,13 +95,14 @@ export const App: React.FC = () => {
 
 	useEffect(() => {
 		updateIncludedPromptParts();
-		if (selectedPromptPart?.id !== -1) {
-			setReadOnly(false);
-		}
+		if (selectedPromptPart?.id !== -1) setReadOnlyValue();
 	}, [snippets, files]);
 
 	return (
 		<div className="app">
+			{!isConnected && (
+				<Alert message="Connection lost. Changes may not be saved!" />
+			)}
 			<main>
 				<div className="left-sidebar">
 					<ProjectSelector />

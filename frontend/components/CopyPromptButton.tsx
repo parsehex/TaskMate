@@ -1,7 +1,7 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCopy } from '@fortawesome/free-solid-svg-icons';
-import { Prompt_Part } from '../../types';
+import { Prompt_Part } from '../../shared/types';
 import { makePrompt } from '../utils';
 import { fetchFiles } from '../api/files';
 import { fetchSnippets } from '../api/snippets';

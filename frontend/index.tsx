@@ -6,10 +6,15 @@ import '@szhsin/react-menu/dist/index.css';
 import 'react-tooltip/dist/react-tooltip.css';
 import './scss/style.scss';
 import { App } from './components/App';
+import { initWebsocket } from './ws';
 
-const root = createRoot(document.getElementById('root') as HTMLDivElement);
-root.render(
-	<DndProvider backend={HTML5Backend}>
-		<App />
-	</DndProvider>
-);
+(async () => {
+	await initWebsocket();
+
+	const root = createRoot(document.getElementById('root') as HTMLDivElement);
+	root.render(
+		<DndProvider backend={HTML5Backend}>
+			<App />
+		</DndProvider>
+	);
+})();

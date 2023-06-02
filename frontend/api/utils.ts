@@ -1,3 +1,5 @@
+import UtilsHandlers from '../ws/utils';
+
 interface GetTokenCountOptions {
 	text?: string;
 	fileId?: number;
@@ -9,24 +11,11 @@ interface GetTokenCountResponse {
 export const getTokenCount = async (
 	options: GetTokenCountOptions
 ): Promise<GetTokenCountResponse> => {
-	const { text, fileId, snippetId } = options;
-	if (text) {
-		const response = await fetch('/api/count_tokens', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({ text }),
-		});
-		return await response.json();
-	} else if (fileId) {
-		const response = await fetch(`/api/files/${fileId}/token_count`);
-		return await response.json();
-	} else if (snippetId) {
-		const response = await fetch(`/api/snippets/${snippetId}/token_count`);
-		return await response.json();
-	} else {
+	if (Object.keys(options).every((key) => options[key] === undefined)) {
 		return { token_count: 0 };
+	} else {
+		const token_count = await UtilsHandlers.GET_TOKEN_COUNT(options);
+		return { token_count };
 	}
 };
 
@@ -41,12 +30,9 @@ export const generateSummary = async (
 	options: GenerateSummaryOptions
 ): Promise<GenerateSummaryResponse> => {
 	const { fileId, snippetId } = options;
-	if (fileId) {
-		const response = await fetch(`/api/files/${fileId}/generate_summary`);
-		return await response.json();
-	} else if (snippetId) {
-		const response = await fetch(`/api/snippets/${snippetId}/generate_summary`);
-		return await response.json();
+	if (fileId !== undefined || snippetId !== undefined) {
+		const data = await UtilsHandlers.GENERATE_SUMMARY(options);
+		return { data: { text: data } };
 	} else {
 		return { data: { text: '' } };
 	}

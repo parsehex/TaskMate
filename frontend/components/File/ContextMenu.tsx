@@ -1,6 +1,6 @@
 import React from 'react';
 import { ControlledMenu, MenuItem, ClickEvent } from '@szhsin/react-menu';
-import { File } from '../../../types';
+import { File } from '../../../shared/types';
 import { deleteFile, updateFile } from '../../api/files';
 import { useStore } from '../../state';
 
@@ -28,21 +28,19 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
 		// note because the way the project scanner works, we should add just the file's name, not the full path (which is the promptPart.name)
 	};
 	const handleMenuUseSummary = async () => {
-		const data = { ...file };
-		data.use_summary = !data.use_summary;
-		const updatedFile = await updateFile(data.id, data);
+		const data: Partial<File> = {};
+		data.use_summary = !file.use_summary;
+		const updatedFile = await updateFile(file.id, data);
 		if (!updatedFile) return;
 		setFile(updatedFile);
 	};
 	const handleMenuUseTitle = async () => {
-		const data = { ...file };
-		data.use_title = !data.use_title;
-		const updatedFile = await updateFile(data.id, data);
+		const data: Partial<File> = {};
+		data.use_title = !file.use_title;
+		const updatedFile = await updateFile(file.id, data);
 		if (!updatedFile) return;
 		setFile(updatedFile);
 	};
-	const handleMenuMoveUp = () => {};
-	const handleMenuMoveDown = () => {};
 	const handleMenuDelete = async () => {
 		const { id } = file;
 		await deleteFile(id);
@@ -54,13 +52,8 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
 		e.stopPropagation = true;
 		e.syntheticEvent.preventDefault();
 		e.syntheticEvent.stopPropagation();
-		const value:
-			| 'ignore-file'
-			| 'use-summary'
-			| 'use-title'
-			| 'move-up'
-			| 'move-down'
-			| 'delete' = e.value;
+		const value: 'ignore-file' | 'use-summary' | 'use-title' | 'delete' =
+			e.value;
 		switch (value) {
 			case 'ignore-file':
 				handleMenuIgnoreFile();
@@ -70,12 +63,6 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
 				break;
 			case 'use-title':
 				handleMenuUseTitle();
-				break;
-			case 'move-up':
-				handleMenuMoveUp();
-				break;
-			case 'move-down':
-				handleMenuMoveDown();
 				break;
 			case 'delete':
 				handleMenuDelete();
@@ -112,8 +99,6 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
 			<MenuItem type="checkbox" value="use-title" checked={file.use_title}>
 				Use Title
 			</MenuItem>
-			<MenuItem value="move-up">Move Up</MenuItem>
-			<MenuItem value="move-down">Move Down</MenuItem>
 			<MenuItem value="delete">Delete</MenuItem>
 		</ControlledMenu>
 	);
