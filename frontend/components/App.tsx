@@ -65,6 +65,7 @@ export const App: React.FC = () => {
 			fetchFiles(selectedProjectId).then((newFiles) => {
 				setFiles(newFiles);
 			});
+			setSelectedPromptPart(null);
 		}
 		if (selectedPromptPart?.id !== -1) setReadOnlyValue();
 	}, [selectedProjectId]);
