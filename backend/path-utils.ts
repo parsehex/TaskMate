@@ -1,18 +1,14 @@
 import path from 'path';
-import { glob } from 'glob';
-import { DefaultIgnoreFiles } from './const.js';
+import { minimatch } from 'minimatch';
 import { db } from './db/index.js';
 
-export async function shouldIgnorePath(
+export function shouldIgnorePath(
 	ignoreFiles: string[],
 	itemPath: string
-): Promise<boolean> {
-	const ignoreFileMatches = await Promise.all(
-		ignoreFiles.map((ignoreFile) => glob(ignoreFile))
-	);
-	const ignoreFileMatchesFlat = ignoreFileMatches.flat();
-	const shouldIgnore = ignoreFileMatchesFlat.some((ignoreFileMatch) =>
-		itemPath.includes(ignoreFileMatch)
+): boolean {
+	// Check if any of the ignore patterns match the itemPath
+	const shouldIgnore = ignoreFiles.some((ignorePattern) =>
+		minimatch(itemPath, ignorePattern, { dot: true })
 	);
 	return shouldIgnore;
 }

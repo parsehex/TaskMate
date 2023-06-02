@@ -16,7 +16,9 @@ async function createFilesForProject(
 	const projectPath = getProjectPath(projectName, folderPath);
 
 	const project = await projectHelper.getProjectById(projectId, 'ignore_files');
-	const ignoreFiles = project ? JSON.parse(project.ignore_files) : [];
+	const ignoreFiles = project
+		? JSON.parse(project.ignore_files)
+		: DefaultIgnoreFiles;
 
 	const items: Dirent[] = await fs.readdir(projectPath, {
 		withFileTypes: true,
@@ -26,7 +28,7 @@ async function createFilesForProject(
 		const itemName = item.name;
 		const itemPath = path.join(folderPath, itemName).replace(/\\/g, '/');
 
-		if (await shouldIgnorePath(ignoreFiles, itemName)) {
+		if (shouldIgnorePath(ignoreFiles, itemPath)) {
 			continue;
 		}
 
@@ -52,12 +54,16 @@ async function createFilesForProject(
 
 async function watchProjectFolder(projectId: number, projectName: string) {
 	const projectPath = getProjectPath(projectName);
+	const project = await projectHelper.getProjectById(projectId, 'ignore_files');
+	const ignoreFiles = project
+		? JSON.parse(project.ignore_files)
+		: DefaultIgnoreFiles;
 
 	const handleFileChange = async (eventType: string, fileName: string) => {
 		const filePath = path.join(projectPath, fileName);
 		const fileExistsFlag = await fileExists(filePath);
 
-		if (await shouldIgnorePath(DefaultIgnoreFiles, fileName)) {
+		if (shouldIgnorePath(ignoreFiles, filePath)) {
 			return;
 		}
 
