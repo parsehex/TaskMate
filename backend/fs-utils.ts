@@ -45,3 +45,8 @@ export async function renameFile(
 		await fs.rename(oldPath, newPath);
 	} catch (e: any) {}
 }
+
+export async function isDirectory(path: string): Promise<boolean> {
+	const stat = await fs.stat(path);
+	return stat.isDirectory();
+}

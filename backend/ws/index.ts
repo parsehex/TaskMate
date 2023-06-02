@@ -6,7 +6,7 @@ import utilsHandlers from './utils.js';
 import { MessageHandlers } from '../../shared/types/ws/index.js';
 
 let connection: autobahn.Connection | null = null;
-let session: autobahn.Session | null = null;
+export let session: autobahn.Session | null = null;
 
 const port = +(process.env.WEBSOCKET_PORT as string) || 8181;
 

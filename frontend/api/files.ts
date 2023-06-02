@@ -2,7 +2,7 @@ import { File } from '../../shared/types';
 import FilesHandlers from '../ws/files';
 import { convertBooleans } from './utils';
 
-const FileBooleanColumns = ['included', 'use_title', 'use_summary'];
+export const FileBooleanColumns = ['included', 'use_title', 'use_summary'];
 
 export const fetchFiles = async (projectId?: number): Promise<File[]> => {
 	const files = await FilesHandlers.GET_FILES(projectId);

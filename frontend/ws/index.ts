@@ -1,4 +1,7 @@
 import autobahn from 'autobahn';
+import { File } from '../../shared/types/index.js';
+import { FileBooleanColumns } from '../api/files';
+import { convertBooleans } from '../api/utils';
 import { useStore } from '../state';
 
 let connection: autobahn.Connection | null = null;
@@ -17,8 +20,23 @@ export async function initWebsocket() {
 	session = await new Promise<autobahn.Session>((resolve, reject) => {
 		if (!connection) throw new Error('Connection is not initialized yet.');
 		connection.onopen = (s) => {
-			console.log('Connection opened!');
-			useStore.getState().setIsConnected(true);
+			const { setIsConnected, setFiles } = useStore.getState();
+			console.log('Connection opened!2');
+			setIsConnected(true);
+			s.subscribe('file.added', (args: [number, File] | undefined) => {
+				console.log('File added:', args);
+				if (!args) return;
+				const [projectId, file] = args;
+				const files = useStore.getState().files;
+				setFiles([...files, convertBooleans(file, FileBooleanColumns)]);
+			});
+			s.subscribe('file.removed', (args: [number, number] | undefined) => {
+				console.log('File removed:', args);
+				if (!args) return;
+				const [projectId, fileId] = args;
+				const files = useStore.getState().files;
+				setFiles(files.filter((file) => file.id !== fileId));
+			});
 			resolve(s);
 		};
 		connection.onclose = (reason, details) => {

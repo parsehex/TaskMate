@@ -1,9 +1,10 @@
+import { Dirent } from 'fs';
 import fs from 'fs-extra';
 import path from 'path';
-import { Dirent } from 'fs';
-import * as projectHelper from './db/helper/projects.js';
 import * as fileHelper from './db/helper/files.js';
-import { fileExists } from './fs-utils.js';
+import * as projectHelper from './db/helper/projects.js';
+import { session } from './ws/index.js';
+import { fileExists, isDirectory } from './fs-utils.js';
 import { shouldIgnorePath, getProjectPath } from './path-utils.js';
 import { DefaultIgnoreFiles } from './const.js';
 
@@ -36,8 +37,12 @@ async function createFilesForProject(
 			});
 
 			if (!existingFiles.length) {
-				await fileHelper.createFile(projectId, { name: itemPath });
+				const file = await fileHelper.createFile(projectId, { name: itemPath });
 				console.log(`Added file: ${itemPath} to project: ${projectName}`);
+
+				if (session) {
+					session.publish('file.added', [projectId, file]);
+				}
 			}
 		} else if (item.isDirectory()) {
 			await createFilesForProject(projectId, projectName, itemPath);
@@ -56,6 +61,8 @@ async function watchProjectFolder(projectId: number, projectName: string) {
 			return;
 		}
 
+		if (await isDirectory(filePath)) return;
+
 		if (!fileExistsFlag) {
 			// File does not exist, it means it was deleted or renamed
 			const existingFile = await fileHelper.getFiles('id', {
@@ -68,9 +75,28 @@ async function watchProjectFolder(projectId: number, projectName: string) {
 				console.log(
 					`Removed file from db: ${fileName} from project: ${projectName}`
 				);
+
+				if (session) {
+					session.publish('file.removed', [projectId, existingFile[0].id]);
+				}
 			}
 
 			return;
+		}
+
+		// File exists, check if it is a new file
+		const existingFiles = await fileHelper.getFiles('id', {
+			project_id: projectId,
+			name: fileName,
+		});
+
+		if (!existingFiles.length) {
+			const file = await fileHelper.createFile(projectId, { name: fileName });
+			console.log(`Added file: ${fileName} to project: ${projectName}`);
+
+			if (session) {
+				session.publish('file.added', [projectId, file]);
+			}
 		}
 	};
 	fs.watch(projectPath, (eventType, fileName) => {
