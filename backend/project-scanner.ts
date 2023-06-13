@@ -67,7 +67,7 @@ async function watchProjectFolder(projectId: number, projectName: string) {
 			return;
 		}
 
-		if (await isDirectory(filePath)) return;
+		if (fileExistsFlag && (await isDirectory(filePath))) return;
 
 		if (!fileExistsFlag) {
 			// File does not exist, it means it was deleted or renamed
