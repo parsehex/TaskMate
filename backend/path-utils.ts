@@ -1,4 +1,5 @@
 import path from 'path';
+import fs from 'fs-extra';
 import { minimatch } from 'minimatch';
 import { db } from './db/index.js';
 
@@ -13,14 +14,29 @@ export function shouldIgnorePath(
 	return shouldIgnore;
 }
 
-export function getProjectPath(projectName: string, folderPath = ''): string {
-	if (!folderPath)
-		return path.join(process.env.PROJECTS_ROOT as string, projectName);
-	return path.join(
-		process.env.PROJECTS_ROOT as string,
-		projectName,
-		folderPath
-	);
+const pathCache: { [key: string]: string } = {};
+
+export async function getProjectPath(
+	projectName: string,
+	folderPath = ''
+): Promise<string> {
+	if (pathCache[projectName]) {
+		return folderPath
+			? path.join(pathCache[projectName], folderPath)
+			: pathCache[projectName];
+	}
+
+	let base = path.join(process.env.PROJECTS_ROOT as string, projectName);
+	const stat = await fs.stat(base);
+
+	if (stat.isSymbolicLink()) {
+		base = await fs.realpath(base);
+	}
+
+	pathCache[projectName] = base; // Add to cache
+
+	if (!folderPath) return base;
+	return path.join(base, folderPath);
 }
 export function getProjectPathLookup(
 	project_id: number,

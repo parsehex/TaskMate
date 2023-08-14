@@ -13,7 +13,7 @@ async function createFilesForProject(
 	projectName: string,
 	folderPath = ''
 ) {
-	const projectPath = getProjectPath(projectName, folderPath);
+	const projectPath = await getProjectPath(projectName, folderPath);
 
 	const project = await projectHelper.getProjectById(projectId, 'ignore_files');
 	const ignoreFiles = project
@@ -23,6 +23,8 @@ async function createFilesForProject(
 	const items: Dirent[] = await fs.readdir(projectPath, {
 		withFileTypes: true,
 	});
+	// if (projectName === 'Stock Watcher')
+	// 	console.log(folderPath + '/' || 'StockWatcher/', items);
 
 	for (const item of items) {
 		const itemName = item.name;
@@ -53,7 +55,7 @@ async function createFilesForProject(
 }
 
 async function watchProjectFolder(projectId: number, projectName: string) {
-	const projectPath = getProjectPath(projectName);
+	const projectPath = await getProjectPath(projectName);
 	const project = await projectHelper.getProjectById(projectId, 'ignore_files');
 	const ignoreFiles = project
 		? JSON.parse(project.ignore_files)
@@ -121,7 +123,9 @@ export async function scanProjectsRoot() {
 
 	try {
 		const items = await fs.readdir(projectsRoot, { withFileTypes: true });
-		const directories = items.filter((item) => item.isDirectory());
+		const directories = items.filter(
+			(item) => item.isDirectory() || item.isSymbolicLink()
+		);
 
 		for (const dir of directories) {
 			const projectName = dir.name;
