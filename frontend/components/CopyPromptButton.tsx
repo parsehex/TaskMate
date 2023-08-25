@@ -16,6 +16,7 @@ const CopyPromptButton: React.FC<CopyPromptButtonProps> = ({
 	promptParts,
 	label = 'Copy Prompt',
 }) => {
+	const [isLoading, setIsLoading] = React.useState(false);
 	const [selectedProjectId, setFiles, setSnippets] = useStore((state) => [
 		state.selectedProjectId,
 		state.setFiles,
@@ -29,6 +30,7 @@ const CopyPromptButton: React.FC<CopyPromptButtonProps> = ({
 	) => {
 		e.preventDefault();
 		e.stopPropagation();
+		setIsLoading(true);
 		if (selectedProjectId) {
 			// refresh parts
 			await fetchFiles(selectedProjectId).then((promptParts) => {
@@ -68,10 +70,11 @@ const CopyPromptButton: React.FC<CopyPromptButtonProps> = ({
 				}
 			);
 		}
+		setIsLoading(false);
 	};
 
 	return (
-		<button onClick={copyPromptToClipboard}>
+		<button onClick={copyPromptToClipboard} disabled={isLoading}>
 			{label !== '' ? label : ''}
 			{label === '' ? <FontAwesomeIcon icon={faCopy} /> : ''}
 		</button>
