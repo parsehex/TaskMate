@@ -7,7 +7,7 @@ import {
 import { getFileById } from '../db/helper/files.js';
 import { getSnippetById } from '../db/helper/snippets.js';
 import { readFileContents } from '../fs-utils.js';
-import { summarize } from '../openai.js';
+import { summarize } from '../openai/index.js';
 import { getProjectPathLookup } from '../path-utils.js';
 import { getTokenCount } from '../tokenizer.js';
 
