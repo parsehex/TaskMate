@@ -52,6 +52,9 @@ async function GENERATE_SUMMARY(payload: GenerateSummaryMessage) {
 		throw new Error('No snippetId or fileId provided');
 	}
 	const summary = await summarize(part.name, content, part.use_summary);
+	if (!summary) {
+		return 'No summary generated';
+	}
 	return summary.text;
 }
 

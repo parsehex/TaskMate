@@ -25,7 +25,7 @@
 		"b:watch": "nodemon -r dotenv/config --watch dist/backend dist/backend/index.js",
 		"b:build": "tsc -p backend",
 		"server": "node -r dotenv/config dist/backend/index.js",
-		"ws": "docker run -v $PWD/crossbar:/node -it -p 8585:8585 crossbario/crossbar",
+		"ws": "docker run -it -p 8585:8080 crossbario/crossbar",
 		"reset": "npm run f:reset && npm run b:reset",
 		"build": "npm run f:build && npm run b:build",
 		"start": "concurrently \"npm run f:dev\" \"npm run b:dev\""
@@ -64,7 +64,7 @@
 		"zustand": "^4.3.8"
 	},
 	"devDependencies": {
-		"@parcel/transformer-sass": "^2.8.3",
+		"@parcel/transformer-sass": "^2.9.3",
 		"@types/autobahn": "^20.9.1",
 		"@types/cors": "^2.8.13",
 		"@types/dotenv": "^8.2.0",
@@ -84,7 +84,7 @@
 		"events": "^3.3.0",
 		"nodemon": "^2.0.22",
 		"os-browserify": "^0.3.0",
-		"parcel": "^2.8.3",
+		"parcel": "^2.9.3",
 		"path-browserify": "^1.0.1",
 		"process": "^0.11.10",
 		"punycode": "^1.4.1",
