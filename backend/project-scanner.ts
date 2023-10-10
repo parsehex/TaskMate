@@ -71,9 +71,9 @@ async function watchProjectFolder(projectId: number, projectName: string) {
 		const filePath = path.join(projectPath, fileName);
 		const fileExists = await fileExistsFunc(filePath);
 
-		if (shouldIgnorePath(ignoreFiles, filePath)) {
-			return;
-		}
+		// Ignore temp files, including where the name is something like "7D6D9E10"
+		if (fileName.endsWith('.tmp')) return;
+		if (fileName.match(/^[0-9A-F]{8}$/)) return;
 
 		if (fileExists && (await isDirectory(filePath))) return;
 
