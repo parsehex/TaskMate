@@ -68,6 +68,7 @@ async function watchProjectFolder(projectId: number, projectName: string) {
 		: DefaultIgnoreFiles;
 
 	const handleFileChange = async (eventType: string, fileName: string) => {
+		// will be called when a file in the project folder is changed
 		const filePath = path.join(projectPath, fileName);
 		const fileExists = await fileExistsFunc(filePath);
 
@@ -76,6 +77,7 @@ async function watchProjectFolder(projectId: number, projectName: string) {
 		if (fileName.match(/^[0-9A-F]{8}$/)) return;
 
 		if (fileExists && (await isDirectory(filePath))) return;
+		if (shouldIgnorePath(ignoreFiles, fileName)) return;
 
 		const projectFilesSnippet = (await getSnippetsByProjectId(projectId)).find(
 			(snippet) => snippet.name === 'Project Files'
