@@ -59,10 +59,18 @@ const Directory: React.FC<DirectoryProps> = ({ node, index, path }) => {
 		state.setFiles,
 		state.selectedPromptPart,
 	]);
-	const [isCollapsed, setIsCollapsed] = useState(true);
+	const storedState = localStorage.getItem(`dir-${path}`);
+	const [isCollapsed, setIsCollapsed] = useState(
+		storedState ? JSON.parse(storedState) : true
+	);
 	const [selectAll, setSelectAll] = useState(false);
 
-	const handleToggle = () => setIsCollapsed(!isCollapsed);
+	const handleToggle = () => {
+		const newState = !isCollapsed;
+		setIsCollapsed(newState);
+		localStorage.setItem(`dir-${path}`, JSON.stringify(newState));
+	};
+
 	const includedFileCount = countIncludedFiles(node);
 
 	useEffect(() => {

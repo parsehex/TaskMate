@@ -83,7 +83,6 @@ async function watchProjectFolder(projectId: number, projectName: string) {
 			(snippet) => snippet.name === 'Project Files'
 		);
 		if (projectFilesSnippet) {
-			console.log('Updating Project Files snippet2');
 			const structure = await generateFolderStructure(projectId, projectName);
 			await updateSnippet(projectFilesSnippet.id, { content: structure });
 		}
