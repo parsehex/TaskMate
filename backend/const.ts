@@ -1,14 +1,24 @@
 export const DefaultIgnoreFiles = [
+	'**/.git',
 	'**/.git/**',
+	'**/.parcel-cache',
 	'**/.parcel-cache/**',
+	'**/.vscode',
+	'**/.vscode/**',
+	'**/node_modules',
 	'**/node_modules/**',
 	'**/*-lock.*',
 	'**/*.psd',
 	'**/*.sqlite3',
+	'**/*.sqlite3-journal',
 	'**/*.xlsx',
 	'**/.env',
+	'**/.env.sample',
+	'**/venv',
 	'**/venv/**',
+	'**/.venv',
 	'**/.venv/**',
+	'**/__pycache__',
 	'**/__pycache__/**',
 	'**/*.ipynb',
 	'**/*.pyc',
@@ -16,5 +26,6 @@ export const DefaultIgnoreFiles = [
 	'**/*.wav',
 
 	// temp
+	'**/dist',
 	'**/dist/**',
 ];
