@@ -4,9 +4,15 @@ import path from 'path';
 import * as fileHelper from './db/helper/files.js';
 import * as projectHelper from './db/helper/projects.js';
 import { session } from './ws/index.js';
-import { fileExists, isDirectory } from './fs-utils.js';
+import { fileExists as fileExistsFunc, isDirectory } from './fs-utils.js';
 import { shouldIgnorePath, getProjectPath } from './path-utils.js';
 import { DefaultIgnoreFiles } from './const.js';
+import {
+	getSnippetsByProjectId,
+	updateSnippet,
+	createSnippet,
+} from './db/helper/snippets.js';
+import { generateFolderStructure } from './projectfiles-note.js';
 
 async function createFilesForProject(
 	projectId: number,
@@ -63,15 +69,24 @@ async function watchProjectFolder(projectId: number, projectName: string) {
 
 	const handleFileChange = async (eventType: string, fileName: string) => {
 		const filePath = path.join(projectPath, fileName);
-		const fileExistsFlag = await fileExists(filePath);
+		const fileExists = await fileExistsFunc(filePath);
 
 		if (shouldIgnorePath(ignoreFiles, filePath)) {
 			return;
 		}
 
-		if (fileExistsFlag && (await isDirectory(filePath))) return;
+		if (fileExists && (await isDirectory(filePath))) return;
 
-		if (!fileExistsFlag) {
+		const projectFilesSnippet = (await getSnippetsByProjectId(projectId)).find(
+			(snippet) => snippet.name === 'Project Files'
+		);
+		if (projectFilesSnippet) {
+			console.log('Updating Project Files snippet2');
+			const structure = await generateFolderStructure(projectId, projectName);
+			await updateSnippet(projectFilesSnippet.id, { content: structure });
+		}
+
+		if (!fileExists) {
 			// File does not exist, it means it was deleted or renamed
 			const existingFile = await fileHelper.getFiles('id', {
 				project_id: projectId,
@@ -146,6 +161,15 @@ export async function scanProjectsRoot() {
 			} else {
 				projectId = existingProject[0].id;
 				console.log('Found existing project:', projectName);
+			}
+
+			const projectFilesSnippet = (
+				await getSnippetsByProjectId(projectId)
+			).find((snippet) => snippet.name === 'Project Files');
+			if (projectFilesSnippet) {
+				console.log('Updating Project Files snippet2');
+				const structure = await generateFolderStructure(projectId, projectName);
+				await updateSnippet(projectFilesSnippet.id, { content: structure });
 			}
 
 			await watchProjectFolder(projectId, projectName);
