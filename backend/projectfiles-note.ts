@@ -18,14 +18,14 @@ export async function generateFolderStructure(
 	folderPath = '',
 	indent = 0
 ): Promise<string> {
-	const projectPath = await getProjectPath(projectName, folderPath);
+	const projectFolderPath = await getProjectPath(projectName, folderPath);
 
 	const project = await projectHelper.getProjectById(projectId, 'ignore_files');
 	const ignoreFiles = project
 		? JSON.parse(project.ignore_files)
 		: DefaultIgnoreFiles;
 
-	let items: Dirent[] = await fs.readdir(projectPath, {
+	let items: Dirent[] = await fs.readdir(projectFolderPath, {
 		withFileTypes: true,
 	});
 
@@ -70,16 +70,36 @@ export async function generateFolderStructure(
 	}
 
 	// Handle files
+	const descriptions = await getFileDescriptions(projectFolderPath);
 	for (const ext in fileGroups) {
 		if (fileGroups[ext].length > 1) {
 			const baseNames = fileGroups[ext]
-				.map((f) => path.basename(f.name, ext))
-				.join(',');
-			structure += `${indentation}(${baseNames})${ext}\n`;
+				.map((f) => {
+					const baseName = path.basename(f.name, ext);
+					const description = descriptions[f.name];
+					return description ? `${baseName}:${description}` : baseName;
+				})
+				.join(','); // Removed the space after the comma
+			structure += `${indentation}(${baseNames})${ext}\n`; // Moved the extension outside and immediately after the parenthesis
 		} else {
-			structure += `${indentation}${fileGroups[ext][0].name}\n`;
+			const fileName = fileGroups[ext][0].name;
+			const description = descriptions[fileName];
+			structure += description
+				? `${indentation}${fileName}:${description}\n`
+				: `${indentation}${fileName}\n`;
 		}
 	}
 
 	return structure;
+}
+
+async function getFileDescriptions(
+	folderPath: string
+): Promise<Record<string, string>> {
+	const descriptionsPath = path.join(folderPath, 'file-descriptions.json');
+	if (await fileExists(descriptionsPath)) {
+		const content = await fs.readFile(descriptionsPath, 'utf8');
+		return JSON.parse(content);
+	}
+	return {};
 }

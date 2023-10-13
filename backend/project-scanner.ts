@@ -13,6 +13,18 @@ import {
 	createSnippet,
 } from './db/helper/snippets.js';
 import { generateFolderStructure } from './projectfiles-note.js';
+import { Project } from '../shared/types/index.js';
+
+const CreateProjectFilesSnippet = async (project: Project) => {
+	const { id, name } = project;
+	const projectFilesSnippet = (await getSnippetsByProjectId(id)).find(
+		(snippet) => snippet.name === 'Project Files'
+	);
+	if (!projectFilesSnippet) return;
+	const structure = await generateFolderStructure(id, name);
+	const content = `The following is a list of files in the project:\n${structure}`;
+	await updateSnippet(projectFilesSnippet.id, { content });
+};
 
 async function createFilesForProject(
 	projectId: number,
@@ -29,8 +41,6 @@ async function createFilesForProject(
 	const items: Dirent[] = await fs.readdir(projectPath, {
 		withFileTypes: true,
 	});
-	// if (projectName === 'Stock Watcher')
-	// 	console.log(folderPath + '/' || 'StockWatcher/', items);
 
 	for (const item of items) {
 		const itemName = item.name;
@@ -62,7 +72,10 @@ async function createFilesForProject(
 
 async function watchProjectFolder(projectId: number, projectName: string) {
 	const projectPath = await getProjectPath(projectName);
-	const project = await projectHelper.getProjectById(projectId, 'ignore_files');
+	const project = await projectHelper.getProjectById(
+		projectId,
+		'id,name,ignore_files'
+	);
 	const ignoreFiles = project
 		? JSON.parse(project.ignore_files)
 		: DefaultIgnoreFiles;
@@ -79,13 +92,7 @@ async function watchProjectFolder(projectId: number, projectName: string) {
 		if (fileExists && (await isDirectory(filePath))) return;
 		if (shouldIgnorePath(ignoreFiles, fileName)) return;
 
-		const projectFilesSnippet = (await getSnippetsByProjectId(projectId)).find(
-			(snippet) => snippet.name === 'Project Files'
-		);
-		if (projectFilesSnippet) {
-			const structure = await generateFolderStructure(projectId, projectName);
-			await updateSnippet(projectFilesSnippet.id, { content: structure });
-		}
+		await CreateProjectFilesSnippet(project);
 
 		if (!fileExists) {
 			// File does not exist, it means it was deleted or renamed
@@ -145,7 +152,7 @@ export async function scanProjectsRoot() {
 
 		for (const dir of directories) {
 			const projectName = dir.name;
-			const existingProject = await projectHelper.getProjects('id', {
+			const existingProject = await projectHelper.getProjects('id,name', {
 				name: projectName,
 			});
 
@@ -158,21 +165,14 @@ export async function scanProjectsRoot() {
 					ignore_files: JSON.stringify(DefaultIgnoreFiles),
 				});
 				projectId = project.id;
+				existingProject.push(project);
 				console.log(`Added project: ${projectName}`);
 			} else {
 				projectId = existingProject[0].id;
 				console.log('Found existing project:', projectName);
 			}
 
-			const projectFilesSnippet = (
-				await getSnippetsByProjectId(projectId)
-			).find((snippet) => snippet.name === 'Project Files');
-			if (projectFilesSnippet) {
-				console.log('Updating Project Files snippet2');
-				const structure = await generateFolderStructure(projectId, projectName);
-				await updateSnippet(projectFilesSnippet.id, { content: structure });
-			}
-
+			await CreateProjectFilesSnippet(existingProject[0]);
 			await watchProjectFolder(projectId, projectName);
 			await createFilesForProject(projectId, projectName);
 			console.log('Scanned project:', projectName);

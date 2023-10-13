@@ -24,6 +24,7 @@ export const DefaultIgnoreFiles = [
 	'**/*.pyc',
 	'**/*.mp3',
 	'**/*.wav',
+	'**/file-descriptions.json',
 
 	// temp
 	'**/dist',
