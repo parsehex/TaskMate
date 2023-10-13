@@ -3,7 +3,7 @@ import { createSnippet, updateSnippets } from '../api/snippets';
 import { useStore } from '../state';
 import SnippetPart from './Snippet/Snippet';
 import FilePart from './File/File';
-import Directory from './Directory';
+import Directory from './Directory/Directory';
 import { createFileHierarchy } from '../file-hierarchy';
 
 const PromptPartsList: React.FC = () => {
