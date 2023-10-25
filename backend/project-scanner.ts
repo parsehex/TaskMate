@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import * as fileHelper from './db/helper/files.js';
 import * as projectHelper from './db/helper/projects.js';
-import { session } from './ws/index.js';
+import { sendToAll } from './ws/index.js';
 import { fileExists as fileExistsFunc, isDirectory } from './fs-utils.js';
 import { shouldIgnorePath, getProjectPath } from './path-utils.js';
 import { DefaultIgnoreFiles } from './const.js';
@@ -60,9 +60,7 @@ async function createFilesForProject(
 				const file = await fileHelper.createFile(projectId, { name: itemPath });
 				console.log(`Added file: ${itemPath} to project: ${projectName}`);
 
-				if (session) {
-					session.publish('file.added', [projectId, file]);
-				}
+				sendToAll('file.added', [projectId, file]);
 			}
 		} else if (item.isDirectory()) {
 			await createFilesForProject(projectId, projectName, itemPath);
@@ -107,9 +105,7 @@ async function watchProjectFolder(projectId: number, projectName: string) {
 					`Removed file from db: ${fileName} from project: ${projectName}`
 				);
 
-				if (session) {
-					session.publish('file.removed', [projectId, existingFile[0].id]);
-				}
+				sendToAll('file.removed', [projectId, existingFile[0].id]);
 			}
 
 			return;
@@ -125,9 +121,7 @@ async function watchProjectFolder(projectId: number, projectName: string) {
 			const file = await fileHelper.createFile(projectId, { name: fileName });
 			console.log(`Added file: ${fileName} to project: ${projectName}`);
 
-			if (session) {
-				session.publish('file.added', [projectId, file]);
-			}
+			sendToAll('file.added', [projectId, file]);
 		}
 	};
 	fs.watch(projectPath, (eventType, fileName) => {

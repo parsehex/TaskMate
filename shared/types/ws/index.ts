@@ -47,3 +47,19 @@ export type MessageHandlers = FilesMessageHandlers &
 	ProjectsMessageHandlers &
 	SnippetsMessageHandlers &
 	UtilsMessageHandlers;
+
+export type WSEvent = 'file.added' | 'file.removed';
+
+export interface WSMessage<T = any> {
+	id: string;
+	event?: WSEvent;
+	endpoint: keyof MessageHandlers;
+	args?: any[];
+	replyTo?: string;
+}
+
+export interface WSResponse<T = any> {
+	requestId?: string;
+	data: T;
+	error?: Error;
+}

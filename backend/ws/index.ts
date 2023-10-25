@@ -1,14 +1,15 @@
-import autobahn from 'autobahn';
+import { WebSocketServer, WebSocket } from 'ws';
+import { v4 as uuidv4 } from 'uuid';
 import filesHandlers from './files.js';
 import snippetsHandlers from './snippets.js';
 import projectsHandlers from './projects.js';
 import utilsHandlers from './utils.js';
-import { MessageHandlers } from '../../shared/types/ws/index.js';
-
-let connection: autobahn.Connection | null = null;
-export let session: autobahn.Session | null = null;
+import { MessageHandlers, WSMessage } from '../../shared/types/ws/index.js';
 
 const port = +(process.env.WEBSOCKET_PORT as string) || 8181;
+const wss = new WebSocketServer({ port });
+
+const clients: { [id: string]: WebSocket } = {};
 
 const allHandlers = {
 	...filesHandlers,
@@ -17,32 +18,44 @@ const allHandlers = {
 	...utilsHandlers,
 } as MessageHandlers;
 
-export async function initWebsocket() {
-	connection = new autobahn.Connection({
-		url: `ws://localhost:${port}/ws`,
-		realm: 'realm1',
-	});
+wss.on('connection', (ws) => {
+	const clientId = uuidv4();
+	clients[clientId] = ws;
 
-	session = await new Promise<autobahn.Session>((resolve) => {
-		if (!connection) throw new Error('Connection is not initialized yet.');
-		connection.onopen = (s) => {
-			// console.log('Connection opened!');
-			Object.entries(allHandlers).forEach(([endpoint, handler]) => {
-				s.register(`${endpoint}`, (args: any[] | undefined) => {
-					if (!args) return handler();
-					return handler(...args);
+	ws.on('message', async (message) => {
+		const data: WSMessage = JSON.parse(message.toString());
+
+		if (allHandlers[data.endpoint]) {
+			// @ts-ignore
+			allHandlers[data.endpoint](...data.args)
+				.then((result) => {
+					ws.send(
+						JSON.stringify({
+							id: data.id,
+							result,
+						})
+					);
+				})
+				.catch((error) => {
+					ws.send(
+						JSON.stringify({
+							id: data.id,
+							error: error.message,
+						})
+					);
 				});
-			});
-			resolve(s);
-		};
-		connection.open();
+		}
 	});
-}
 
-export function getSession(): autobahn.Session {
-	if (session) {
-		return session;
-	} else {
-		throw new Error('WebSocket session is not open yet.');
-	}
+	ws.on('close', () => {
+		delete clients[clientId];
+	});
+});
+
+export function sendToAll(topic: string, args: any[]) {
+	Object.values(clients).forEach((client) => {
+		if (client.readyState === WebSocket.OPEN) {
+			client.send(JSON.stringify({ topic, args }));
+		}
+	});
 }

@@ -7,7 +7,6 @@ import fs from 'fs-extra';
 import path from 'path';
 import * as fileHelper from './db/helper/files.js';
 import * as projectHelper from './db/helper/projects.js';
-import { session } from './ws/index.js';
 import { fileExists, isDirectory } from './fs-utils.js';
 import { shouldIgnorePath, getProjectPath } from './path-utils.js';
 import { DefaultIgnoreFiles } from './const.js';
