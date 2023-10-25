@@ -8,7 +8,12 @@ export const DefaultIgnoreFiles = [
 	'**/node_modules',
 	'**/node_modules/**',
 	'**/*-lock.*',
+	'**/*.ico',
+	'**/*.jpg',
+	'**/*.jpeg',
+	'**/*.png',
 	'**/*.psd',
+	'**/*.svg',
 	'**/*.sqlite3',
 	'**/*.sqlite3-journal',
 	'**/*.xlsx',
@@ -24,6 +29,9 @@ export const DefaultIgnoreFiles = [
 	'**/*.pyc',
 	'**/*.mp3',
 	'**/*.wav',
+	'**/*.bin',
+	'**/.next',
+	'**/.next/**',
 	'**/file-descriptions.json',
 
 	// temp
