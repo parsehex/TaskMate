@@ -53,7 +53,7 @@ export function initWebsocket() {
 	});
 }
 
-export function call(endpoint: string, ...args: any[]): Promise<any> {
+export function call(endpoint: string, args: any[]): Promise<any> {
 	return new Promise((resolve, reject) => {
 		const id = Math.random().toString(36).substr(2, 9);
 		socket.send(
@@ -66,6 +66,7 @@ export function call(endpoint: string, ...args: any[]): Promise<any> {
 
 		const handleMessage = (event: MessageEvent) => {
 			const data = JSON.parse(event.data);
+			// console.log('Received data:', data);
 			if (data.id === id) {
 				if (data.error) {
 					reject(new Error(data.error));
