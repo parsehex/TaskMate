@@ -1,10 +1,12 @@
-import { Prompt_Part } from '../shared/types';
+import { Prompt_Part, isFile } from '../shared/types';
 
 export const makePrompt = (includedPromptParts?: Prompt_Part[]): string => {
 	if (!includedPromptParts) return '';
 	return includedPromptParts
 		.map((part) => {
 			let content = '';
+
+			const shouldWrapCode = isFile(part) || part.use_title;
 			if (part.use_title) {
 				content += part.name;
 				if (part.use_summary) content += ' (summary)';
@@ -13,7 +15,10 @@ export const makePrompt = (includedPromptParts?: Prompt_Part[]): string => {
 			if (part.use_summary) {
 				content += part.summary;
 			} else {
-				content += part.content;
+				const partContent = part.content;
+				content += shouldWrapCode
+					? `\`\`\`\n${partContent}\n\`\`\``
+					: partContent;
 			}
 			return content.trim();
 		})
