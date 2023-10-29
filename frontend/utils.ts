@@ -2,27 +2,29 @@ import { Prompt_Part, isFile } from '../shared/types';
 
 export const makePrompt = (includedPromptParts?: Prompt_Part[]): string => {
 	if (!includedPromptParts) return '';
-	return includedPromptParts
-		.map((part) => {
-			let content = '';
+	return (
+		includedPromptParts
+			.map((part) => {
+				let content = '';
 
-			const shouldWrapCode = isFile(part) || part.use_title;
-			if (part.use_title) {
-				content += part.name;
-				if (part.use_summary) content += ' (summary)';
-				content += ':\n';
-			}
-			if (part.use_summary) {
-				content += part.summary;
-			} else {
-				const partContent = part.content;
-				content += shouldWrapCode
-					? `\`\`\`\n${partContent}\n\`\`\``
-					: partContent;
-			}
-			return content.trim();
-		})
-		.join('\n\n');
+				const shouldWrapCode = isFile(part) || part.use_title;
+				if (part.use_title) {
+					content += part.name;
+					if (part.use_summary) content += ' (summary)';
+					content += ':\n';
+				}
+				if (part.use_summary) {
+					content += part.summary;
+				} else {
+					const partContent = part.content || '';
+					content += shouldWrapCode
+						? `\`\`\`\n${partContent.trim()}\n\`\`\`\n`
+						: partContent;
+				}
+				return content.trim();
+			})
+			.join('\n\n') + '\n'
+	).trim();
 };
 
 export const detectFileLanguage = (
