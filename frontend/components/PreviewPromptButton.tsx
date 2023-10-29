@@ -38,10 +38,10 @@ const PreviewPromptButton: React.FC = () => {
 		const previewContent = makePrompt(includedPromptParts);
 
 		// do some basic checks to prevent previewing mistakenly large prompts
-		if (previewContent.length > 10000) {
-			console.log('Blocked preview');
-			return;
-		}
+		// if (previewContent.length > 10000) {
+		// 	console.log('Blocked preview');
+		// 	return;
+		// }
 		const previewPromptPart = createPreviewPromptPart(previewContent);
 
 		setReadOnly(true);
