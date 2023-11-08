@@ -15,12 +15,12 @@ export const makePrompt = (includedPromptParts?: Prompt_Part[]): string => {
 			if (part.use_summary) {
 				content += part.summary;
 			} else {
-				const partContent = part.content;
+				const partContent = part.content?.trim();
 				content += shouldWrapCode
 					? `\`\`\`\n${partContent}\n\`\`\``
 					: partContent;
 			}
-			return content.trim();
+			return content;
 		})
 		.join('\n\n');
 };
