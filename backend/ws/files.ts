@@ -69,12 +69,26 @@ async function UPDATE_FILE(id: number, file: Partial<File>): Promise<File> {
 }
 
 async function UPDATE_FILES(files: Partial<File>[]): Promise<File[]> {
-	return Promise.all(
-		files.map((file) => {
-			if (!file.id) throw new Error('File id is required');
-			return UPDATE_FILE(file.id, file);
-		})
-	);
+	const updatedFiles = await helper.updateFiles(files);
+
+	for (let i = 0; i < updatedFiles.length; i++) {
+		const file = updatedFiles[i];
+		const projectPath = await getProjectPathLookup(file.project_id, file.name);
+		if (file.name && !(await fs.pathExists(projectPath))) {
+			throw new Error('File does not exist');
+		}
+		if (file.name && file.name !== file.name) {
+			const basePath = await getProjectPathLookup(file.project_id);
+			const oldPath = path.join(basePath, file.name);
+			const newPath = path.join(basePath, file.name);
+			await fs.rename(oldPath, newPath);
+		}
+		let updatedFile: File | undefined;
+		if (file.content) await fs.writeFile(projectPath, file.content);
+		else updatedFile = (await resolveFileContent(file)) as File;
+		if (updatedFile) updatedFiles[i] = updatedFile;
+	}
+	return updatedFiles;
 }
 
 async function DELETE_FILE(id: number): Promise<void> {

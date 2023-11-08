@@ -48,6 +48,34 @@ export const updateFile = async (
 	return await getFileById(id);
 };
 
+export const updateFiles = async (files: Partial<File>[]): Promise<File[]> => {
+	const updatedFiles: File[] = [];
+
+	await db.run('BEGIN TRANSACTION');
+
+	try {
+		for (const file of files) {
+			if (!file.id) continue;
+			const fieldsObj: Partial<File> = {
+				updated_at: new Date().toISOString(),
+				...file,
+			};
+			if (file.content) delete fieldsObj.content;
+			const { sql, values } = updateStatement('files', fieldsObj, {
+				id: file.id,
+			});
+			await db.run(sql, values);
+			updatedFiles.push(await getFileById(file.id));
+		}
+		await db.run('COMMIT');
+	} catch (e) {
+		await db.run('ROLLBACK');
+		throw e;
+	}
+
+	return updatedFiles;
+};
+
 export const createFile = async (
 	project_id: number,
 	file: Partial<File>
