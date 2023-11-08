@@ -9,12 +9,21 @@ const TokenCountDisplay: React.FC<TokenCountDisplayProps> = ({
 	tokenCount,
 	small = false,
 }) => {
-	const tokenCountClass =
-		tokenCount >= 4096 ? 'token-count red' : 'token-count';
+	let tokenCountClass = 'token-count';
+	if (tokenCount >= 128000) {
+		tokenCountClass += ' red';
+	} else if (tokenCount >= 32000) {
+		tokenCountClass += ' orange';
+	} else if (tokenCount >= 5000) {
+		tokenCountClass += ' yellow';
+	} else {
+		tokenCountClass += ' green';
+	}
 
 	return (
 		<span className={tokenCountClass} title={`${tokenCount} tokens`}>
-			{tokenCount}{small ? '' : ' tokens'}
+			{tokenCount}
+			{small ? '' : ' tokens'}
 		</span>
 	);
 };
