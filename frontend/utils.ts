@@ -7,24 +7,23 @@ export const makePrompt = (includedPromptParts?: Prompt_Part[]): string => {
 			.map((part) => {
 				let content = '';
 
-				const shouldWrapCode = isFile(part) || part.use_title;
-				if (part.use_title) {
-					content += part.name;
-					if (part.use_summary) content += ' (summary)';
-					content += ':\n';
-				}
-				if (part.use_summary) {
-					content += part.summary;
-				} else {
-					const partContent = part.content || '';
-					content += shouldWrapCode
-						? `\`\`\`\n${partContent.trim()}\n\`\`\`\n`
-						: partContent;
-				}
-				return content.trim();
-			})
-			.join('\n\n') + '\n'
-	).trim();
+			const shouldWrapCode = isFile(part) || part.use_title;
+			if (part.use_title) {
+				content += part.name;
+				if (part.use_summary) content += ' (summary)';
+				content += ':\n';
+			}
+			if (part.use_summary) {
+				content += part.summary;
+			} else {
+				const partContent = part.content?.trim();
+				content += shouldWrapCode
+					? `\`\`\`\n${partContent}\n\`\`\``
+					: partContent;
+			}
+			return content;
+		})
+		.join('\n\n');
 };
 
 export const detectFileLanguage = (

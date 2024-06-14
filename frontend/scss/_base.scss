@@ -5,8 +5,17 @@ body {
 	background-color: $bg-color;
 }
 
-.red {
-	color: red;
+.token-count.green {
+	color: #52c41a;
+}
+.token-count.red {
+	color: #ff4d4f;
+}
+.token-count.orange {
+	color: #ffa940;
+}
+.token-count.yellow {
+	color: #dabd00;
 }
 
 .badge {
