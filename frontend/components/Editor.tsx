@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import MonacoEditor from '@monaco-editor/react';
-import { Prompt_Part, Snippet, isSnippet } from '../../shared/types';
+import { Range } from 'monaco-editor';
+import * as monaco from 'monaco-editor';
+import { Prompt_Part, Snippet, isFile, isSnippet } from '../../shared/types';
 import { updateFile } from '../api/files';
 import { updateSnippet } from '../api/snippets';
 import { generateSummary, getTokenCount } from '../api/utils';
@@ -12,6 +14,24 @@ import TokenCountDisplay from './TokenCountDisplay';
 interface EditorProps {
 	onContentChange?: (content: string) => void;
 }
+
+const parseSelectedLines = (lines: string | string[]): Range[] => {
+	if (!lines) return [];
+	if (typeof lines === 'string') lines = lines.split(',');
+	const ranges: Range[] = [];
+
+	lines.forEach((line) => {
+		if (line.includes('-')) {
+			const [start, end] = line.split('-').map(Number);
+			ranges.push(new Range(start, 1, end, 1));
+		} else {
+			const lineNumber = Number(line);
+			ranges.push(new Range(lineNumber, 1, lineNumber, 1));
+		}
+	});
+
+	return ranges;
+};
 
 const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 	const [promptPart, setFile, setSnippet, readOnly, setReadOnly, isConnected] =
@@ -43,6 +63,107 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 		oldValue: false,
 	});
 
+	const [selectedLines, setSelectedLines] = useState<Set<number>>(new Set());
+	const [selectedDuringDrag, setSelectedDuringDrag] = useState<Set<number>>(
+		new Set()
+	);
+	const editorRef = useRef(null as monaco.editor.IStandaloneCodeEditor | null);
+	const decorationsCollectionRef = useRef(
+		null as monaco.editor.IEditorDecorationsCollection | null
+	);
+
+	const handleEditorMount = (editor: monaco.editor.IStandaloneCodeEditor) => {
+		editorRef.current = editor;
+		decorationsCollectionRef.current = editor.createDecorationsCollection([]);
+
+		let isMouseDown = false;
+		let initialLine = -1;
+		let isSelecting = true;
+
+		const updateSelection = (lineNumber: number, select?: boolean) => {
+			console.log(selectedLines, lineNumber);
+			const newSet = new Set([...selectedLines]);
+			const lineSelected = selectedLines.has(lineNumber);
+
+			isSelecting = lineSelected;
+			if (select !== undefined) isSelecting = select;
+
+			if (!isSelecting) {
+				newSet.delete(lineNumber);
+			} else {
+				newSet.add(lineNumber);
+			}
+			setSelectedLines(newSet);
+		};
+
+		editor.onMouseDown((event) => {
+			if (!event.target.position || event.target.type !== 2) return;
+			isMouseDown = true;
+			initialLine = event.target.position.lineNumber;
+
+			const lineSelected = selectedLines.has(initialLine);
+			isSelecting = !lineSelected;
+			// console.log(isSelecting, lineSelected, selectedLines, initialLine);
+
+			updateSelection(initialLine, isSelecting);
+		});
+
+		editor.onMouseMove((event) => {
+			if (!isMouseDown || !event.target.position) return;
+			const lineNumber = event.target.position.lineNumber;
+
+			if (selectedDuringDrag.has(lineNumber)) return;
+			console.log(
+				// selectedDuringDrag,
+				'drag',
+				lineNumber,
+				selectedDuringDrag.has(lineNumber)
+			);
+
+			updateSelection(lineNumber);
+
+			selectedDuringDrag.add(lineNumber);
+		});
+
+		editor.onMouseUp(() => {
+			if (!isMouseDown) return;
+			isMouseDown = false;
+			initialLine = -1;
+
+			setSelectedDuringDrag(new Set());
+		});
+	};
+
+	const applyDecorations = () => {
+		if (!editorRef.current) return;
+
+		const newDecorations = Array.from(selectedLines).map((lineNumber) => ({
+			range: new monaco.Range(
+				lineNumber,
+				1,
+				lineNumber,
+				editorRef.current?.getModel()?.getLineMaxColumn(lineNumber) || 1
+			),
+			options: {
+				isWholeLine: true,
+				className: 'selected-line',
+				glyphMarginClassName: 'line-indicator',
+				glyphMarginHoverMessage: { value: 'Selected Line' },
+			},
+		}));
+
+		if (decorationsCollectionRef.current) {
+			// decorationsCollectionRef.current.clear();
+			decorationsCollectionRef.current =
+				editorRef.current.createDecorationsCollection(newDecorations);
+		}
+		console.log(decorationsCollectionRef.current?.getRanges());
+	};
+
+	useEffect(() => {
+		applyDecorations();
+	}, [selectedLines]);
+
 	useEffect(() => {
 		// If we're not connected, set the editor to read-only and save
 		// the old value so we can restore it after we reconnect.
@@ -68,6 +189,12 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 		setUseTitle(promptPart.use_title);
 		setIsSaved(true);
 		setActiveTab(promptPart.use_summary ? 'summary' : 'content');
+		if (isFile(promptPart) && promptPart.selected_lines) {
+			const lines = promptPart.selected_lines.map((line) => +line);
+			setSelectedLines(new Set(lines));
+		} else {
+			setSelectedLines(new Set());
+		}
 	}, [promptPart]);
 
 	useEffect(() => {
@@ -78,13 +205,12 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 		});
 	}, [content, summary, activeTab]);
 
-	// Save on Ctrl+S
 	const handleKeyPress = useCallback(
 		async (event: KeyboardEvent) => {
-			if (event.code === 'KeyS' && (event.ctrlKey || event.metaKey)) {
-				event.preventDefault();
-				await handleSave();
-			}
+			if (event.code !== 'KeyS' || (!event.ctrlKey && !event.metaKey)) return;
+
+			event.preventDefault();
+			await handleSave();
 		},
 		[content, summary]
 	);
@@ -98,12 +224,11 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 
 	const handleNameChange = async (newName: string) => {
 		if (!promptPart || promptPart.id < 0) return;
-		if (newName !== promptPart?.name) {
-			const setFunc = isSnippet(promptPart) ? setSnippet : setFile;
-			const updateFunc = isSnippet(promptPart) ? updateSnippet : updateFile;
-			const updatedPart = await updateFunc(promptPart.id, { name: newName });
-			setFunc(updatedPart as any);
-		}
+		if (newName === promptPart?.name) return;
+		const setFunc = isSnippet(promptPart) ? setSnippet : setFile;
+		const updateFunc = isSnippet(promptPart) ? updateSnippet : updateFile;
+		const updatedPart = await updateFunc(promptPart.id, { name: newName });
+		setFunc(updatedPart as any);
 	};
 
 	const handleChange = (value: string | undefined, ev: any) => {
@@ -114,15 +239,15 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 	};
 
 	const handleSave = async () => {
-		if (promptPart && promptPart.id >= 0) {
-			const data: any = {};
-			if (activeTab === 'content') data.content = content;
-			else if (activeTab === 'summary') data.summary = summary;
-			const setFunc = isSnippet(promptPart) ? setSnippet : setFile;
-			const updateFunc = isSnippet(promptPart) ? updateSnippet : updateFile;
-			const updatedPart = await updateFunc(promptPart.id, data);
-			setFunc(updatedPart as any);
-		}
+		if (!promptPart || promptPart.id < 0) return;
+		const data: any = {};
+		if (activeTab === 'content') data.content = content;
+		else if (activeTab === 'summary') data.summary = summary;
+		const setFunc = isSnippet(promptPart) ? setSnippet : setFile;
+		const updateFunc = isSnippet(promptPart) ? updateSnippet : updateFile;
+		const updatedPart = await updateFunc(promptPart.id, data);
+		setFunc(updatedPart as any);
+
 		setIsSaved(true);
 	};
 
@@ -148,14 +273,13 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 	};
 
 	const handleGenerateSummary = async () => {
-		if (promptPart && promptPart.id >= 0) {
-			const data: any = {};
-			if (isSnippet(promptPart)) data.snippetId = promptPart.id;
-			else data.fileId = promptPart.id;
-			setSummary((await generateSummary(data)).data.text);
-			setIsSaved(false);
-			setActiveTab('summary');
-		}
+		if (!promptPart || promptPart.id < 0) return;
+		const data: any = {};
+		if (isSnippet(promptPart)) data.snippetId = promptPart.id;
+		else data.fileId = promptPart.id;
+		setSummary((await generateSummary(data)).data.text);
+		setIsSaved(false);
+		setActiveTab('summary');
 	};
 
 	const options: any = {
@@ -224,7 +348,12 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 				theme="vs-dark"
 				value={activeTab === 'content' ? content : summary}
 				onChange={activeTab === 'content' ? handleChange : handleSummaryChange}
-				options={options}
+				onMount={handleEditorMount}
+				options={{
+					...options,
+					lineDecorationsWidth: 20,
+					glyphMargin: true,
+				}}
 			/>
 			<div className="bottom-bar">
 				<button type="button" onClick={handleSave}>

@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS files (
 	included BOOLEAN DEFAULT 1,
 	use_title BOOLEAN DEFAULT 1,
 	use_summary BOOLEAN DEFAULT 0,
+	selected_lines TEXT DEFAULT '[]',
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY (project_id) REFERENCES projects (id),

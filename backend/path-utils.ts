@@ -27,7 +27,13 @@ export async function getProjectPath(
 	}
 
 	let base = path.join(process.env.PROJECTS_ROOT as string, projectName);
-	const stat = await fs.stat(base);
+	let stat: fs.Stats;
+	try {
+		stat = await fs.stat(base);
+	} catch (error) {
+		console.log(error);
+		throw new Error(`Project ${projectName} not found`);
+	}
 
 	if (stat.isSymbolicLink()) {
 		base = await fs.realpath(base);

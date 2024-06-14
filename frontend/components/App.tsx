@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Tooltip } from 'react-tooltip';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClose } from '@fortawesome/free-solid-svg-icons';
@@ -15,6 +15,7 @@ import { fetchSnippets } from '../api/snippets';
 import { fetchFiles } from '../api/files';
 import { getTokenCount } from '../api/utils';
 import Alert from './Alert';
+import EditorPage from './EditorPage';
 
 export const App: React.FC = () => {
 	const {
@@ -35,6 +36,7 @@ export const App: React.FC = () => {
 		setIncludedPromptParts,
 		setReadOnly,
 	} = useStore((state) => state);
+	const [showEditorPage, setShowEditorPage] = useState(false);
 
 	const setReadOnlyValue = () => {
 		let readOnly = false;
@@ -104,29 +106,34 @@ export const App: React.FC = () => {
 			{!isConnected && (
 				<Alert message="Connection lost. Changes may not be saved!" />
 			)}
-			<main>
-				<div className="left-sidebar">
-					<ProjectSelector />
-					<div className="prompt-options">
-						<CopyPromptButton />
-						<PreviewPromptButton />
-						<TokenCountDisplay tokenCount={promptTokenCount} /> /{' '}
-						{includedPromptParts.length} parts
+			<button onClick={() => setShowEditorPage(true)}>Go to Editor Page</button>
+			{showEditorPage ? (
+				<EditorPage />
+			) : (
+				<main>
+					<div className="left-sidebar">
+						<ProjectSelector />
+						<div className="prompt-options">
+							<CopyPromptButton />
+							<PreviewPromptButton />
+							<TokenCountDisplay tokenCount={promptTokenCount} /> /{' '}
+							{includedPromptParts.length} parts
+						</div>
+						<PromptPartsList />
 					</div>
-					<PromptPartsList />
-				</div>
-				<div className="right-sidebar">
-					{selectedPromptPart && (
-						<button
-							className="close-button"
-							onClick={() => setSelectedPromptPart(null)}
-						>
-							<FontAwesomeIcon icon={faClose} />
-						</button>
-					)}
-					{selectedPromptPart && <Editor />}
-				</div>
-			</main>
+					<div className="right-sidebar">
+						{selectedPromptPart && (
+							<button
+								className="close-button"
+								onClick={() => setSelectedPromptPart(null)}
+							>
+								<FontAwesomeIcon icon={faClose} />
+							</button>
+						)}
+						{selectedPromptPart && <Editor />}
+					</div>
+				</main>
+			)}
 			<Tooltip id="previewButton" />
 		</div>
 	);

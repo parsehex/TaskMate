@@ -16,6 +16,9 @@ export function initWebsocket() {
 			console.log('Connection opened!');
 			const { setIsConnected } = useStore.getState();
 			setIsConnected(true);
+			call('GET_PROJECTS', []).then((projects) => {
+				console.log('Projects:', projects);
+			});
 			resolve(true);
 		};
 

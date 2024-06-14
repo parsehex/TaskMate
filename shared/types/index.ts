@@ -6,8 +6,6 @@ export interface Project {
 	created_at: string;
 }
 
-export type Prompt_Part = Snippet | File;
-
 export interface Snippet {
 	id: number;
 	project_id: number;
@@ -32,6 +30,7 @@ export interface File {
 	included: boolean;
 	use_title: boolean;
 	use_summary: boolean;
+	selected_lines: string[];
 	created_at: string;
 	updated_at: string;
 }
@@ -39,6 +38,8 @@ export interface File {
 export function isSnippet(part: Prompt_Part): part is Snippet {
 	return 'type' in part && 'content' in part;
 }
-export function isFile(part: Prompt_Part): part is Snippet {
+export function isFile(part: Prompt_Part): part is File {
 	return !('type' in part);
 }
+
+export type Prompt_Part = Snippet | File;

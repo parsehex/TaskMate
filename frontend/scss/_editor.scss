@@ -1,3 +1,13 @@
+.monaco-editor .line-indicator {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background-color: #f00; // You can choose any color
+}
+.editor-page {
+	max-height: 100vh;
+	overflow: auto;
+}
 #root .app .editor {
 	background-color: #fff;
 	display: flex;
