@@ -2,10 +2,9 @@ import { Prompt_Part, isFile } from '../shared/types';
 
 export const makePrompt = (includedPromptParts?: Prompt_Part[]): string => {
 	if (!includedPromptParts) return '';
-	return (
-		includedPromptParts
-			.map((part) => {
-				let content = '';
+	return includedPromptParts
+		.map((part) => {
+			let content = '';
 
 			const shouldWrapCode = isFile(part) || part.use_title;
 			if (part.use_title) {
