@@ -67,12 +67,12 @@ const PreviewPromptButton: React.FC = () => {
 
 const createPreviewPromptPart = (content: string) => {
 	return {
-		id: -1,
+		id: '-1',
 		name: 'Prompt Preview',
 		content,
 		summary: '',
 		included: false,
-		project_id: -1,
+		project_id: '-1',
 		use_summary: false,
 		use_title: false,
 	} as Prompt_Part;

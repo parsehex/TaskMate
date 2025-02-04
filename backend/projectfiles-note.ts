@@ -12,12 +12,12 @@ import { shouldIgnorePath, getProjectPath } from './path-utils.js';
 import { DefaultIgnoreFiles } from './const.js';
 
 export async function generateFolderStructure(
-	projectId: number,
+	projectId: string,
 	projectName: string,
 	folderPath = '',
 	indent = 0
 ): Promise<string> {
-	const projectFolderPath = await getProjectPath(projectName, folderPath);
+	const projectFolderPath = await getProjectPath({id: projectId}, folderPath);
 
 	const project = await projectHelper.getProjectById(projectId, 'ignore_files');
 	const ignoreFiles = project

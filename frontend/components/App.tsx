@@ -38,7 +38,7 @@ export const App: React.FC = () => {
 
 	const setReadOnlyValue = () => {
 		let readOnly = false;
-		if (selectedPromptPart?.id === -1) readOnly = true;
+		if (selectedPromptPart?.id === '-1') readOnly = true;
 		if (!isConnected) readOnly = true;
 		setReadOnly(readOnly);
 	};
@@ -53,12 +53,12 @@ export const App: React.FC = () => {
 
 		const selectedProjectId = localStorage.getItem('selectedProjectId');
 		if (selectedProjectId) {
-			setSelectedProjectId(Number(selectedProjectId));
+			setSelectedProjectId(selectedProjectId);
 		}
 	}, []);
 
 	useEffect(() => {
-		if (selectedProjectId !== null && Number.isInteger(selectedProjectId)) {
+		if (selectedProjectId !== null) {
 			fetchSnippets(selectedProjectId).then((newSnippets) => {
 				setSnippets(newSnippets);
 			});
@@ -67,7 +67,7 @@ export const App: React.FC = () => {
 			});
 			setSelectedPromptPart(null);
 		}
-		if (selectedPromptPart?.id !== -1) setReadOnlyValue();
+		if (selectedPromptPart?.id !== '-1') setReadOnlyValue();
 	}, [selectedProjectId]);
 
 	useEffect(() => {
@@ -96,7 +96,7 @@ export const App: React.FC = () => {
 
 	useEffect(() => {
 		updateIncludedPromptParts();
-		if (selectedPromptPart?.id !== -1) setReadOnlyValue();
+		if (selectedPromptPart?.id !== '-1') setReadOnlyValue();
 	}, [snippets, files]);
 
 	return (

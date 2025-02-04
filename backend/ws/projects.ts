@@ -10,11 +10,11 @@ async function CREATE_PROJECT(name: string) {
 	return await helper.createProject({ name });
 }
 
-async function UPDATE_PROJECT(id: number, project: Partial<Project>) {
+async function UPDATE_PROJECT(id: string, project: Partial<Project>) {
 	return await helper.updateProject(id, project);
 }
 
-async function DELETE_PROJECT(id: number) {
+async function DELETE_PROJECT(id: string) {
 	await helper.deleteProject(id);
 }
 

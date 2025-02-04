@@ -1,3 +1,4 @@
+import { v4 } from 'uuid';
 import { File } from '../../../shared/types/index.js';
 import { db } from '../index.js';
 import { insertStatement, updateStatement } from '../sql-utils.js';
@@ -21,7 +22,7 @@ export const getFiles = async (
 };
 
 export const getFilesByProjectId = async (
-	project_id: number,
+	project_id: string,
 	columns = '*'
 ): Promise<File[]> => {
 	return await db.all(`SELECT ${columns} FROM files WHERE project_id = ?`, [
@@ -29,12 +30,12 @@ export const getFilesByProjectId = async (
 	]);
 };
 
-export const getFileById = async (id: number, columns = '*'): Promise<File> => {
+export const getFileById = async (id: string, columns = '*'): Promise<File> => {
 	return await db.get(`SELECT ${columns} FROM files WHERE id = ?`, [id]);
 };
 
 export const updateFile = async (
-	id: number,
+	id: string,
 	file: Partial<File>
 ): Promise<File> => {
 	const fieldsObj: Partial<File> = {
@@ -77,11 +78,12 @@ export const updateFiles = async (files: Partial<File>[]): Promise<File[]> => {
 };
 
 export const createFile = async (
-	project_id: number,
+	project_id: string,
 	file: Partial<File>
 ): Promise<File> => {
 	const { sql, values } = insertStatement('files', {
 		...file,
+		id: v4(),
 		project_id,
 		updated_at: new Date().toISOString(),
 	});
@@ -91,6 +93,6 @@ export const createFile = async (
 	return await getFileById(result.lastID);
 };
 
-export const deleteFile = async (id: number): Promise<void> => {
+export const deleteFile = async (id: string): Promise<void> => {
 	await db.run('DELETE FROM files WHERE id = ?', [id]);
 };

@@ -12,7 +12,7 @@ async function resolveFileContent(file: File) {
 	return { ...file, content };
 }
 
-async function GET_FILE(id: number): Promise<File> {
+async function GET_FILE(id: string): Promise<File> {
 	const file = await helper.getFileById(id);
 	if (!file) {
 		throw new Error(`File with id ${id} not found`);
@@ -24,9 +24,8 @@ async function GET_FILE(id: number): Promise<File> {
 	return obj as File;
 }
 
-async function GET_FILES(project_id: number | undefined): Promise<File[]> {
-	const files =
-		project_id !== undefined && Number.isInteger(project_id)
+async function GET_FILES(project_id: string | undefined): Promise<File[]> {
+	const files = project_id
 			? await helper.getFilesByProjectId(project_id)
 			: await helper.getFiles();
 	return Promise.all(files.map(resolveFileContent)).then((files) =>
@@ -34,7 +33,7 @@ async function GET_FILES(project_id: number | undefined): Promise<File[]> {
 	) as Promise<File[]>;
 }
 
-async function CREATE_FILE(project_id: number, name: string): Promise<File> {
+async function CREATE_FILE(project_id: string, name: string): Promise<File> {
 	const p = await getProjectPathLookup(project_id, name);
 	if (await fs.pathExists(p)) {
 		throw new Error('File already exists');
@@ -44,7 +43,7 @@ async function CREATE_FILE(project_id: number, name: string): Promise<File> {
 	return file;
 }
 
-async function UPDATE_FILE(id: number, file: Partial<File>): Promise<File> {
+async function UPDATE_FILE(id: string, file: Partial<File>): Promise<File> {
 	let updatedFile = await helper.updateFile(id, file);
 	const projectPath = await getProjectPathLookup(
 		updatedFile.project_id,
@@ -91,7 +90,7 @@ async function UPDATE_FILES(files: Partial<File>[]): Promise<File[]> {
 	return updatedFiles;
 }
 
-async function DELETE_FILE(id: number): Promise<void> {
+async function DELETE_FILE(id: string): Promise<void> {
 	await helper.deleteFile(id);
 }
 

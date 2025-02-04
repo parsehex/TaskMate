@@ -2,6 +2,7 @@ import path from 'path';
 import fs from 'fs-extra';
 import { minimatch } from 'minimatch';
 import { db } from './db/index.js';
+import { getProjectById } from './db/helper/projects.js';
 
 export function shouldIgnorePath(
 	ignoreFiles: string[],
@@ -17,9 +18,24 @@ export function shouldIgnorePath(
 const pathCache: { [key: string]: string } = {};
 
 export async function getProjectPath(
-	projectName: string,
+	project: {id?: string, name?: string} | string,
 	folderPath = ''
 ): Promise<string> {
+	if (typeof project === 'string') project = { name: project };
+	const hasID = !!project.id;
+	const hasName = !!project.name;
+	if (!hasID && !hasName) {
+		throw new Error(`Must pass project ID or name, received ${typeof (project)}`);
+	}
+
+	if (hasID && !hasName) {
+		const n = await getProjectById(project.id as string);
+		if (n) project.name = n.name;
+		else throw new Error(`Couldn't find project with id ${project.id}`);
+	}
+
+	const projectName = project.name as string;
+
 	if (pathCache[projectName]) {
 		return folderPath
 			? path.join(pathCache[projectName], folderPath)
@@ -39,7 +55,7 @@ export async function getProjectPath(
 	return path.join(base, folderPath);
 }
 export function getProjectPathLookup(
-	project_id: number,
+	project_id: string,
 	folderPath = ''
 ): Promise<string> {
 	return new Promise(async (resolve, reject) => {

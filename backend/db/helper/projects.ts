@@ -1,3 +1,4 @@
+import { v4 } from 'uuid';
 import { Project } from '../../../shared/types/index.js';
 import { db } from '../index.js';
 import { insertStatement, updateStatement } from '../sql-utils.js';
@@ -19,7 +20,7 @@ export const getProjects = async (
 	}
 	return await db.all(sql, values);
 };
-export const getProjectById = async (id: number, columns = '*') => {
+export const getProjectById = async (id: string, columns = '*') => {
 	const project: Project = await db.get(
 		`SELECT ${columns} FROM projects WHERE id = ?`,
 		[id]
@@ -29,6 +30,7 @@ export const getProjectById = async (id: number, columns = '*') => {
 export const createProject = async ({ name, ...project }: Partial<Project>) => {
 	if (!name) throw new Error('Project name is required');
 	const fieldsObj: Partial<Project> & { name: string } = {
+		id: v4(),
 		name,
 		...project,
 	};
@@ -38,7 +40,7 @@ export const createProject = async ({ name, ...project }: Partial<Project>) => {
 		q.lastID,
 	])) as Project;
 };
-export const updateProject = async (id: number, project: Partial<Project>) => {
+export const updateProject = async (id: string, project: Partial<Project>) => {
 	const fieldsObj: Partial<Project> = {};
 	if (project.name) fieldsObj.name = project.name;
 	if (project.description) fieldsObj.description = project.description;
@@ -48,6 +50,6 @@ export const updateProject = async (id: number, project: Partial<Project>) => {
 	await db.run(sql, values);
 	return (await db.get('SELECT * FROM projects WHERE id = ?', [id])) as Project;
 };
-export const deleteProject = async (id: number) => {
+export const deleteProject = async (id: string) => {
 	return await db.run('DELETE FROM projects WHERE id = ?', [id]);
 };

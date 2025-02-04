@@ -1,6 +1,6 @@
 import React from 'react';
 import { ControlledMenu, MenuItem, ClickEvent } from '@szhsin/react-menu';
-import { File } from '../../../shared/types';
+import { File, Snippet } from '../../../shared/types';
 import {
 	deleteSnippet,
 	updateSnippet,
@@ -10,7 +10,7 @@ import { useStore } from '../../state';
 import { EditableNameRef } from '../EditableName';
 
 interface ContextMenuProps {
-	snippet: File;
+	snippet: File | Snippet;
 	menuOpen: boolean;
 	setMenuOpen: (open: boolean) => void;
 	anchorRef: React.RefObject<HTMLElement>;

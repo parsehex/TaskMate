@@ -18,7 +18,7 @@ export const fetchProjects = async (): Promise<Project[]> => {
 };
 
 export const fetchPromptParts = async (
-	selectedProjectId?: number | null
+	selectedProjectId?: string | null
 ): Promise<Prompt_Part[]> => {
 	if (!selectedProjectId) {
 		const response = await fetch('/api/prompt_parts');
@@ -35,7 +35,7 @@ export const fetchPromptParts = async (
 };
 
 export const updateProject = async (
-	id: number,
+	id: string,
 	data: Partial<Project>
 ): Promise<void> => {
 	const response = await fetch(`/api/projects/${id}`, {
@@ -55,7 +55,7 @@ interface PromptPartUpdateResponse {
 	promptPart: Prompt_Part;
 }
 export const updatePromptPart = async (
-	id: number,
+	id: string,
 	data: Partial<Prompt_Part>
 ): Promise<PromptPartUpdateResponse> => {
 	if (!id) throw new Error('Prompt part id is required');
@@ -74,7 +74,7 @@ export const updatePromptPart = async (
 };
 
 export const updatePromptParts = async (
-	ids: number[],
+	ids: string[],
 	promptParts: Partial<Prompt_Part>[] = []
 ): Promise<Prompt_Part[]> => {
 	const updatedPromptParts = await Promise.all(
@@ -95,11 +95,11 @@ interface PromptPartCreateResponse {
 	promptPart: Prompt_Part;
 }
 export const createPromptPart = async (
-	selectedProjectId: number | null,
+	selectedProjectId: string | null,
 	newPromptPart: Partial<Prompt_Part>
 ): Promise<PromptPartCreateResponse | void> => {
 	if (!selectedProjectId) return;
-	const name = 'New Snippet' || newPromptPart.name;
+	const name = newPromptPart.name || 'New Snippet';
 	const response = await fetch(`/api/prompt_parts`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
@@ -116,7 +116,7 @@ export const createPromptPart = async (
 	}
 };
 
-export const deletePromptPart = async (id: number): Promise<void> => {
+export const deletePromptPart = async (id: string): Promise<void> => {
 	const response = await fetch(`/api/prompt_parts/${id}`, {
 		method: 'DELETE',
 	});
@@ -160,7 +160,7 @@ interface GenerateSummaryResponse {
 	summary: string;
 }
 export const generateSummary = async (
-	partId: number
+	partId: string
 ): Promise<GenerateSummaryResponse> => {
 	const response = await fetch(`/api/prompt_parts/${partId}/generate_summary`);
 	const res = await response.json();

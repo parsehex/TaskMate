@@ -2,22 +2,22 @@ import { Snippet } from '../../shared/types/index.js';
 import { SnippetsMessageHandlers } from '../../shared/types/ws/index.js';
 import * as helper from '../db/helper/snippets.js';
 
-async function GET_SNIPPET(id: number) {
+async function GET_SNIPPET(id: string) {
 	return await helper.getSnippetById(id);
 }
 
-async function GET_SNIPPETS(project_id: number | undefined) {
+async function GET_SNIPPETS(project_id: string | undefined) {
 	const where: any = {};
 	if (project_id !== null && Number.isInteger(project_id))
 		where['project_id'] = project_id;
 	return await helper.getSnippets('*', where);
 }
 
-async function CREATE_SNIPPET(project_id: number, snippet: Partial<Snippet>) {
+async function CREATE_SNIPPET(project_id: string, snippet: Partial<Snippet>) {
 	return await helper.createSnippet(project_id, snippet);
 }
 
-async function UPDATE_SNIPPET(id: number, snippet: Partial<Snippet>) {
+async function UPDATE_SNIPPET(id: string, snippet: Partial<Snippet>) {
 	return await helper.updateSnippet(id, snippet);
 }
 async function UPDATE_SNIPPETS(snippets: Partial<Snippet>[]) {
@@ -29,7 +29,7 @@ async function UPDATE_SNIPPETS(snippets: Partial<Snippet>[]) {
 	);
 }
 
-async function DELETE_SNIPPET(id: number) {
+async function DELETE_SNIPPET(id: string) {
 	return await helper.deleteSnippet(id);
 }
 

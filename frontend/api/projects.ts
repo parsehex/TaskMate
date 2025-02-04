@@ -6,7 +6,7 @@ export const fetchProjects = async (): Promise<Project[]> => {
 };
 
 export const updateProject = async (
-	id: number,
+	id: string,
 	data: Partial<Project>
 ): Promise<void> => {
 	await ProjectsHandlers.UPDATE_PROJECT(id, data);
@@ -16,6 +16,6 @@ export const createProject = async (name: string): Promise<Project> => {
 	return await ProjectsHandlers.CREATE_PROJECT(name);
 };
 
-export const deleteProject = async (id: number): Promise<void> => {
+export const deleteProject = async (id: string): Promise<void> => {
 	await ProjectsHandlers.DELETE_PROJECT(id);
 };

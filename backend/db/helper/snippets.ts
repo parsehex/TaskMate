@@ -1,3 +1,4 @@
+import { v4 } from 'uuid';
 import { Snippet } from '../../../shared/types/index.js';
 import { db } from '../index.js';
 import { insertStatement, updateStatement } from '../sql-utils.js';
@@ -22,14 +23,14 @@ export const getSnippets = async (
 };
 
 export const getSnippetsByProjectId = async (
-	project_id: number,
+	project_id: string,
 	columns = '*'
 ): Promise<Snippet[]> => {
 	return await getSnippets(columns, { project_id });
 };
 
 export const getSnippetById = async (
-	id: number,
+	id: string,
 	columns = '*'
 ): Promise<Snippet> => {
 	return await db.get(
@@ -39,7 +40,7 @@ export const getSnippetById = async (
 };
 
 export const updateSnippet = async (
-	id: number,
+	id: string,
 	snippet: Partial<Snippet>
 ): Promise<Snippet> => {
 	const fieldsObj: Partial<Snippet> = {
@@ -54,11 +55,12 @@ export const updateSnippet = async (
 };
 
 export const createSnippet = async (
-	project_id: number,
+	project_id: string,
 	snippet: Partial<Snippet>
 ): Promise<Snippet> => {
 	const { sql, values } = insertStatement('snippets', {
 		...snippet,
+		id: v4(),
 		project_id,
 		updated_at: new Date().toISOString(),
 	});
@@ -67,6 +69,6 @@ export const createSnippet = async (
 	return await getSnippetById(result.lastID);
 };
 
-export const deleteSnippet = async (id: number): Promise<void> => {
+export const deleteSnippet = async (id: string): Promise<void> => {
 	await db.run('DELETE FROM snippets WHERE id = ?', [id]);
 };

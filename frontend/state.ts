@@ -3,7 +3,7 @@ import { Project, Prompt_Part, Snippet, File } from '../shared/types';
 
 interface State {
 	projects: Project[];
-	selectedProjectId: number | null;
+	selectedProjectId: string | null;
 	files: File[];
 	snippets: Snippet[];
 	selectedPromptPart: Prompt_Part | null;
@@ -13,7 +13,7 @@ interface State {
 	isConnected: boolean;
 
 	setProjects: (projects: Project[]) => void;
-	setSelectedProjectId: (projectId: number | null) => void;
+	setSelectedProjectId: (projectId: string | null) => void;
 	setFiles: (files: File[]) => void;
 	setFile: (file: File) => void;
 	setSnippets: (snippets: Snippet[]) => void;

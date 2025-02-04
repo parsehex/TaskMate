@@ -2,8 +2,8 @@ import UtilsHandlers from '../ws/utils';
 
 interface GetTokenCountOptions {
 	text?: string;
-	fileId?: number;
-	snippetId?: number;
+	fileId?: string;
+	snippetId?: string;
 }
 interface GetTokenCountResponse {
 	token_count: number;
@@ -20,8 +20,8 @@ export const getTokenCount = async (
 };
 
 interface GenerateSummaryOptions {
-	fileId?: number;
-	snippetId?: number;
+	fileId?: string;
+	snippetId?: string;
 }
 interface GenerateSummaryResponse {
 	data: { text: string };

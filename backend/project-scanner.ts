@@ -27,11 +27,11 @@ const CreateProjectFilesSnippet = async (project: Project) => {
 };
 
 async function createFilesForProject(
-	projectId: number,
+	projectId: string,
 	projectName: string,
 	folderPath = ''
 ) {
-	const projectPath = await getProjectPath(projectName, folderPath);
+	const projectPath = await getProjectPath({name: projectName}, folderPath);
 
 	const project = await projectHelper.getProjectById(projectId, 'ignore_files');
 	const ignoreFiles = project
@@ -68,8 +68,8 @@ async function createFilesForProject(
 	}
 }
 
-async function watchProjectFolder(projectId: number, projectName: string) {
-	const projectPath = await getProjectPath(projectName);
+async function watchProjectFolder(projectId: string, projectName: string) {
+	const projectPath = await getProjectPath({name: projectName});
 	const project = await projectHelper.getProjectById(
 		projectId,
 		'id,name,ignore_files'
@@ -150,7 +150,7 @@ export async function scanProjectsRoot() {
 				name: projectName,
 			});
 
-			let projectId: number;
+			let projectId: string;
 
 			if (!existingProject.length) {
 				const project = await projectHelper.createProject({

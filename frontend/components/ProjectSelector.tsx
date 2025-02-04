@@ -15,7 +15,7 @@ const ProjectSelector: React.FC = () => {
 	const handleProjectSelection = (
 		event: React.ChangeEvent<HTMLSelectElement>
 	) => {
-		const projectId = Number(event.target.value);
+		const projectId = event.target.value;
 		setSelectedProjectId(projectId);
 
 		localStorage.setItem('selectedProjectId', projectId.toString());

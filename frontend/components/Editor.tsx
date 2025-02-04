@@ -97,7 +97,7 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 	}, [handleKeyPress]);
 
 	const handleNameChange = async (newName: string) => {
-		if (!promptPart || promptPart.id < 0) return;
+		if (!promptPart || promptPart.id === '-1') return;
 		if (newName !== promptPart?.name) {
 			const setFunc = isSnippet(promptPart) ? setSnippet : setFile;
 			const updateFunc = isSnippet(promptPart) ? updateSnippet : updateFile;
@@ -114,8 +114,8 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 	};
 
 	const handleSave = async () => {
-		if (promptPart && promptPart.id >= 0) {
 			const data: any = {};
+		if (promptPart && promptPart.id !== '-1') {
 			if (activeTab === 'content') data.content = content;
 			else if (activeTab === 'summary') data.summary = summary;
 			const setFunc = isSnippet(promptPart) ? setSnippet : setFile;
@@ -136,7 +136,7 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 		value: boolean,
 		type: 'useTitle' | 'useSummary'
 	) => {
-		if (!promptPart || promptPart.id < 0) return;
+		if (!promptPart || promptPart.id === '-1') return;
 		const data: any = {};
 		if (type === 'useSummary') data.use_summary = value;
 		else if (type === 'useTitle') data.use_title = value;
@@ -148,7 +148,7 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 	};
 
 	const handleGenerateSummary = async () => {
-		if (promptPart && promptPart.id >= 0) {
+		if (promptPart && promptPart.id !== '-1') {
 			const data: any = {};
 			if (isSnippet(promptPart)) data.snippetId = promptPart.id;
 			else data.fileId = promptPart.id;
