@@ -90,7 +90,7 @@ const PromptPartsList: React.FC = () => {
 			<ResizablePanelGroup direction="vertical" className="flex-1">
 				<ResizablePanel defaultSize={50} minSize={30} maxSize={70}>
 					<ScrollArea className="border rounded-md h-full">
-						<div className="sticky top-0 bg-neutral-400 z-10 flex justify-between items-center px-2 pb-2 border-b">
+						<div className="sticky top-0 bg-neutral-300 flex justify-between items-center px-2 border-b">
 							<h3 className="text-sm font-medium">Snippets</h3>
 							<Button
 								onClick={handleClearSnippets}
@@ -121,7 +121,7 @@ const PromptPartsList: React.FC = () => {
 
 				<ResizablePanel defaultSize={50} minSize={30} maxSize={70}>
 					<ScrollArea className="border rounded-md h-full">
-						<div className="sticky top-0 bg-neutral-400 z-10 flex justify-between items-center px-2 pb-2 border-b">
+						<div className="sticky top-0 bg-neutral-300 flex justify-between items-center px-2 border-b">
 							<h3 className="text-sm font-medium">Files</h3>
 							<Button
 								onClick={handleClearFiles}

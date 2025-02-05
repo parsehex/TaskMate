@@ -79,9 +79,9 @@ const CopyPromptButton: React.FC<CopyPromptButtonProps> = ({
 			onClick={copyPromptToClipboard}
 			disabled={isLoading}
 			variant="secondary"
-			size="sm"
+			size="xs"
 		>
-			{label !== '' ? label : <Copy className="h-2 w-2" />}
+			{label !== '' ? label : <Copy />}
 		</Button>
 	);
 };

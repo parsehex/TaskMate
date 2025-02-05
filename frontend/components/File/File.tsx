@@ -70,7 +70,7 @@ const File: React.FC<FileProps> = ({ file, selected }) => {
 				)}
 			</div>
 
-			<span className="ml-auto flex items-center gap-2">
+			<span className="mr-2 flex items-center gap-2">
 				<Indicators file={file} />
 				<CopyPromptButton promptParts={[file]} label="" />
 			</span>
