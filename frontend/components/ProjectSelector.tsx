@@ -34,7 +34,11 @@ const ProjectSelector: React.FC = () => {
 					value={selectedProjectId || ''}
 					onValueChange={handleProjectSelection}
 				>
-					<SelectTrigger>
+					<SelectTrigger
+						data-tooltip-id="previewButton"
+						data-tooltip-html="Projects"
+						data-tooltip-delay-show={250}
+					>
 						<SelectValue placeholder="Select a project" />
 					</SelectTrigger>
 					<SelectContent>

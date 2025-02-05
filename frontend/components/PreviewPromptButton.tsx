@@ -59,7 +59,7 @@ const PreviewPromptButton: React.FC = () => {
 				data-tooltip-html={includedPromptParts
 					.map((part) => '- ' + part.name)
 					.join('<br>')}
-				data-tooltip-delay-show={0}
+				data-tooltip-delay-show={150}
 				data-data-tooltip-place="bottom"
 				onClick={handlePreviewClick}
 			>
