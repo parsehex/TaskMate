@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/select';
 import { useStore } from '../state';
 import ProjectSettingsModal from './ProjectSettingsModal';
+import NewProjectModal from './NewProjectModal';
 
 const ProjectSelector: React.FC = () => {
 	const [projects, selectedProjectId, setSelectedProjectId] = useStore(
@@ -19,6 +20,7 @@ const ProjectSelector: React.FC = () => {
 		]
 	);
 	const [showSettingsModal, setShowSettingsModal] = useState(false);
+	const [showNewProjectModal, setShowNewProjectModal] = useState(false);
 
 	const handleProjectSelection = (value: string) => {
 		setSelectedProjectId(value);
@@ -47,9 +49,16 @@ const ProjectSelector: React.FC = () => {
 			<Button variant="outline" onClick={() => setShowSettingsModal(true)}>
 				Edit Project
 			</Button>
+			<Button variant="default" onClick={() => setShowNewProjectModal(true)}>
+				New Project
+			</Button>
 			<ProjectSettingsModal
 				isOpen={showSettingsModal && selectedProjectId !== null}
 				onClose={() => setShowSettingsModal(false)}
+			/>
+			<NewProjectModal
+				isOpen={showNewProjectModal}
+				onClose={() => setShowNewProjectModal(false)}
 			/>
 		</div>
 	);

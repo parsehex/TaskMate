@@ -8,7 +8,7 @@ async function GET_SNIPPET(id: string) {
 
 async function GET_SNIPPETS(project_id: string | undefined) {
 	const where: any = {};
-	if (project_id !== null && Number.isInteger(project_id))
+	if (project_id !== null)
 		where['project_id'] = project_id;
 	return await helper.getSnippets('*', where);
 }

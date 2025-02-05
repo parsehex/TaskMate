@@ -153,10 +153,12 @@ export async function scanProjectsRoot() {
 			let projectId: string;
 
 			if (!existingProject.length) {
+				const p = path.join(projectsRoot, projectName);
 				const project = await projectHelper.createProject({
 					name: projectName,
 					description: '',
 					ignore_files: JSON.stringify(DefaultIgnoreFiles),
+					path: p,
 				});
 				projectId = project.id;
 				existingProject.push(project);

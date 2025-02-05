@@ -6,8 +6,8 @@ async function GET_PROJECTS() {
 	return await helper.getProjects();
 }
 
-async function CREATE_PROJECT(name: string) {
-	return await helper.createProject({ name });
+async function CREATE_PROJECT(name: string, path: string) {
+	return await helper.createProject({ name, path });
 }
 
 async function UPDATE_PROJECT(id: string, project: Partial<Project>) {

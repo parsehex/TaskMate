@@ -1,7 +1,11 @@
 import { v4 } from 'uuid';
+import fs from 'fs-extra';
+import p from 'path';
 import { Project } from '../../../shared/types/index.js';
 import { db } from '../index.js';
 import { insertStatement, updateStatement } from '../sql-utils.js';
+import { getProjectPath } from '../../path-utils.js';
+import { DefaultIgnoreFiles } from '../../const.js';
 
 export const getProjects = async (
 	columns = '*',
@@ -27,9 +31,22 @@ export const getProjectById = async (id: string, columns = '*') => {
 	);
 	return project;
 };
-export const createProject = async ({ name, ...project }: Partial<Project>) => {
+export const createProject = async ({ name, path, ...project }: Partial<Project> & {path:string}) => {
 	if (!name) throw new Error('Project name is required');
+	if (!path) throw new Error('Project path is required');
+	try {
+		const stat = await fs.stat(path);
+		if (!stat.isDirectory()) throw new Error('Project path must be directory');
+	} catch(e) {
+		throw new Error('Project path must exist');
+	}
+	const projectPath = p.join(process.env.PROJECTS_ROOT as string, name);
+	fs.createSymlink(path, projectPath);
 	const id = v4();
+	project.description = project.description || '';
+	if (!project.ignore_files?.length) {
+		project.ignore_files = JSON.stringify(DefaultIgnoreFiles);
+	}
 	const fieldsObj: Partial<Project> & { name: string } = {
 		id,
 		name,
