@@ -43,7 +43,7 @@ const File: React.FC<FileProps> = ({ file, selected }) => {
 				'flex items-center justify-between p-2 rounded-md transition',
 				'border border-transparent hover:border-gray-300',
 				'shadow-sm cursor-pointer',
-				{ 'bg-gray-100 dark:bg-gray-700': file.included },
+				{ 'bg-gray-100 dark:bg-gray-500': file.included },
 				{ 'ring-2 ring-blue-500': selected }
 			)}
 			onClick={handleOnSelect}
@@ -56,17 +56,19 @@ const File: React.FC<FileProps> = ({ file, selected }) => {
 				anchorRef={ref}
 			/>
 
-			<Checkbox
-				checked={file.included}
-				handleCheckboxChange={handleCheckboxChange}
-				handleCheckboxClick={handleCheckboxClick}
-			/>
+			<div className="flex items-center gap-2 flex-1 mr-4">
+				<Checkbox
+					checked={file.included}
+					handleCheckboxChange={handleCheckboxChange}
+					handleCheckboxClick={handleCheckboxClick}
+				/>
 
-			<span className="file-name ml-1">{file.name.split('/').pop()}</span>
+				<span className="file-name">{file.name.split('/').pop()}</span>
 
-			{file.use_title && (
-				<span className="indicator title-indicator text-blue-500">T</span>
-			)}
+				{file.use_title && (
+					<span className="indicator title-indicator text-blue-500">T</span>
+				)}
+			</div>
 
 			<span className="ml-auto flex items-center gap-2">
 				<Indicators file={file} />

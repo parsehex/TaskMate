@@ -50,7 +50,7 @@ const Snippet: React.FC<SnippetProps> = ({
 				'border border-transparent hover:border-gray-300',
 				'bg-background text-foreground',
 				'shadow-sm cursor-pointer',
-				{ 'bg-gray-100 dark:bg-gray-700': snippet.included },
+				{ 'bg-gray-100 dark:bg-gray-500': snippet.included },
 				{ 'ring-2 ring-blue-500': selected },
 				{ 'opacity-50': isDragging }
 			)}

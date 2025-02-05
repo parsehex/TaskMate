@@ -15,8 +15,5 @@ export const Indicators: React.FC<IndicatorsProps> = ({ file }) => (
 				<FontAwesomeIcon icon={faBookOpen} color="orange" />
 			</span>
 		)}
-		<span className="indicator" title="Is a file">
-			<FontAwesomeIcon icon={faFile} />
-		</span>
 	</span>
 );

@@ -1,7 +1,17 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Project } from '../../shared/types';
 import { updateProject } from '../api/projects';
 import { useStore } from '../state';
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 
 interface ProjectSettingsModalProps {
 	onClose: () => void;
@@ -16,37 +26,28 @@ const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
 		state.projects,
 		state.selectedProjectId,
 	]);
-	let selectedProject: Project | undefined;
-	const findSelectedProject = () => {
-		selectedProject = projects.find(
-			(project) => project.id === selectedProjectId
-		);
-	};
-	findSelectedProject();
+	const selectedProject = projects.find(
+		(project) => project.id === selectedProjectId
+	);
+
 	const [description, setDescription] = useState(
 		selectedProject?.description || ''
 	);
 	const [ignoredPaths, setIgnoredPaths] = useState(
 		selectedProject?.ignore_files || ''
 	);
-	const dialog = useRef<HTMLDialogElement>(null);
 
 	useEffect(() => {
-		setDescription(selectedProject?.description || '');
-		setIgnoredPaths(selectedProject?.ignore_files || '');
-	}, [selectedProject]);
-
-	useEffect(() => {
-		if (isOpen && selectedProject) {
-			dialog.current?.showModal();
-		} else {
-			dialog.current?.close();
+		if (selectedProject) {
+			setDescription(selectedProject.description || '');
+			setIgnoredPaths(selectedProject.ignore_files || '');
 		}
-	}, [isOpen]);
+	}, [selectedProject, isOpen]);
 
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		if (!selectedProject) return;
+
 		await updateProject(selectedProject.id, {
 			description,
 			ignore_files: ignoredPaths,
@@ -55,30 +56,46 @@ const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
 	};
 
 	return (
-		<dialog ref={dialog}>
-			<form onSubmit={handleSubmit}>
-				<h2>Edit Project</h2>
-				<label htmlFor="description">Description</label>
-				<textarea
-					id="description"
-					value={description}
-					onChange={(e) => setDescription(e.target.value)}
-				/>
-				<label htmlFor="ignoredPaths">Ignored Paths</label>
-				<input
-					type="text"
-					id="ignoredPaths"
-					value={ignoredPaths}
-					onChange={(e) => setIgnoredPaths(e.target.value)}
-				/>
-				<div>
-					<button type="submit">Save</button>
-					<button type="button" onClick={onClose}>
-						Cancel
-					</button>
-				</div>
-			</form>
-		</dialog>
+		<Dialog open={isOpen} onOpenChange={onClose}>
+			<DialogContent className="max-w-lg bg-gray-200">
+				<DialogHeader>
+					<DialogTitle>Edit Project</DialogTitle>
+				</DialogHeader>
+				<form onSubmit={handleSubmit} className="space-y-4">
+					<div className="space-y-2">
+						<label htmlFor="description" className="text-sm font-medium">
+							Description
+						</label>
+						<Textarea
+							id="description"
+							value={description}
+							onChange={(e) => setDescription(e.target.value)}
+							placeholder="Enter project description..."
+							className="w-full"
+						/>
+					</div>
+					<div className="space-y-2">
+						<label htmlFor="ignoredPaths" className="text-sm font-medium">
+							Ignored Paths
+						</label>
+						<Input
+							type="text"
+							id="ignoredPaths"
+							value={ignoredPaths}
+							onChange={(e) => setIgnoredPaths(e.target.value)}
+							placeholder="e.g., node_modules/, dist/, .git/"
+							className="w-full"
+						/>
+					</div>
+					<DialogFooter className="flex justify-end space-x-2">
+						<Button type="button" variant="ghost" onClick={onClose}>
+							Cancel
+						</Button>
+						<Button type="submit">Save</Button>
+					</DialogFooter>
+				</form>
+			</DialogContent>
+		</Dialog>
 	);
 };
 
