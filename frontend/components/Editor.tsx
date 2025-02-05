@@ -205,7 +205,7 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 				onChange={activeTab === 'content' ? handleChange : handleSummaryChange}
 				options={{ readOnly, wordWrap: 'on' }}
 			/>
-			<div className="flex items-center justify-between mt-2">
+			<div className="flex items-center justify-between mt-2 px-2">
 				<Button onClick={handleSave} disabled={isSaved}>
 					Save
 				</Button>

@@ -116,7 +116,7 @@ export const App: React.FC = () => {
 			)}
 			<main className="flex-1 overflow-hidden">
 				<ResizablePanelGroup direction="horizontal" className="h-full">
-					<ResizablePanel defaultSize={30} minSize={35} maxSize={40}>
+					<ResizablePanel defaultSize={30} minSize={35} maxSize={50}>
 						<div className="h-full flex flex-col p-4">
 							<ProjectSelector />
 							<div className="flex items-center gap-2 my-4">
@@ -137,7 +137,7 @@ export const App: React.FC = () => {
 
 					<ResizableHandle withHandle />
 
-					<ResizablePanel defaultSize={70}>
+					<ResizablePanel>
 						<div className="h-full relative">
 							{selectedPromptPart && (
 								<>
