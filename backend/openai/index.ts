@@ -7,7 +7,7 @@ import { getSummarizePrompt } from './prompts.js';
 
 let chat: ChatOpenAI;
 if (process.env.OPENAI_API_KEY) {
-	new ChatOpenAI({
+	chat = new ChatOpenAI({
 		openAIApiKey: process.env.OPENAI_API_KEY as string,
 		modelName: 'gpt-3.5-turbo',
 		temperature: 0.5,
