@@ -3,6 +3,7 @@ import { FileNode } from '../../file-hierarchy';
 import { useStore } from '../../state';
 import File from '../File/File';
 import { useDirectoryState } from './useState';
+import { Folder, FolderOpen } from 'lucide-react';
 
 interface DirectoryProps {
 	node: FileNode;
@@ -25,22 +26,34 @@ const Directory: React.FC<DirectoryProps> = ({ node, index, path }) => {
 
 	return (
 		<>
-			<div onClick={handleToggle} className="directory">
-				{node.children && <span>{isCollapsed ? '▶' : '▼'}</span>}
-				{node.name}
-				{includedFileCount > 0 && (
-					<span className="badge">{includedFileCount}</span>
+			<div
+				onClick={handleToggle}
+				className="flex items-center gap-2 cursor-pointer p-2 hover:bg-accent rounded-md"
+			>
+				{node.children && (
+					<span>
+						{isCollapsed ? <Folder size={16} /> : <FolderOpen size={16} />}
+					</span>
 				)}
+				<span className="font-medium">{node.name}</span>
+
+				{includedFileCount > 0 && (
+					<span className="ml-auto text-xs px-2 py-1 bg-muted rounded-md">
+						{includedFileCount}
+					</span>
+				)}
+
 				<button
-					className="select-all"
+					className="text-xs px-1 border rounded hover:bg-secondary"
 					onClick={handleSelectAllChange}
 					title={selectAll ? 'Deselect All' : 'Select All'}
 				>
-					{selectAll ? '-' : '+'}
+					{selectAll ? '−' : '+'}
 				</button>
 			</div>
+
 			{!isCollapsed && node.children && (
-				<ul>
+				<ul className="pl-4 border-l border-muted">
 					{node.children.map((childNode, thisIndex) => (
 						<React.Fragment
 							key={

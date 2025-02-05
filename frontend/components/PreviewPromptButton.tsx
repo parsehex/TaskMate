@@ -1,4 +1,6 @@
 import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Eye } from 'lucide-react';
 import { Prompt_Part } from '../../shared/types';
 import { makePrompt } from '../utils';
 import { useStore } from '../state';
@@ -50,7 +52,8 @@ const PreviewPromptButton: React.FC = () => {
 
 	return (
 		<>
-			<button
+			<Button
+				variant="secondary"
 				data-tooltip-id="previewButton"
 				data-tooltip-html={includedPromptParts
 					.map((part) => '- ' + part.name)
@@ -60,7 +63,7 @@ const PreviewPromptButton: React.FC = () => {
 				onClick={handlePreviewClick}
 			>
 				Preview
-			</button>
+			</Button>
 		</>
 	);
 };

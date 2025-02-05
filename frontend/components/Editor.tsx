@@ -114,7 +114,7 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 	};
 
 	const handleSave = async () => {
-			const data: any = {};
+		const data: any = {};
 		if (promptPart && promptPart.id !== '-1') {
 			if (activeTab === 'content') data.content = content;
 			else if (activeTab === 'summary') data.summary = summary;
@@ -164,7 +164,7 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 	};
 
 	return (
-		<div className="editor">
+		<div className="editor h-[80vh]">
 			<h2>
 				{readOnly ? '' : 'Editing: '}
 				<EditableName

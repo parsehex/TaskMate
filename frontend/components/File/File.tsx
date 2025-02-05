@@ -45,8 +45,8 @@ const File: React.FC<FileProps> = ({ file, selected }) => {
 				setMenuOpen={setMenuOpen}
 				anchorRef={ref}
 			/>
-			<main>
-				<div>
+			<main className="flex items-center justify-between">
+				<div className="flex items-center gap-2">
 					<Checkbox
 						checked={file.included}
 						handleCheckboxChange={handleCheckboxChange}
@@ -63,15 +63,14 @@ const File: React.FC<FileProps> = ({ file, selected }) => {
 							T
 						</span>
 					)}
+					<span>
+						<Indicators file={file} />
+						<CopyPromptButton promptParts={[file]} label="" />
+					</span>
 				</div>
 
-				<span>
-					<Indicators file={file} />
-					<CopyPromptButton promptParts={[file]} label="" />
-				</span>
+				<TokenCountDisplay tokenCount={tokenCount} small={true} />
 			</main>
-
-			<TokenCountDisplay tokenCount={tokenCount} small={true} />
 		</div>
 	);
 };

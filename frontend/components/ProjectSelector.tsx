@@ -1,4 +1,12 @@
 import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select';
 import { useStore } from '../state';
 import ProjectSettingsModal from './ProjectSettingsModal';
 
@@ -12,44 +20,36 @@ const ProjectSelector: React.FC = () => {
 	);
 	const [showSettingsModal, setShowSettingsModal] = useState(false);
 
-	const handleProjectSelection = (
-		event: React.ChangeEvent<HTMLSelectElement>
-	) => {
-		const projectId = event.target.value;
-		setSelectedProjectId(projectId);
-
-		localStorage.setItem('selectedProjectId', projectId.toString());
+	const handleProjectSelection = (value: string) => {
+		setSelectedProjectId(value);
+		localStorage.setItem('selectedProjectId', value.toString());
 	};
 
 	return (
-		<div className="project-selector">
-			<label>
-				Project:{' '}
-				<select
+		<div className="flex items-center gap-2">
+			<div className="flex-1">
+				<Select
 					value={selectedProjectId || ''}
-					onChange={handleProjectSelection}
+					onValueChange={handleProjectSelection}
 				>
-					<option value="">Select a project</option>
-					{projects.map((project) => (
-						<option key={project.id} value={project.id}>
-							{project.name}
-						</option>
-					))}
-				</select>
-			</label>
-			<button
-				className="edit-project"
-				onClick={() => {
-					setShowSettingsModal(true);
-				}}
-			>
+					<SelectTrigger>
+						<SelectValue placeholder="Select a project" />
+					</SelectTrigger>
+					<SelectContent>
+						{projects.map((project) => (
+							<SelectItem key={project.id} value={project.id}>
+								{project.name}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
+			</div>
+			<Button variant="outline" onClick={() => setShowSettingsModal(true)}>
 				Edit Project
-			</button>
+			</Button>
 			<ProjectSettingsModal
 				isOpen={showSettingsModal && selectedProjectId !== null}
-				onClose={() => {
-					setShowSettingsModal(false);
-				}}
+				onClose={() => setShowSettingsModal(false)}
 			/>
 		</div>
 	);

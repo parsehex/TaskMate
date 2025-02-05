@@ -1,6 +1,6 @@
 import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCopy } from '@fortawesome/free-solid-svg-icons';
+import { Copy } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Prompt_Part } from '../../shared/types';
 import { makePrompt } from '../utils';
 import { fetchFiles } from '../api/files';
@@ -25,6 +25,7 @@ const CopyPromptButton: React.FC<CopyPromptButtonProps> = ({
 	if (!promptParts) {
 		promptParts = useStore((state) => state.includedPromptParts);
 	}
+
 	const copyPromptToClipboard = async (
 		e: React.MouseEvent<HTMLButtonElement>
 	) => {
@@ -74,10 +75,14 @@ const CopyPromptButton: React.FC<CopyPromptButtonProps> = ({
 	};
 
 	return (
-		<button onClick={copyPromptToClipboard} disabled={isLoading}>
-			{label !== '' ? label : ''}
-			{label === '' ? <FontAwesomeIcon icon={faCopy} /> : ''}
-		</button>
+		<Button
+			onClick={copyPromptToClipboard}
+			disabled={isLoading}
+			variant="secondary"
+			size="sm"
+		>
+			{label !== '' ? label : <Copy className="h-2 w-2" />}
+		</Button>
 	);
 };
 

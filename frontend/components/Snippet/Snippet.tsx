@@ -63,8 +63,8 @@ const Snippet: React.FC<SnippetProps> = ({
 				editableNameRef={editableNameRef}
 				move={move}
 			/>
-			<main>
-				<div>
+			<main className="flex items-center justify-between">
+				<div className="flex items-center gap-2">
 					<Checkbox
 						checked={snippet.included}
 						handleCheckboxChange={handleCheckboxChange}
@@ -84,15 +84,13 @@ const Snippet: React.FC<SnippetProps> = ({
 							T
 						</span>
 					)}
+					<span>
+						<Indicators file={snippet} />
+						<CopyPromptButton promptParts={[snippet]} label="" />
+					</span>
 				</div>
-
-				<span>
-					<Indicators file={snippet} />
-					<CopyPromptButton promptParts={[snippet]} label="" />
-				</span>
+				<TokenCountDisplay tokenCount={tokenCount} small={true} />
 			</main>
-
-			<TokenCountDisplay tokenCount={tokenCount} small={true} />
 		</div>
 	);
 };

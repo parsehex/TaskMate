@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from '@/lib/utils';
 
 interface TokenCountDisplayProps {
 	tokenCount: number;
@@ -9,19 +10,18 @@ const TokenCountDisplay: React.FC<TokenCountDisplayProps> = ({
 	tokenCount,
 	small = false,
 }) => {
-	let tokenCountClass = 'token-count';
-	if (tokenCount >= 128000) {
-		tokenCountClass += ' red';
-	} else if (tokenCount >= 32000) {
-		tokenCountClass += ' orange';
-	} else if (tokenCount >= 5000) {
-		tokenCountClass += ' yellow';
-	} else {
-		tokenCountClass += ' green';
-	}
+	const getColorClass = () => {
+		if (tokenCount >= 128000) return 'text-red-500';
+		if (tokenCount >= 32000) return 'text-orange-500';
+		if (tokenCount >= 5000) return 'text-yellow-500';
+		return 'text-green-500';
+	};
 
 	return (
-		<span className={tokenCountClass} title={`${tokenCount} tokens`}>
+		<span
+			className={cn('font-medium', getColorClass())}
+			title={`${tokenCount} tokens`}
+		>
 			{tokenCount}
 			{small ? '' : ' tokens'}
 		</span>

@@ -5,23 +5,27 @@ import SnippetPart from './Snippet/Snippet';
 import FilePart from './File/File';
 import Directory from './Directory/Directory';
 import { createFileHierarchy } from '../file-hierarchy';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Plus, Minus } from 'lucide-react';
 
 const PromptPartsList: React.FC = () => {
 	const [
 		files,
 		snippets,
-		setSnippet,
 		setSnippets,
+		setFiles,
 		selectedProjectId,
 		selectedPromptPart,
 	] = useStore((state) => [
 		state.files,
 		state.snippets,
-		state.setSnippet,
 		state.setSnippets,
+		state.setFiles,
 		state.selectedProjectId,
 		state.selectedPromptPart,
 	]);
+
 	const move = async (dragIndex: number, hoverIndex: number) => {
 		const dragged = snippets[dragIndex];
 		let data = [...snippets];
@@ -31,6 +35,7 @@ const PromptPartsList: React.FC = () => {
 		data.forEach((part, index) => {
 			part.position = index;
 		});
+
 		// should only update snippets that have changed
 		data = data.filter(
 			(part, index) => part.position !== snippets[index].position
@@ -58,50 +63,102 @@ const PromptPartsList: React.FC = () => {
 		setSnippets([...snippets, newSnippet]);
 	};
 
+	const handleClearSnippets = async () => {
+		setSnippets(
+			snippets.map((snippet) => {
+				return {
+					...snippet,
+					included: false,
+				};
+			})
+		);
+	};
+
+	const handleClearFiles = async () => {
+		setFiles(
+			files.map((file) => {
+				return {
+					...file,
+					included: false,
+				};
+			})
+		);
+	};
+
 	const fileHierarchy = createFileHierarchy(files);
-	// console.log(fileHierarchy);
+
 	return (
-		<div className="prompt-parts-list-container">
-			<div className="prompt-parts-list-options">
-				<button onClick={handleNewSnippetClick}>+ Snippet</button>
+		<div className="flex flex-col h-full">
+			<Button
+				onClick={handleNewSnippetClick}
+				variant="outline"
+				size="sm"
+				className="mb-4"
+			>
+				<Plus className="h-4 w-4 mr-2" />
+				New Snippet
+			</Button>
+
+			<div className="space-y-4 flex-1">
+				<ScrollArea className="border rounded-md h-[35vh]">
+					<div className="p-4">
+						<h3 className="text-sm font-medium mb-2">
+							Snippets
+							<Button
+								onClick={handleClearSnippets}
+								variant="outline"
+								size="sm"
+								className="ml-2"
+							>
+								-
+							</Button>
+						</h3>
+						<ul className="space-y-1">
+							{snippets.map((part, index) => (
+								<li key={part.name}>
+									<SnippetPart
+										snippet={part}
+										index={index}
+										selected={selectedPromptPart?.id === part.id}
+										move={move}
+									/>
+								</li>
+							))}
+						</ul>
+					</div>
+				</ScrollArea>
+
+				<ScrollArea className="border rounded-md h-[35vh]">
+					<div className="p-4">
+						<h3 className="text-sm font-medium mb-2">
+							Files
+							<Button
+								onClick={handleClearFiles}
+								variant="outline"
+								size="sm"
+								className="ml-2"
+							>
+								-
+							</Button>
+						</h3>
+						<ul className="space-y-1">
+							{fileHierarchy.children?.map((node, index) => (
+								<li key={'file-' + node.path}>
+									{node.promptPart ? (
+										<FilePart
+											file={node.promptPart as any}
+											index={index}
+											selected={selectedPromptPart?.id === node.promptPart.id}
+										/>
+									) : (
+										<Directory node={node} index={index} path={node.path} />
+									)}
+								</li>
+							))}
+						</ul>
+					</div>
+				</ScrollArea>
 			</div>
-			<ul className="prompt-parts-list">
-				{snippets.map((part, index) => (
-					<li
-						key={
-							// (console.log(part.name) as any) ||
-							part.name
-						}
-					>
-						<SnippetPart
-							snippet={part}
-							index={index}
-							selected={selectedPromptPart?.id === part.id}
-							move={move}
-						/>
-					</li>
-				))}
-			</ul>
-			<ul className="prompt-parts-list">
-				{fileHierarchy.children?.map((node, index) => (
-					<li
-						key={
-							// (console.log(node.path) as any) ||
-							'file-' + node.path
-						}
-					>
-						{node.promptPart ? (
-							<FilePart
-								file={node.promptPart}
-								index={index}
-								selected={selectedPromptPart?.id === node.promptPart.id}
-							/>
-						) : (
-							<Directory node={node} index={index} path={node.path} />
-						)}
-					</li>
-				))}
-			</ul>
 		</div>
 	);
 };
