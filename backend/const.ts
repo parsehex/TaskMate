@@ -7,6 +7,8 @@ export const DefaultIgnoreFiles = [
 	'**/.vscode/**',
 	'**/node_modules',
 	'**/node_modules/**',
+	'**/*.lock',
+	'**/*.lockb',
 	'**/*-lock.*',
 	'**/*.ico',
 	'**/*.jpg',
