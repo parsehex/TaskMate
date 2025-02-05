@@ -54,6 +54,7 @@ const PreviewPromptButton: React.FC = () => {
 		<>
 			<Button
 				variant="secondary"
+				size="xs"
 				data-tooltip-id="previewButton"
 				data-tooltip-html={includedPromptParts
 					.map((part) => '- ' + part.name)
