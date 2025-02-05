@@ -68,7 +68,8 @@ const Editor: React.FC = () => {
 	) => {
 		if (!promptPart || promptPart.id === '-1') return;
 		const data: any = {};
-		data[type] = value;
+		const dbType = type === 'useSummary' ? 'use_summary' : 'use_title';
+		data[dbType] = value;
 		type === 'useSummary' ? setUseSummary(value) : setUseTitle(value);
 
 		const setFunc = isSnippet(promptPart) ? setSnippet : setFile;
