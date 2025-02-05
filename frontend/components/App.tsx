@@ -117,9 +117,9 @@ export const App: React.FC = () => {
 			<main className="flex-1 overflow-hidden">
 				<ResizablePanelGroup direction="horizontal" className="h-full">
 					<ResizablePanel defaultSize={30} minSize={35} maxSize={50}>
-						<div className="h-full flex flex-col p-4">
+						<div className="h-full flex flex-col p-1">
 							<ProjectSelector />
-							<div className="flex items-center gap-2 my-4">
+							<div className="flex items-center gap-2 my-2">
 								{/* TODO */}
 								{/* This whole section is revamped to be icons+tooltips:
 								Copy | Run | Preview */}
