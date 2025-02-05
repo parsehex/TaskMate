@@ -40,7 +40,7 @@ const File: React.FC<FileProps> = ({ file, selected }) => {
 			// 	selected ? 'border border-primary' : '',
 			// ].join(' ')}
 			className={clsx(
-				'flex items-center justify-between p-2 rounded-md transition',
+				'flex items-center justify-between p-1 rounded-md transition',
 				'border border-transparent hover:border-gray-300',
 				'shadow-sm cursor-pointer',
 				{ 'bg-gray-100 dark:bg-gray-500': file.included },

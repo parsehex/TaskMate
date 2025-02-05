@@ -120,6 +120,10 @@ export const App: React.FC = () => {
 						<div className="h-full flex flex-col p-4">
 							<ProjectSelector />
 							<div className="flex items-center gap-2 my-4">
+								{/* TODO */}
+								{/* This whole section is revamped to be icons+tooltips:
+								Copy | Run | Preview */}
+								{/* Run = Send prompt to in-app LLM */}
 								<CopyPromptButton />
 								<PreviewPromptButton />
 								<span className="ml-auto">
@@ -146,6 +150,9 @@ export const App: React.FC = () => {
 										<X className="h-4 w-4" />
 									</Button>
 									<Editor />
+									{/* TODO */}
+									{/* - Expose whether editor is open */}
+									{/* - When the editor is closed, show a chat with LLM */}
 								</>
 							)}
 						</div>

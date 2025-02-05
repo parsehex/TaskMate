@@ -28,7 +28,7 @@ const Directory: React.FC<DirectoryProps> = ({ node, index, path }) => {
 		<>
 			<div
 				onClick={handleToggle}
-				className="flex items-center gap-2 cursor-pointer p-2 hover:bg-accent rounded-md"
+				className="flex items-center gap-2 cursor-pointer p-1 hover:bg-accent rounded-md"
 			>
 				{node.children && (
 					<span>
