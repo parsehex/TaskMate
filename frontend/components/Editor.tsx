@@ -39,6 +39,20 @@ const Editor: React.FC = () => {
 		});
 	}, [content, summary, activeTab]);
 
+	useEffect(() => {
+		if (!promptPart) return;
+		if (promptPart.content !== content) {
+			setContent(promptPart.content || '');
+		}
+		if (!summary || promptPart.summary !== summary) {
+			setSummary(promptPart.summary);
+		}
+		setUseSummary(promptPart.use_summary);
+		setUseTitle(promptPart.use_title);
+		setIsSaved(true);
+		setActiveTab(promptPart.use_summary ? 'summary' : 'content');
+	}, [promptPart]);
+
 	const handleNameChange = async (newName: string) => {
 		if (!promptPart || promptPart.id === '-1') return;
 		if (newName !== promptPart?.name) {
@@ -130,7 +144,7 @@ const Editor: React.FC = () => {
 				}
 				theme="vs-dark"
 				value={activeTab === 'content' ? content : summary}
-				options={{ readOnly }}
+				options={{ readOnly, wordWrap: 'on' }}
 			/>
 			<div className="flex items-center justify-between mt-2">
 				<Button onClick={handleSave} disabled={isSaved}>
