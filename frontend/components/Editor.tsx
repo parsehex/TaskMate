@@ -11,7 +11,11 @@ import TokenCountDisplay from './TokenCountDisplay';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 
-const Editor: React.FC = () => {
+interface EditorProps {
+	onContentChange?: (content: string) => void;
+}
+
+const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 	const [promptPart, setFile, setSnippet, readOnly, setReadOnly, isConnected] =
 		useStore((state) => [
 			state.selectedPromptPart,
@@ -31,13 +35,28 @@ const Editor: React.FC = () => {
 	const [useSummary, setUseSummary] = useState(promptPart?.use_summary);
 	const [useTitle, setUseTitle] = useState(promptPart?.use_title);
 
+	const setOption = {
+		useSummary: setUseSummary,
+		useTitle: setUseTitle,
+	};
+
+	const readOnlyState = useRef({
+		restore: false,
+		oldValue: false,
+	});
+
 	useEffect(() => {
-		const text = activeTab === 'content' ? content : summary;
-		getTokenCount({ text }).then((data) => {
-			if (!data) return;
-			setTokenCount(data.token_count);
-		});
-	}, [content, summary, activeTab]);
+		// If we're not connected, set the editor to read-only and save
+		// the old value so we can restore it after we reconnect.
+		if (!isConnected) {
+			readOnlyState.current.restore = true;
+			readOnlyState.current.oldValue = readOnly;
+			setReadOnly(true);
+		} else if (readOnlyState.current.restore) {
+			setReadOnly(readOnlyState.current.oldValue);
+			readOnlyState.current.restore = false;
+		}
+	}, [isConnected]);
 
 	useEffect(() => {
 		if (!promptPart) return;
@@ -53,6 +72,32 @@ const Editor: React.FC = () => {
 		setActiveTab(promptPart.use_summary ? 'summary' : 'content');
 	}, [promptPart]);
 
+	useEffect(() => {
+		const text = activeTab === 'content' ? content : summary;
+		getTokenCount({ text }).then((data) => {
+			if (!data) return;
+			setTokenCount(data.token_count);
+		});
+	}, [content, summary, activeTab]);
+
+	// Save on Ctrl+S
+	const handleKeyPress = useCallback(
+		async (event: KeyboardEvent) => {
+			if (event.code === 'KeyS' && (event.ctrlKey || event.metaKey)) {
+				event.preventDefault();
+				await handleSave();
+			}
+		},
+		[content, summary]
+	);
+	useEffect(() => {
+		window.addEventListener('keydown', handleKeyPress);
+
+		return () => {
+			window.removeEventListener('keydown', handleKeyPress);
+		};
+	}, [handleKeyPress]);
+
 	const handleNameChange = async (newName: string) => {
 		if (!promptPart || promptPart.id === '-1') return;
 		if (newName !== promptPart?.name) {
@@ -61,6 +106,19 @@ const Editor: React.FC = () => {
 			const updatedPart = await updateFunc(promptPart.id, { name: newName });
 			setFunc(updatedPart as any);
 		}
+	};
+
+	const handleChange = (value: string | undefined, ev: any) => {
+		if (!value) return;
+		setContent(value);
+		setIsSaved(value === promptPart?.content);
+		onContentChange && onContentChange(value);
+	};
+	const handleSummaryChange = (value: string | undefined, ev: any) => {
+		if (!value) return;
+		setSummary(value);
+		setIsSaved(value === promptPart?.summary);
+		onContentChange && onContentChange(value);
 	};
 
 	const handleSave = async () => {
@@ -144,6 +202,7 @@ const Editor: React.FC = () => {
 				}
 				theme="vs-dark"
 				value={activeTab === 'content' ? content : summary}
+				onChange={activeTab === 'content' ? handleChange : handleSummaryChange}
 				options={{ readOnly, wordWrap: 'on' }}
 			/>
 			<div className="flex items-center justify-between mt-2">
