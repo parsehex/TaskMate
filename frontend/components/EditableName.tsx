@@ -64,7 +64,7 @@ const EditableName: React.ForwardRefRenderFunction<
 		<input
 			ref={inputRef}
 			type="text"
-			className="editable-name"
+			className="editable-name font-medium"
 			value={newName}
 			onChange={handleChange}
 			onBlur={handleSubmit}

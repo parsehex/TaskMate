@@ -6,6 +6,8 @@ import { useFileState } from './useState';
 import { ContextMenu } from './ContextMenu';
 import { Checkbox } from '../Checkbox';
 import { Indicators } from './Indicators';
+import { FileText } from 'lucide-react';
+import clsx from 'clsx';
 
 interface FileProps {
 	file: File;
@@ -31,11 +33,19 @@ const File: React.FC<FileProps> = ({ file, selected }) => {
 	return (
 		<div
 			ref={ref}
-			className={[
-				'prompt-part file ',
-				file.included ? 'included ' : '',
-				selected ? 'selected ' : '',
-			].join(' ')}
+			// className={[
+			// 	'flex items-center gap-2 p-2 rounded-md cursor-pointer',
+			// 	'hover:bg-accent',
+			// 	file.included ? 'bg-muted' : '',
+			// 	selected ? 'border border-primary' : '',
+			// ].join(' ')}
+			className={clsx(
+				'flex items-center justify-between p-2 rounded-md transition',
+				'border border-transparent hover:border-gray-300',
+				'shadow-sm cursor-pointer',
+				{ 'bg-gray-100 dark:bg-gray-700': file.included },
+				{ 'ring-2 ring-blue-500': selected }
+			)}
 			onClick={handleOnSelect}
 			onContextMenu={handleContextMenu}
 		>
@@ -45,32 +55,25 @@ const File: React.FC<FileProps> = ({ file, selected }) => {
 				setMenuOpen={setMenuOpen}
 				anchorRef={ref}
 			/>
-			<main className="flex items-center justify-between">
-				<div className="flex items-center gap-2">
-					<Checkbox
-						checked={file.included}
-						handleCheckboxChange={handleCheckboxChange}
-						handleCheckboxClick={handleCheckboxClick}
-					/>
 
-					{/* show file name (show rightmost name) */}
-					<span className="file-name">{file.name.split('/').pop()}</span>
-					{file.use_title && (
-						<span
-							className="indicator title-indicator"
-							title="Includes the title"
-						>
-							T
-						</span>
-					)}
-					<span>
-						<Indicators file={file} />
-						<CopyPromptButton promptParts={[file]} label="" />
-					</span>
-				</div>
+			<Checkbox
+				checked={file.included}
+				handleCheckboxChange={handleCheckboxChange}
+				handleCheckboxClick={handleCheckboxClick}
+			/>
 
-				<TokenCountDisplay tokenCount={tokenCount} small={true} />
-			</main>
+			<span className="file-name ml-1">{file.name.split('/').pop()}</span>
+
+			{file.use_title && (
+				<span className="indicator title-indicator text-blue-500">T</span>
+			)}
+
+			<span className="ml-auto flex items-center gap-2">
+				<Indicators file={file} />
+				<CopyPromptButton promptParts={[file]} label="" />
+			</span>
+
+			<TokenCountDisplay tokenCount={tokenCount} small={true} />
 		</div>
 	);
 };

@@ -7,7 +7,12 @@ import Directory from './Directory/Directory';
 import { createFileHierarchy } from '../file-hierarchy';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Plus, Minus } from 'lucide-react';
+import { Plus } from 'lucide-react';
+import {
+	ResizablePanelGroup,
+	ResizablePanel,
+	ResizableHandle,
+} from '@/components/ui/resizable';
 
 const PromptPartsList: React.FC = () => {
 	const [
@@ -56,33 +61,10 @@ const PromptPartsList: React.FC = () => {
 
 	const handleNewSnippetClick = async () => {
 		if (!selectedProjectId) return;
-		// get new name based on existing names
 		const name = 'Snippet ' + (snippets.length + 1);
 		const newSnippet = await createSnippet(selectedProjectId, { name });
 		if (!newSnippet) return;
 		setSnippets([...snippets, newSnippet]);
-	};
-
-	const handleClearSnippets = async () => {
-		setSnippets(
-			snippets.map((snippet) => {
-				return {
-					...snippet,
-					included: false,
-				};
-			})
-		);
-	};
-
-	const handleClearFiles = async () => {
-		setFiles(
-			files.map((file) => {
-				return {
-					...file,
-					included: false,
-				};
-			})
-		);
 	};
 
 	const fileHierarchy = createFileHierarchy(files);
@@ -99,66 +81,53 @@ const PromptPartsList: React.FC = () => {
 				New Snippet
 			</Button>
 
-			<div className="space-y-4 flex-1">
-				<ScrollArea className="border rounded-md h-[35vh]">
-					<div className="p-4">
-						<h3 className="text-sm font-medium mb-2">
-							Snippets
-							<Button
-								onClick={handleClearSnippets}
-								variant="outline"
-								size="sm"
-								className="ml-2"
-							>
-								-
-							</Button>
-						</h3>
-						<ul className="space-y-1">
-							{snippets.map((part, index) => (
-								<li key={part.name}>
-									<SnippetPart
-										snippet={part}
-										index={index}
-										selected={selectedPromptPart?.id === part.id}
-										move={move}
-									/>
-								</li>
-							))}
-						</ul>
-					</div>
-				</ScrollArea>
-
-				<ScrollArea className="border rounded-md h-[35vh]">
-					<div className="p-4">
-						<h3 className="text-sm font-medium mb-2">
-							Files
-							<Button
-								onClick={handleClearFiles}
-								variant="outline"
-								size="sm"
-								className="ml-2"
-							>
-								-
-							</Button>
-						</h3>
-						<ul className="space-y-1">
-							{fileHierarchy.children?.map((node, index) => (
-								<li key={'file-' + node.path}>
-									{node.promptPart ? (
-										<FilePart
-											file={node.promptPart as any}
+			{/* Add resizable panels */}
+			<ResizablePanelGroup direction="vertical" className="flex-1">
+				<ResizablePanel defaultSize={50} minSize={30} maxSize={70}>
+					<ScrollArea className="border rounded-md h-full">
+						<div className="p-4">
+							<h3 className="text-sm font-medium mb-2">Snippets</h3>
+							<ul className="space-y-1 pl-2 border-l border-muted">
+								{snippets.map((part, index) => (
+									<li key={part.name}>
+										<SnippetPart
+											snippet={part}
 											index={index}
-											selected={selectedPromptPart?.id === node.promptPart.id}
+											selected={selectedPromptPart?.id === part.id}
+											move={move}
 										/>
-									) : (
-										<Directory node={node} index={index} path={node.path} />
-									)}
-								</li>
-							))}
-						</ul>
-					</div>
-				</ScrollArea>
-			</div>
+									</li>
+								))}
+							</ul>
+						</div>
+					</ScrollArea>
+				</ResizablePanel>
+
+				<ResizableHandle withHandle />
+
+				<ResizablePanel defaultSize={50} minSize={30} maxSize={70}>
+					<ScrollArea className="border rounded-md h-full">
+						<div className="p-4">
+							<h3 className="text-sm font-medium mb-2">Files</h3>
+							<ul className="space-y-1 pl-2 border-l border-muted">
+								{fileHierarchy.children?.map((node, index) => (
+									<li key={'file-' + node.path}>
+										{node.promptPart ? (
+											<FilePart
+												file={node.promptPart as any}
+												index={index}
+												selected={selectedPromptPart?.id === node.promptPart.id}
+											/>
+										) : (
+											<Directory node={node} index={index} path={node.path} />
+										)}
+									</li>
+								))}
+							</ul>
+						</div>
+					</ScrollArea>
+				</ResizablePanel>
+			</ResizablePanelGroup>
 		</div>
 	);
 };

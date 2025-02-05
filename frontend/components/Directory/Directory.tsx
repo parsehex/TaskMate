@@ -82,5 +82,4 @@ const Directory: React.FC<DirectoryProps> = ({ node, index, path }) => {
 		</>
 	);
 };
-
 export default Directory;
