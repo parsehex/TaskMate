@@ -7,7 +7,7 @@ import Directory from './Directory/Directory';
 import { createFileHierarchy } from '../file-hierarchy';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Plus } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import {
 	ResizablePanelGroup,
 	ResizablePanel,
@@ -67,6 +67,11 @@ const PromptPartsList: React.FC = () => {
 		setSnippets([...snippets, newSnippet]);
 	};
 
+	const handleClearSnippets = () =>
+		setSnippets(snippets.map((snippet) => ({ ...snippet, included: false })));
+	const handleClearFiles = () =>
+		setFiles(files.map((file) => ({ ...file, included: false })));
+
 	const fileHierarchy = createFileHierarchy(files);
 
 	return (
@@ -85,21 +90,30 @@ const PromptPartsList: React.FC = () => {
 			<ResizablePanelGroup direction="vertical" className="flex-1">
 				<ResizablePanel defaultSize={50} minSize={30} maxSize={70}>
 					<ScrollArea className="border rounded-md h-full">
-						<div className="p-4">
-							<h3 className="text-sm font-medium mb-2">Snippets</h3>
-							<ul className="space-y-1 pl-2 border-l border-muted">
-								{snippets.map((part, index) => (
-									<li key={part.name}>
-										<SnippetPart
-											snippet={part}
-											index={index}
-											selected={selectedPromptPart?.id === part.id}
-											move={move}
-										/>
-									</li>
-								))}
-							</ul>
+						<div className="sticky top-0 bg-neutral-400 z-10 flex justify-between items-center px-2 pb-2 border-b">
+							<h3 className="text-sm font-medium">Snippets</h3>
+							<Button
+								onClick={handleClearSnippets}
+								variant="ghost"
+								size="sm"
+								className="text-muted-foreground"
+							>
+								<X className="h-4 w-4 mr-1" />
+								Clear
+							</Button>
 						</div>
+						<ul className="space-y-1 pl-2 border-l border-muted">
+							{snippets.map((part, index) => (
+								<li key={part.name}>
+									<SnippetPart
+										snippet={part}
+										index={index}
+										selected={selectedPromptPart?.id === part.id}
+										move={move}
+									/>
+								</li>
+							))}
+						</ul>
 					</ScrollArea>
 				</ResizablePanel>
 
@@ -107,24 +121,33 @@ const PromptPartsList: React.FC = () => {
 
 				<ResizablePanel defaultSize={50} minSize={30} maxSize={70}>
 					<ScrollArea className="border rounded-md h-full">
-						<div className="p-4">
-							<h3 className="text-sm font-medium mb-2">Files</h3>
-							<ul className="space-y-1 pl-2 border-l border-muted">
-								{fileHierarchy.children?.map((node, index) => (
-									<li key={'file-' + node.path}>
-										{node.promptPart ? (
-											<FilePart
-												file={node.promptPart as any}
-												index={index}
-												selected={selectedPromptPart?.id === node.promptPart.id}
-											/>
-										) : (
-											<Directory node={node} index={index} path={node.path} />
-										)}
-									</li>
-								))}
-							</ul>
+						<div className="sticky top-0 bg-neutral-400 z-10 flex justify-between items-center px-2 pb-2 border-b">
+							<h3 className="text-sm font-medium">Files</h3>
+							<Button
+								onClick={handleClearFiles}
+								variant="ghost"
+								size="sm"
+								className="text-muted-foreground"
+							>
+								<X className="h-4 w-4 mr-1" />
+								Clear
+							</Button>
 						</div>
+						<ul className="space-y-1 pl-2 border-l border-muted">
+							{fileHierarchy.children?.map((node, index) => (
+								<li key={'file-' + node.path}>
+									{node.promptPart ? (
+										<FilePart
+											file={node.promptPart as any}
+											index={index}
+											selected={selectedPromptPart?.id === node.promptPart.id}
+										/>
+									) : (
+										<Directory node={node} index={index} path={node.path} />
+									)}
+								</li>
+							))}
+						</ul>
 					</ScrollArea>
 				</ResizablePanel>
 			</ResizablePanelGroup>
