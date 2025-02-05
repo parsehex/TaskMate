@@ -46,7 +46,7 @@ const Snippet: React.FC<SnippetProps> = ({
 		<div
 			ref={ref}
 			className={clsx(
-				'flex items-center justify-between p-2 rounded-md transition',
+				'flex items-center justify-between p-1 rounded-md transition',
 				'border border-transparent hover:border-gray-300',
 				'bg-background text-foreground',
 				'shadow-sm cursor-pointer',
