@@ -139,6 +139,17 @@ export async function scanProjectsRoot() {
 	}
 
 	try {
+		const rootParent = path.dirname(projectsRoot);
+		const stat = await fs.stat(rootParent);
+		if (!stat.isDirectory()) {
+			throw new Error('Projects root must be in a folder');
+		}
+		await fs.ensureDir(projectsRoot);
+	} catch (e: any) {
+		throw new Error('Could not initialize projects root:' + e?.message);
+	}
+
+	try {
 		const items = await fs.readdir(projectsRoot, { withFileTypes: true });
 		const directories = items.filter(
 			(item) => item.isDirectory() || item.isSymbolicLink()
