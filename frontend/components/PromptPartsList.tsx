@@ -13,6 +13,7 @@ import {
 	ResizablePanel,
 	ResizableHandle,
 } from '@/components/ui/resizable';
+import { updateFiles } from '@/api/files';
 
 const PromptPartsList: React.FC = () => {
 	const [
@@ -30,6 +31,11 @@ const PromptPartsList: React.FC = () => {
 		state.selectedProjectId,
 		state.selectedPromptPart,
 	]);
+
+	const selectedSnippetsCount = snippets.filter(
+		(snippet) => snippet.included
+	).length;
+	const selectedFilesCount = files.filter((file) => file.included).length;
 
 	const move = async (dragIndex: number, hoverIndex: number) => {
 		const dragged = snippets[dragIndex];
@@ -67,10 +73,25 @@ const PromptPartsList: React.FC = () => {
 		setSnippets([...snippets, newSnippet]);
 	};
 
-	const handleClearSnippets = () =>
-		setSnippets(snippets.map((snippet) => ({ ...snippet, included: false })));
-	const handleClearFiles = () =>
-		setFiles(files.map((file) => ({ ...file, included: false })));
+	const handleClearSnippets = async () => {
+		const updatedSnippets = snippets.map((snippet) => ({
+			...snippet,
+			included: false,
+		}));
+
+		await updateSnippets(updatedSnippets); // Persist to API
+		setSnippets(updatedSnippets);
+	};
+
+	const handleClearFiles = async () => {
+		const updatedFiles = files.map((file) => ({
+			...file,
+			included: false,
+		}));
+
+		await updateFiles(updatedFiles); // Persist to API
+		setFiles(updatedFiles);
+	};
 
 	const fileHierarchy = createFileHierarchy(files);
 
@@ -91,7 +112,9 @@ const PromptPartsList: React.FC = () => {
 				<ResizablePanel defaultSize={50} minSize={30} maxSize={70}>
 					<ScrollArea className="border rounded-md h-full">
 						<div className="sticky top-0 bg-neutral-300 flex justify-between items-center px-2 border-b">
-							<h3 className="text-sm font-medium">Snippets</h3>
+							<h3 className="text-sm font-medium">
+								Snippets ({selectedSnippetsCount})
+							</h3>
 							<Button
 								onClick={handleClearSnippets}
 								variant="ghost"
@@ -102,6 +125,7 @@ const PromptPartsList: React.FC = () => {
 								Clear
 							</Button>
 						</div>
+
 						<ul className="space-y-1 pl-2 border-l border-muted">
 							{snippets.map((part, index) => (
 								<li key={part.name}>
@@ -122,7 +146,9 @@ const PromptPartsList: React.FC = () => {
 				<ResizablePanel defaultSize={50} minSize={30} maxSize={70}>
 					<ScrollArea className="border rounded-md h-full">
 						<div className="sticky top-0 bg-neutral-300 flex justify-between items-center px-2 border-b">
-							<h3 className="text-sm font-medium">Files</h3>
+							<h3 className="text-sm font-medium">
+								Files ({selectedFilesCount})
+							</h3>
 							<Button
 								onClick={handleClearFiles}
 								variant="ghost"
@@ -133,6 +159,7 @@ const PromptPartsList: React.FC = () => {
 								Clear
 							</Button>
 						</div>
+
 						<ul className="space-y-1 pl-2 border-l border-muted">
 							{fileHierarchy.children?.map((node, index) => (
 								<li key={'file-' + node.path}>
