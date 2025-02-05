@@ -111,7 +111,7 @@ const PromptPartsList: React.FC = () => {
 			<ResizablePanelGroup direction="vertical" className="flex-1">
 				<ResizablePanel defaultSize={50} minSize={30} maxSize={70}>
 					<ScrollArea className="border rounded-md h-full">
-						<div className="sticky top-0 bg-neutral-300 flex justify-between items-center px-2 border-b">
+						<div className="sticky top-0 bg-neutral-300 flex justify-between items-center px-2 mb-1 border-b">
 							<h3 className="text-sm font-medium">
 								Snippets ({selectedSnippetsCount})
 							</h3>
@@ -126,7 +126,7 @@ const PromptPartsList: React.FC = () => {
 							</Button>
 						</div>
 
-						<ul className="space-y-1 pl-2 border-l border-muted">
+						<ul className="space-y-1 px-1 border-muted">
 							{snippets.map((part, index) => (
 								<li key={part.name}>
 									<SnippetPart
