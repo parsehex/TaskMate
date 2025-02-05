@@ -50,7 +50,7 @@ const ProjectSelector: React.FC = () => {
 				Edit Project
 			</Button>
 			<Button variant="default" onClick={() => setShowNewProjectModal(true)}>
-				New Project
+				New
 			</Button>
 			<ProjectSettingsModal
 				isOpen={showSettingsModal && selectedProjectId !== null}
