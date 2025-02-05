@@ -10,8 +10,8 @@ export const fetchFiles = async (projectId?: string): Promise<File[]> => {
 };
 
 export const updateFile = async (
-	data: Partial<File>
 	id: string,
+	data: Partial<File>
 ): Promise<File> => {
 	const res = await FilesHandlers.UPDATE_FILE(id, data);
 	return convertBooleans(res, FileBooleanColumns);

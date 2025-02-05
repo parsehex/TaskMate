@@ -12,8 +12,8 @@ export const fetchSnippets = async (projectId?: string): Promise<Snippet[]> => {
 };
 
 export const updateSnippet = async (
-	data: Partial<Snippet>
 	id: string,
+	data: Partial<Snippet>
 ): Promise<Snippet> => {
 	const res = await SnippetsHandlers.UPDATE_SNIPPET(id, data);
 	return convertBooleans(res, SnippetBooleanColumns);
