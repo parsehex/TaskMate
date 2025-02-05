@@ -29,15 +29,16 @@ export const getProjectById = async (id: string, columns = '*') => {
 };
 export const createProject = async ({ name, ...project }: Partial<Project>) => {
 	if (!name) throw new Error('Project name is required');
+	const id = v4();
 	const fieldsObj: Partial<Project> & { name: string } = {
-		id: v4(),
+		id,
 		name,
 		...project,
 	};
 	const { sql, values } = insertStatement('projects', fieldsObj);
-	const q = await db.run(sql, values);
+	await db.run(sql, values);
 	return (await db.get('SELECT * FROM projects WHERE id = ?', [
-		q.lastID,
+		id,
 	])) as Project;
 };
 export const updateProject = async (id: string, project: Partial<Project>) => {

@@ -58,15 +58,16 @@ export const createSnippet = async (
 	project_id: string,
 	snippet: Partial<Snippet>
 ): Promise<Snippet> => {
+	const id = v4();
 	const { sql, values } = insertStatement('snippets', {
 		...snippet,
-		id: v4(),
+		id,
 		project_id,
 		updated_at: new Date().toISOString(),
 	});
 	if (snippet.id) delete snippet.id;
-	const result = await db.run(sql, values);
-	return await getSnippetById(result.lastID);
+	await db.run(sql, values);
+	return await getSnippetById(id);
 };
 
 export const deleteSnippet = async (id: string): Promise<void> => {

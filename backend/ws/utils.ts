@@ -18,10 +18,12 @@ async function GET_TOKEN_COUNT(payload: GetTokenCountMessage) {
 		content = payload.text;
 	} else if (payload.snippetId !== undefined) {
 		const snippet = await getSnippetById(payload.snippetId);
-		content += snippet.use_title
-			? snippet.name + (snippet.use_summary ? ' (summary)' : '') + ':\n'
-			: '';
-		content += snippet.use_summary ? snippet.summary : snippet.content;
+		if (snippet) {
+			content += snippet.use_title
+				? snippet.name + (snippet.use_summary ? ' (summary)' : '') + ':\n'
+				: '';
+			content += snippet.use_summary ? snippet.summary : snippet.content;
+		}
 	} else if (payload.fileId !== undefined) {
 		const file = await getFileById(payload.fileId);
 		if (file.use_summary) {

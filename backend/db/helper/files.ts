@@ -81,16 +81,17 @@ export const createFile = async (
 	project_id: string,
 	file: Partial<File>
 ): Promise<File> => {
+	const id = v4();
 	const { sql, values } = insertStatement('files', {
 		...file,
-		id: v4(),
+		id,
 		project_id,
 		updated_at: new Date().toISOString(),
 	});
 	if (file.id) delete file.id;
 	if (file.content) delete file.content;
-	const result = await db.run(sql, values);
-	return await getFileById(result.lastID);
+	await db.run(sql, values);
+	return await getFileById(id);
 };
 
 export const deleteFile = async (id: string): Promise<void> => {
