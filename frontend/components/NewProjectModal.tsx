@@ -10,6 +10,8 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { DefaultIgnoreFiles } from 'shared/const';
 
 interface NewProjectModalProps {
 	isOpen: boolean;
@@ -22,6 +24,10 @@ const NewProjectModal: React.FC<NewProjectModalProps> = ({
 }) => {
 	const [name, setName] = useState('');
 	const [path, setPath] = useState('');
+	const [ignoredPaths, setIgnoredPaths] = useState(
+		JSON.stringify(DefaultIgnoreFiles, null, 2)
+	);
+	console.log(JSON.stringify(DefaultIgnoreFiles));
 	const setProjects = useStore((state) => state.setProjects);
 	const setSelectedProjectId = useStore((state) => state.setSelectedProjectId);
 
@@ -39,7 +45,12 @@ const NewProjectModal: React.FC<NewProjectModalProps> = ({
 		}
 
 		try {
-			const newProject = await createProject(name.trim(), path.trim());
+			const paths = JSON.parse(ignoredPaths);
+			const newProject = await createProject(
+				name.trim(),
+				path.trim(),
+				paths.trim()
+			);
 			const updatedProjects = await fetchProjects();
 			setProjects(updatedProjects);
 			setSelectedProjectId(newProject.id);
@@ -68,7 +79,7 @@ const NewProjectModal: React.FC<NewProjectModalProps> = ({
 		<Dialog open={isOpen} onOpenChange={onClose}>
 			<DialogContent className="max-w-md bg-gray-200">
 				<DialogHeader>
-					<DialogTitle>Create New Project</DialogTitle>
+					<DialogTitle>Add a Project</DialogTitle>
 				</DialogHeader>
 				<form onSubmit={handleSubmit} className="space-y-4">
 					<div>
@@ -94,6 +105,18 @@ const NewProjectModal: React.FC<NewProjectModalProps> = ({
 							onChange={(e) => handleSetPath(e.target.value.replace(/"/g, ''))}
 							placeholder="Enter project path"
 							autoFocus
+						/>
+					</div>
+					<div className="space-y-2">
+						<label htmlFor="ignoredPaths" className="text-sm font-medium">
+							Ignored Paths
+						</label>
+						<Textarea
+							id="ignoredPaths"
+							value={ignoredPaths}
+							onChange={(e) => setIgnoredPaths(e.target.value)}
+							placeholder='e.g., ["node_modules/", "dist/", ".git/"]'
+							className="w-full min-h-28"
 						/>
 					</div>
 					<DialogFooter className="flex justify-end space-x-2">

@@ -12,8 +12,8 @@ export const updateProject = async (
 	await ProjectsHandlers.UPDATE_PROJECT(id, data);
 };
 
-export const createProject = async (name: string, path: string): Promise<Project> => {
-	return await ProjectsHandlers.CREATE_PROJECT(name, path);
+export const createProject = async (name: string, path: string, ignoredPaths?: string[]): Promise<Project> => {
+	return await ProjectsHandlers.CREATE_PROJECT(name, path, ignoredPaths);
 };
 
 export const deleteProject = async (id: string): Promise<void> => {

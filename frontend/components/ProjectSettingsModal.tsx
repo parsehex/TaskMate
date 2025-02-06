@@ -10,7 +10,6 @@ import {
 	DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
 interface ProjectSettingsModalProps {
@@ -34,13 +33,23 @@ const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
 		selectedProject?.description || ''
 	);
 	const [ignoredPaths, setIgnoredPaths] = useState(
-		selectedProject?.ignore_files || ''
+		JSON.stringify(
+			JSON.parse(selectedProject?.ignore_files || '[]'),
+			null,
+			2
+		) || ''
 	);
 
 	useEffect(() => {
 		if (selectedProject) {
 			setDescription(selectedProject.description || '');
-			setIgnoredPaths(selectedProject.ignore_files || '');
+			setIgnoredPaths(
+				JSON.stringify(
+					JSON.parse(selectedProject?.ignore_files || '[]'),
+					null,
+					2
+				) || ''
+			);
 		}
 	}, [selectedProject, isOpen]);
 
@@ -78,13 +87,12 @@ const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
 						<label htmlFor="ignoredPaths" className="text-sm font-medium">
 							Ignored Paths
 						</label>
-						<Input
-							type="text"
+						<Textarea
 							id="ignoredPaths"
 							value={ignoredPaths}
 							onChange={(e) => setIgnoredPaths(e.target.value)}
 							placeholder="e.g., node_modules/, dist/, .git/"
-							className="w-full"
+							className="w-full min-h-28"
 						/>
 					</div>
 					<DialogFooter className="flex justify-end space-x-2">
