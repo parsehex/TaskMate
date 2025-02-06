@@ -1,3 +1,7 @@
+import { ensureEnvVars } from './env.js';
 import { startServer } from './server.js';
 
-startServer();
+(async () => {
+	await ensureEnvVars();
+	startServer();
+})();
