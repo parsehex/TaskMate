@@ -62,11 +62,10 @@ const ensureEnvVars = async () => {
 
 	for (const key of REQUIRED_ENV_VARS) {
 		if (process.env[key]) continue;
-			const defaultValue = exampleDefaults[key];
-			const value = await askQuestion(`Enter value for ${key}`, defaultValue);
-			missingVars[key] = value;
-			process.env[key] = value; // Set dynamically
-
+		const defaultValue = exampleDefaults[key];
+		const value = await askQuestion(`Enter value for ${key}`, defaultValue);
+		missingVars[key] = value;
+		process.env[key] = value;
 	}
 
 	if (Object.keys(missingVars).length > 0) {

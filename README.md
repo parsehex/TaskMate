@@ -1,7 +1,7 @@
-## What is this?
+# Query Craft
 
-This project aims to assist in constructing prompts from text snippets and files. It's intended as a tool to help developers working on a project to construct prompts to send to an LLM like ChatGPT or Claude.
+This is a web app to assist with constructing prompts that get sent to an LLM in a project-centric way.
 
-There is a section for snippets as well as a section listing the files in a chosen project. You can select a combination of snippets and files to construct a prompt which can be copied to the clipboard.
+You have a list of Snippets which are just string of text that you can edit, and you have Files within the selected project folder. By selecting Snippets + Files, the app combines the text into a single prompt, providing an easy way to reuse common parts of the prompt (e.g. instructions, common tasks).
 
-Projects can be added to the set projects folder and changes to the folder will be reflected in the app.
+## Work in Progress
