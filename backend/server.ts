@@ -32,6 +32,14 @@ export const startServer = async () => {
 		app.get('/', (req, res) => {
 			res.sendFile(path.join(staticPath, 'index.html'));
 		});
+		app.post('/rescan-projects', async (req, res) => {
+			try {
+				await scanProjectsRoot();
+				res.json({ success: true, message: 'Projects rescanned.' });
+			} catch (error: any) {
+				res.status(500).json({ success: false, error: error.message });
+			}
+		});
 
 		app.listen(port, () => {
 			console.log(`Server is running on port ${port}`);

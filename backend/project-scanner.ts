@@ -1,6 +1,7 @@
 import { Dirent } from 'fs';
 import fs from 'fs-extra';
 import path from 'path';
+import chokidar from 'chokidar';
 import * as fileHelper from './db/helper/files.js';
 import * as projectHelper from './db/helper/projects.js';
 import { sendToAll } from './ws/index.js';
@@ -124,11 +125,18 @@ async function watchProjectFolder(projectId: string, projectName: string) {
 			sendToAll('file.added', [projectId, file]);
 		}
 	};
-	fs.watch(projectPath, (eventType, fileName) => {
-		if (fileName) {
-			handleFileChange(eventType, fileName);
-		}
+	const watcher = chokidar.watch(projectPath, {
+		ignored: (path) => shouldIgnorePath(DefaultIgnoreFiles, path),
+		ignoreInitial: true,
+		persistent: true,
 	});
+
+	watcher
+		.on('add', (filePath) => handleFileChange('added', filePath))
+		.on('unlink', (filePath) => handleFileChange('removed', filePath))
+		.on('change', (filePath) => handleFileChange('changed', filePath));
+
+	console.log(`Watching project folder: ${projectPath}`);
 }
 
 export async function scanProjectsRoot() {

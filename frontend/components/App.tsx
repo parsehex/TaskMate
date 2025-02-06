@@ -22,6 +22,7 @@ import {
 	ResizableHandle,
 } from '@/components/ui/resizable';
 import { Button } from '@/components/ui/button';
+import ScanProjectsButton from './ScanProjectsButton';
 
 export const App: React.FC = () => {
 	const {
@@ -126,6 +127,7 @@ export const App: React.FC = () => {
 								{/* Run = Send prompt to in-app LLM */}
 								<CopyPromptButton />
 								<PreviewPromptButton />
+								<ScanProjectsButton />
 								<span className="ml-auto">
 									<TokenCountDisplay tokenCount={promptTokenCount} /> /{' '}
 									{includedPromptParts.length} parts
