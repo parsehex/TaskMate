@@ -54,6 +54,7 @@ export const updateFiles = async (files: Partial<File>[]): Promise<File[]> => {
 
 	await db.run('BEGIN TRANSACTION');
 
+	let lastData: any[] = [];
 	try {
 		for (const file of files) {
 			if (!file.id) continue;
@@ -61,16 +62,18 @@ export const updateFiles = async (files: Partial<File>[]): Promise<File[]> => {
 				updated_at: new Date().toISOString(),
 				...file,
 			};
-			if (file.content) delete fieldsObj.content;
+			delete fieldsObj.content;
 			const { sql, values } = updateStatement('files', fieldsObj, {
 				id: file.id,
 			});
+			lastData = [sql, values];
 			await db.run(sql, values);
 			updatedFiles.push(await getFileById(file.id));
 		}
 		await db.run('COMMIT');
 	} catch (e) {
 		await db.run('ROLLBACK');
+		console.log(e, ...lastData);
 		throw e;
 	}
 
