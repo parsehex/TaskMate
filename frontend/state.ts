@@ -11,7 +11,11 @@ interface State {
 	promptTokenCount: number;
 	readOnly: boolean;
 	isConnected: boolean;
+	chatVisible: boolean;
+	chatMessages: any[];
 
+	setChatVisible: (visible: boolean) => void;
+	addChatMessage: (message: any) => void;
 	setProjects: (projects: Project[]) => void;
 	setSelectedProjectId: (projectId: string | null) => void;
 	setFiles: (files: File[]) => void;
@@ -35,6 +39,10 @@ export const useStore = create<State>((set) => ({
 	promptTokenCount: 0,
 	readOnly: false,
 	isConnected: false,
+	chatVisible: false,
+	chatMessages: [],
+  setChatVisible: (visible: boolean) => set({ chatVisible: visible }),
+  addChatMessage: (message) => set((state) => ({ chatMessages: [...state.chatMessages, message] })),
 
 	setProjects: (projects) => set({ projects }),
 	setSelectedProjectId: (projectId) => set({ selectedProjectId: projectId }),
@@ -52,8 +60,7 @@ export const useStore = create<State>((set) => ({
 		snippets[index] = snippet;
 		set({ snippets });
 	},
-	setSelectedPromptPart: (promptPart) =>
-		set({ selectedPromptPart: promptPart }),
+	setSelectedPromptPart: (part) => set({ selectedPromptPart: part, chatVisible: part ? false : true }),
 	setIncludedPromptParts: (promptParts) =>
 		set({ includedPromptParts: promptParts }),
 	setPromptTokenCount: (tokenCount) => set({ promptTokenCount: tokenCount }),

@@ -45,3 +45,14 @@ export const summarize = async (
 	console.log(response);
 	return response;
 };
+
+import { OpenAI } from 'openai';
+
+export const generateResponse = async (prompt: string) => {
+	const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  const response = await openai.chat.completions.create({
+    model: 'gpt-4-turbo',
+    messages: [{ role: 'user', content: prompt }],
+  });
+  return response.choices[0]?.message?.content;
+};

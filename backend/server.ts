@@ -5,6 +5,7 @@ import * as url from 'url';
 import { initializeDatabase } from './db/index.js';
 import './ws/index.js';
 import { scanProjectsRoot } from './project-scanner.js';
+import { generateResponse } from './openai/index.js';
 
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
@@ -38,6 +39,18 @@ export const startServer = async () => {
 				res.json({ success: true, message: 'Projects rescanned.' });
 			} catch (error: any) {
 				res.status(500).json({ success: false, error: error.message });
+			}
+		});
+		app.post('/api/chat', async (req, res) => {
+			const { prompt } = req.body;
+			if (!prompt) return res.status(400).json({ error: 'No prompt provided' });
+
+			try {
+				const response = await generateResponse(prompt);
+				res.json({ response });
+			} catch (error) {
+				console.error('Error generating response:', error);
+				res.status(500).json({ error: 'Internal server error' });
 			}
 		});
 

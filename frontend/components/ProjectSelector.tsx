@@ -10,6 +10,7 @@ import {
 import { useStore } from '../state';
 import ProjectSettingsModal from './ProjectSettingsModal';
 import NewProjectModal from './NewProjectModal';
+import ScanProjectsButton from './ScanProjectsButton';
 
 const ProjectSelector: React.FC = () => {
 	const [projects, selectedProjectId, setSelectedProjectId] = useStore(
@@ -50,12 +51,21 @@ const ProjectSelector: React.FC = () => {
 					</SelectContent>
 				</Select>
 			</div>
-			<Button variant="outline" onClick={() => setShowSettingsModal(true)}>
+			<Button
+				variant="outline"
+				size="xs"
+				onClick={() => setShowSettingsModal(true)}
+			>
 				Edit
 			</Button>
-			<Button variant="default" onClick={() => setShowNewProjectModal(true)}>
-				Add Project
+			<Button
+				variant="default"
+				size="xs"
+				onClick={() => setShowNewProjectModal(true)}
+			>
+				Add
 			</Button>
+			<ScanProjectsButton />
 			<ProjectSettingsModal
 				isOpen={showSettingsModal && selectedProjectId !== null}
 				onClose={() => setShowSettingsModal(false)}

@@ -23,6 +23,8 @@ import {
 } from '@/components/ui/resizable';
 import { Button } from '@/components/ui/button';
 import ScanProjectsButton from './ScanProjectsButton';
+import ChatPanel from './ChatPanel';
+import RunPromptButton from './RunPromptButton';
 
 export const App: React.FC = () => {
 	const {
@@ -120,18 +122,18 @@ export const App: React.FC = () => {
 					<ResizablePanel defaultSize={30} minSize={35} maxSize={50}>
 						<div className="h-full flex flex-col p-1">
 							<ProjectSelector />
-							<div className="flex items-center gap-2 my-2">
-								{/* TODO */}
-								{/* This whole section is revamped to be icons+tooltips:
-								Copy | Run | Preview */}
-								{/* Run = Send prompt to in-app LLM */}
-								<CopyPromptButton />
-								<PreviewPromptButton />
-								<ScanProjectsButton />
-								<span className="ml-auto">
-									<TokenCountDisplay tokenCount={promptTokenCount} /> /{' '}
-									{includedPromptParts.length} parts
-								</span>
+
+							<div className="flex flex-col items-start my-2">
+								<div className="text-xs">Prompt</div>
+								<div className="grow flex items-center justify-around w-full gap-1">
+									<CopyPromptButton label="" />
+									<RunPromptButton />
+									<PreviewPromptButton />
+									<span className="ml-auto">
+										<TokenCountDisplay tokenCount={promptTokenCount} /> /{' '}
+										{includedPromptParts.length} parts
+									</span>
+								</div>
 							</div>
 							<PromptPartsList />
 						</div>
@@ -141,7 +143,7 @@ export const App: React.FC = () => {
 
 					<ResizablePanel>
 						<div className="h-full relative">
-							{selectedPromptPart && (
+							{selectedPromptPart ? (
 								<>
 									<Button
 										variant="ghost"
@@ -152,10 +154,9 @@ export const App: React.FC = () => {
 										<X className="h-4 w-4" />
 									</Button>
 									<Editor />
-									{/* TODO */}
-									{/* - Expose whether editor is open */}
-									{/* - When the editor is closed, show a chat with LLM */}
 								</>
+							) : (
+								<ChatPanel />
 							)}
 						</div>
 					</ResizablePanel>
