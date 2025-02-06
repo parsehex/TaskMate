@@ -117,6 +117,7 @@ const PromptPartsList: React.FC = () => {
 							</h3>
 							<Button
 								onClick={handleClearSnippets}
+								disabled={selectedSnippetsCount <= 0}
 								variant="ghost"
 								size="sm"
 								className="text-muted-foreground"
@@ -151,6 +152,7 @@ const PromptPartsList: React.FC = () => {
 							</h3>
 							<Button
 								onClick={handleClearFiles}
+								disabled={selectedFilesCount <= 0}
 								variant="ghost"
 								size="sm"
 								className="text-muted-foreground"
