@@ -5,7 +5,7 @@ import { Project } from '../../../shared/types/index.js';
 import { db } from '../index.js';
 import { insertStatement, updateStatement } from '../sql-utils.js';
 import { getProjectPath } from '../../path-utils.js';
-import { DefaultIgnoreFiles } from '../../const.js';
+import { DefaultIgnoreFiles } from '../../../shared/const.js';
 
 export const getProjects = async (
 	columns = '*',

@@ -9,7 +9,7 @@ import * as fileHelper from './db/helper/files.js';
 import * as projectHelper from './db/helper/projects.js';
 import { fileExists, isDirectory } from './fs-utils.js';
 import { shouldIgnorePath, getProjectPath } from './path-utils.js';
-import { DefaultIgnoreFiles } from './const.js';
+import { DefaultIgnoreFiles } from '../shared/const.js';
 
 export async function generateFolderStructure(
 	projectId: string,

@@ -7,7 +7,7 @@ import * as projectHelper from './db/helper/projects.js';
 import { sendToAll } from './ws/index.js';
 import { fileExists as fileExistsFunc, isDirectory } from './fs-utils.js';
 import { shouldIgnorePath, getProjectPath } from './path-utils.js';
-import { DefaultIgnoreFiles } from './const.js';
+import { DefaultIgnoreFiles } from '../shared/const.js';
 import {
 	getSnippetsByProjectId,
 	updateSnippet,
