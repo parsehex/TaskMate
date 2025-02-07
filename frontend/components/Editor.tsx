@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import MonacoEditor from '@monaco-editor/react';
-import { Prompt_Part, Snippet, isSnippet } from '../../shared/types';
+import { isSnippet } from '../../shared/types';
 import { updateFile } from '../api/files';
 import { updateSnippet } from '../api/snippets';
-import { generateSummary, getTokenCount } from '../api/utils';
+import { getTokenCount } from '../api/utils';
 import { useStore } from '../state';
 import { detectFileLanguage } from '../utils';
-import EditableName from './EditableName';
 import TokenCountDisplay from './TokenCountDisplay';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -154,13 +153,7 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 		<div className="editor h-[80vh]">
 			<h2>
 				{readOnly ? '' : 'Editing: '}
-				<EditableName
-					className="font-mono"
-					name={promptPart?.name || ''}
-					onNameChange={(newName) => {
-						handleNameChange(newName);
-					}}
-				/>
+				<span className="font-mono">{promptPart?.name || ''}</span>
 				{isSaved || readOnly ? '' : '*'}
 			</h2>
 			<div className="flex items-center gap-4 mb-2">
