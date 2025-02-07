@@ -67,8 +67,12 @@ const PromptPartsList: React.FC = () => {
 
 	const handleNewSnippetClick = async () => {
 		if (!selectedProjectId) return;
-		const name = 'Snippet ' + (snippets.length + 1);
-		const newSnippet = await createSnippet(selectedProjectId, { name });
+		const position = snippets.length;
+		const name = 'Snippet ' + (position + 1);
+		const newSnippet = await createSnippet(selectedProjectId, {
+			name,
+			position,
+		});
 		if (!newSnippet) return;
 		setSnippets([...snippets, newSnippet]);
 	};
