@@ -45,7 +45,7 @@ const NewProjectModal: React.FC<NewProjectModalProps> = ({
 		}
 
 		try {
-			const paths = JSON.parse(ignoredPaths);
+			const paths = JSON.stringify(JSON.parse(ignoredPaths));
 			const newProject = await createProject(
 				name.trim(),
 				path.trim(),

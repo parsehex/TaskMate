@@ -6,7 +6,7 @@ async function GET_PROJECTS() {
 	return await helper.getProjects();
 }
 
-async function CREATE_PROJECT(name: string, path: string, ignoredPaths?: string[]) {
+async function CREATE_PROJECT(name: string, path: string, ignoredPaths?: string[] | string) {
 	const data: Partial<Project> & {path:string} = { name, path }
 	if (ignoredPaths && Array.isArray(ignoredPaths)) data.ignore_files = JSON.stringify(ignoredPaths);
 	return await helper.createProject(data);

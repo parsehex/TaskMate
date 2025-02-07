@@ -12,7 +12,7 @@ export const updateProject = async (
 	await ProjectsHandlers.UPDATE_PROJECT(id, data);
 };
 
-export const createProject = async (name: string, path: string, ignoredPaths?: string[]): Promise<Project> => {
+export const createProject = async (name: string, path: string, ignoredPaths?: string[] | string): Promise<Project> => {
 	return await ProjectsHandlers.CREATE_PROJECT(name, path, ignoredPaths);
 };
 

@@ -11,7 +11,7 @@ export interface FilesMessageHandlers {
 
 export interface ProjectsMessageHandlers {
 	GET_PROJECTS: () => Promise<Project[]>;
-	CREATE_PROJECT: (name: string, path: string, ignoredPaths?: string[]) => Promise<Project>;
+	CREATE_PROJECT: (name: string, path: string, ignoredPaths?: string[] | string) => Promise<Project>;
 	UPDATE_PROJECT: (id: string, project: Partial<Project>) => Promise<Project>;
 	DELETE_PROJECT: (id: string) => Promise<void>;
 }
