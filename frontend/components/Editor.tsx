@@ -155,6 +155,7 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 			<h2>
 				{readOnly ? '' : 'Editing: '}
 				<EditableName
+					className="font-mono"
 					name={promptPart?.name || ''}
 					onNameChange={(newName) => {
 						handleNameChange(newName);

@@ -97,7 +97,6 @@ const PromptPartsList: React.FC = () => {
 
 	return (
 		<div className="flex flex-col h-full">
-			{/* Add resizable panels */}
 			<ResizablePanelGroup direction="vertical" className="flex-1">
 				<ResizablePanel defaultSize={50} minSize={30} maxSize={70}>
 					<ScrollArea className="border rounded-md h-full">
@@ -107,7 +106,7 @@ const PromptPartsList: React.FC = () => {
 							</h3>
 							<Button
 								onClick={handleNewSnippetClick}
-								className="px-4"
+								className="px-4 rounded-md hover:bg-neutral-200"
 								variant="link"
 								size="sm"
 							>

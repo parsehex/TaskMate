@@ -18,10 +18,7 @@ const TokenCountDisplay: React.FC<TokenCountDisplayProps> = ({
 	};
 
 	return (
-		<span
-			className={cn('font-medium', getColorClass())}
-			title={`${tokenCount} tokens`}
-		>
+		<span className={cn('font-medium', getColorClass())}>
 			{tokenCount}
 			{small ? '' : ' tokens'}
 		</span>

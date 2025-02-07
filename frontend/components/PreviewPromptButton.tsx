@@ -52,17 +52,7 @@ const PreviewPromptButton: React.FC = () => {
 
 	return (
 		<>
-			<Button
-				variant="secondary"
-				size="xs"
-				data-tooltip-id="previewButton"
-				data-tooltip-html={includedPromptParts
-					.map((part) => '- ' + part.name)
-					.join('<br>')}
-				data-tooltip-delay-show={150}
-				data-data-tooltip-place="bottom"
-				onClick={handlePreviewClick}
-			>
+			<Button variant="secondary" size="xs" onClick={handlePreviewClick}>
 				Preview
 			</Button>
 		</>

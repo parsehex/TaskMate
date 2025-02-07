@@ -9,6 +9,7 @@ import React, {
 interface EditableNameProps {
 	name: string;
 	onNameChange: (newName: string) => void;
+	className?: string;
 }
 
 export interface EditableNameRef {
@@ -18,7 +19,7 @@ export interface EditableNameRef {
 const EditableName: React.ForwardRefRenderFunction<
 	EditableNameRef,
 	EditableNameProps
-> = ({ name, onNameChange }, ref) => {
+> = ({ name, onNameChange, className }, ref) => {
 	const inputRef = React.useRef<HTMLInputElement>(null);
 	const [isEditing, setIsEditing] = useState(false);
 	const [newName, setNewName] = useState(name);
@@ -64,7 +65,7 @@ const EditableName: React.ForwardRefRenderFunction<
 		<input
 			ref={inputRef}
 			type="text"
-			className="editable-name font-medium"
+			className={`editable-name font-medium ${className}`}
 			value={newName}
 			onChange={handleChange}
 			onBlur={handleSubmit}
@@ -72,7 +73,7 @@ const EditableName: React.ForwardRefRenderFunction<
 			autoFocus
 		/>
 	) : (
-		<span className="editable-name" onDoubleClick={handleEdit}>
+		<span className={`editable-name ${className}`} onDoubleClick={handleEdit}>
 			{name}
 		</span>
 	);

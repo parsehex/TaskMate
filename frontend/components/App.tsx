@@ -123,13 +123,21 @@ export const App: React.FC = () => {
 						<div className="h-full flex flex-col p-1">
 							<ProjectSelector />
 
-							<div className="flex flex-col items-start my-2 p-2 border border-gray-300 rounded-md">
-								<div className="text-xs">Prompt</div>
+							<div className="flex flex-col items-start my-2 p-1 px-2 border border-gray-300 rounded-md">
+								<div className="text-xs select-none">Prompt</div>
 								<div className="grow flex items-center justify-around w-full gap-1">
 									<CopyPromptButton label="" />
 									<RunPromptButton />
 									<PreviewPromptButton />
-									<span className="ml-auto">
+									<span
+										className="ml-auto"
+										data-tooltip-id="previewButton"
+										data-tooltip-html={includedPromptParts
+											.map((part) => '- ' + part.name)
+											.join('<br />')}
+										data-tooltip-delay-show={250}
+										data-data-tooltip-place="bottom"
+									>
 										<TokenCountDisplay tokenCount={promptTokenCount} /> /{' '}
 										{includedPromptParts.length} parts
 									</span>
