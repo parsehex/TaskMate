@@ -123,7 +123,7 @@ export const App: React.FC = () => {
 						<div className="h-full flex flex-col p-1">
 							<ProjectSelector />
 
-							<div className="flex flex-col items-start my-2">
+							<div className="flex flex-col items-start my-2 p-2 border border-gray-300 rounded-md">
 								<div className="text-xs">Prompt</div>
 								<div className="grow flex items-center justify-around w-full gap-1">
 									<CopyPromptButton label="" />

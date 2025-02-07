@@ -97,16 +97,6 @@ const PromptPartsList: React.FC = () => {
 
 	return (
 		<div className="flex flex-col h-full">
-			<Button
-				onClick={handleNewSnippetClick}
-				variant="outline"
-				size="sm"
-				className="mb-2"
-			>
-				<Plus className="h-4 w-4 mr-2" />
-				New Snippet
-			</Button>
-
 			{/* Add resizable panels */}
 			<ResizablePanelGroup direction="vertical" className="flex-1">
 				<ResizablePanel defaultSize={50} minSize={30} maxSize={70}>
@@ -115,6 +105,15 @@ const PromptPartsList: React.FC = () => {
 							<h3 className="text-sm font-medium">
 								Snippets ({selectedSnippetsCount})
 							</h3>
+							<Button
+								onClick={handleNewSnippetClick}
+								className="px-4"
+								variant="link"
+								size="sm"
+							>
+								<Plus className="h-4 w-4 mr-2" />
+								New Snippet
+							</Button>
 							<Button
 								onClick={handleClearSnippets}
 								disabled={selectedSnippetsCount <= 0}
