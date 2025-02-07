@@ -3,7 +3,7 @@ import { FileBooleanColumns } from '../api/files';
 import { convertBooleans } from '../api/utils';
 import { useStore } from '../state';
 
-const port = +(process.env.WEBSOCKET_PORT as string) || 8181;
+const port = +(process.env.WEBSOCKET_PORT as string) || 8585;
 let socket: WebSocket;
 
 export function initWebsocket() {

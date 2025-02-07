@@ -3,6 +3,7 @@
 	"version": "1.0.0",
 	"description": "",
 	"type": "module",
+	"main": "dist/main.js",
 	"source": [
 		"frontend/index.html"
 	],
@@ -27,7 +28,26 @@
 		"server": "node -r dotenv/config dist/backend/index.js",
 		"reset": "npm run f:reset && npm run b:reset",
 		"build": "npm run f:build && npm run b:build",
-		"start": "concurrently \"npm run f:dev\" \"npm run b:dev\""
+		"start": "concurrently \"npm run f:dev\" \"npm run b:dev\"",
+		"e:dev": "pnpm run build && cp env-setup.html ./dist/ && electron .",
+		"e:build": "electron-builder"
+	},
+	"build": {
+		"appId": "net.thomasmays.querycraft",
+		"productName": "Query Craft",
+		"files": [
+			"dist/**/*",
+			"package.json"
+		],
+		"mac": {
+			"target": "dmg"
+		},
+		"win": {
+			"target": "nsis"
+		},
+		"linux": {
+			"target": "AppImage"
+		}
 	},
 	"dependencies": {
 		"@fortawesome/fontawesome-svg-core": "^6.4.0",
@@ -94,6 +114,8 @@
 		"buffer": "^5.7.1",
 		"concurrently": "^8.0.1",
 		"crypto-browserify": "^3.12.0",
+		"electron": "^34.1.1",
+		"electron-builder": "^25.1.8",
 		"events": "^3.3.0",
 		"nodemon": "^2.0.22",
 		"os-browserify": "^0.3.0",

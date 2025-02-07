@@ -4,7 +4,7 @@ import path from 'path';
 import * as url from 'url';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
-const ENV_PATH = path.resolve(__dirname, '../../.env');
+const ENV_PATH = path.resolve(__dirname, '../.env');
 const ENV_EXAMPLE_PATH = path.resolve(__dirname, '../../.env.sample');
 
 // List of required environment variables

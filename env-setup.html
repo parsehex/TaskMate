@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Setup Environment Variables</title>
+		<style>
+			body {
+				font-family: sans-serif;
+				padding: 20px;
+			}
+			input {
+				display: block;
+				width: 100%;
+				margin-bottom: 10px;
+				padding: 5px;
+			}
+			button {
+				padding: 10px;
+				cursor: pointer;
+			}
+		</style>
+	</head>
+	<body>
+		<h2>Enter Required Environment Variables</h2>
+		<form id="env-form">
+			<label>Projects Root: <input type="text" id="PROJECTS_ROOT" /></label>
+			<label>Database Path: <input type="text" id="DATABASE_PATH" /></label>
+			<label>Server Port: <input type="number" id="SERVER_PORT" /></label>
+			<label>WebSocket Port: <input type="number" id="WEBSOCKET_PORT" /></label>
+			<button type="submit">Save & Quit</button>
+		</form>
+		<script>
+			document.getElementById('env-form').addEventListener('submit', (e) => {
+				e.preventDefault();
+				const envData = {
+					PROJECTS_ROOT: document.getElementById('PROJECTS_ROOT').value,
+					DATABASE_PATH: document.getElementById('DATABASE_PATH').value,
+					SERVER_PORT: document.getElementById('SERVER_PORT').value,
+					WEBSOCKET_PORT: document.getElementById('WEBSOCKET_PORT').value,
+				};
+				window.electron.saveEnv(envData);
+			});
+		</script>
+	</body>
+</html>

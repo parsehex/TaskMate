@@ -6,7 +6,7 @@ import projectsHandlers from './projects.js';
 import utilsHandlers from './utils.js';
 import { MessageHandlers, WSMessage } from '../../shared/types/ws/index.js';
 
-const port = +(process.env.WEBSOCKET_PORT as string) || 8181;
+const port = +(process.env.WEBSOCKET_PORT as string) || 8585;
 const wss = new WebSocketServer({ port });
 
 const clients: { [id: string]: WebSocket } = {};

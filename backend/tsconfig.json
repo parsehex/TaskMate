@@ -10,6 +10,6 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["./**/*.ts"],
+  "include": ["./**/*.ts", "../main.ts"],
   "exclude": ["node_modules", "**/prompt_parts.ts"]
 }
