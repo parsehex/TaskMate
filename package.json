@@ -43,7 +43,6 @@
 		"@tailwindcss/postcss": "^4.0.3",
 		"aws-sdk": "^2.1368.0",
 		"axios": "^1.5.1",
-		"chatgpt": "^5.2.4",
 		"chokidar": "^4.0.3",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
