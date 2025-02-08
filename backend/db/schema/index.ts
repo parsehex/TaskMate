@@ -21,7 +21,8 @@ async function applyMigration(db: AsyncDatabase, version: number) {
 }
 
 export async function updateSchema(db: AsyncDatabase) {
-	const schemaFile = path.join(process.cwd(), 'schema.sql');
+	const base = __dirname.includes('app.asar') ? [__dirname, '../../../'] : [process.cwd()];
+	const schemaFile = path.resolve(...base, 'schema.sql');
 	const schemaContent = await fs.readFile(schemaFile, 'utf-8');
 	await db.exec(schemaContent);
 

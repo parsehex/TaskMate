@@ -46,7 +46,7 @@ export const summarize = async (
 	return response;
 };
 
-import { OpenAI } from 'openai';
+import OpenAI from 'openai';
 
 export const generateResponse = async (prompt: string) => {
 	const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });

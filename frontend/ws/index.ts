@@ -3,11 +3,14 @@ import { FileBooleanColumns } from '../api/files';
 import { convertBooleans } from '../api/utils';
 import { useStore } from '../state';
 
-const port = +(process.env.WEBSOCKET_PORT as string) || 8585;
 let socket: WebSocket;
 
 export function initWebsocket() {
 	return new Promise((resolve) => {
+		const port =
+			(window as any).electron?.WEBSOCKET_PORT ||
+			(process.env.WEBSOCKET_PORT as string) ||
+			8585;
 		console.log(`Connecting to WebSocket on port ${port}`);
 
 		socket = new WebSocket(`ws://localhost:${port}/ws`);

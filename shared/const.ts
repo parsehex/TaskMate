@@ -41,4 +41,8 @@ export const DefaultIgnoreFiles = [
 	// temp
 	'**/dist',
 	'**/dist/**',
+	'**/.dist',
+	'**/.dist/**',
+	'**/.electron-dist',
+	'**/.electron-dist/**',
 ];

@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS files (
 	project_id TEXT,
 	name VARCHAR(255),
 	summary TEXT DEFAULT '',
-	included BOOLEAN DEFAULT 1,
+	included BOOLEAN DEFAULT 0,
 	use_title BOOLEAN DEFAULT 1,
 	use_summary BOOLEAN DEFAULT 0,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

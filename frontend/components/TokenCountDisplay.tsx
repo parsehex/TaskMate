@@ -10,6 +10,8 @@ const TokenCountDisplay: React.FC<TokenCountDisplayProps> = ({
 	tokenCount,
 	small = false,
 }) => {
+	// TODO (disjointed) add option to color the count relative to the included parts
+	//   so that when you have any parts selected, the color is based on the count with this part too
 	const getColorClass = () => {
 		if (tokenCount >= 128000) return 'text-red-500';
 		if (tokenCount >= 32000) return 'text-orange-500';

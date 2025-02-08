@@ -2,8 +2,13 @@ import { AsyncDatabase } from 'promised-sqlite3';
 import path from 'path';
 import fs from 'fs-extra';
 import { updateSchema } from './schema/index.js';
+import * as url from 'url';
 
-const dbPath = process.env.DATABASE_PATH || 'database.sqlite3';
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+const dbPath = path.join(
+	process.env.PROJECTS_ROOT || `${__dirname}/..`,
+	'query-craft_db.sqlite3'
+);
 
 export let db: AsyncDatabase;
 
@@ -13,9 +18,10 @@ export const initializeDatabase = async () => {
 };
 
 export const backupDatabase = async () => {
-	const backupDir = path.join(process.cwd(), 'backups');
+	const base = path.dirname(dbPath);
+	const backupDir = path.join(base, 'backups');
 	const timestamp = new Date().toISOString().replace(/[-:.]/g, '');
-	const backupFilename = `database-backup-${timestamp}.sqlite3`;
+	const backupFilename = `db-backup-${timestamp}.sqlite3`;
 	const backupPath = path.join(backupDir, backupFilename);
 
 	await fs.ensureDir(backupDir);

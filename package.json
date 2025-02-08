@@ -3,14 +3,14 @@
 	"version": "1.0.0",
 	"description": "",
 	"type": "module",
-	"main": "dist/main.js",
+	"main": "main.js",
 	"source": [
 		"frontend/index.html"
 	],
 	"targets": {
 		"frontend": {
 			"source": "frontend/index.html",
-			"distDir": "dist/frontend",
+			"distDir": ".dist/frontend",
 			"context": "browser"
 		}
 	},
@@ -18,36 +18,19 @@
 	"author": "",
 	"license": "ISC",
 	"scripts": {
-		"f:reset": "rimraf dist/frontend && rimraf .parcel-cache",
+		"f:reset": "rimraf .dist/frontend && rimraf .parcel-cache",
 		"f:dev": "parcel watch",
 		"f:build": "parcel build",
-		"b:reset": "rimraf dist/backend",
+		"b:reset": "rimraf .dist/backend",
 		"b:dev": "tsc -p backend --watch",
-		"b:watch": "nodemon -r dotenv/config --watch dist/backend dist/backend/index.js",
+		"b:watch": "nodemon -r dotenv/config --watch .dist/backend .dist/backend/index.js",
 		"b:build": "tsc -p backend",
-		"server": "node -r dotenv/config dist/backend/index.js",
+		"server": "node -r dotenv/config .dist/backend/index.js",
 		"reset": "npm run f:reset && npm run b:reset",
 		"build": "npm run f:build && npm run b:build",
 		"start": "concurrently \"npm run f:dev\" \"npm run b:dev\"",
-		"e:dev": "pnpm run build && cp env-setup.html ./dist/ && electron .",
-		"e:build": "electron-builder"
-	},
-	"build": {
-		"appId": "net.thomasmays.querycraft",
-		"productName": "Query Craft",
-		"files": [
-			"dist/**/*",
-			"package.json"
-		],
-		"mac": {
-			"target": "dmg"
-		},
-		"win": {
-			"target": "nsis"
-		},
-		"linux": {
-			"target": "AppImage"
-		}
+		"e:dev": "pnpm run build && cp env-setup.html ./.dist/ && electron .",
+		"e:build": "npm run build && cp env-setup.html package.json schema.sql ./.dist/ && node build.js"
 	},
 	"dependencies": {
 		"@fortawesome/fontawesome-svg-core": "^6.4.0",

@@ -4,35 +4,10 @@ import path from 'path';
 import * as url from 'url';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
-const ENV_PATH = path.resolve(__dirname, '../.env');
-const ENV_EXAMPLE_PATH = path.resolve(__dirname, '../../.env.sample');
+const isElectron = __dirname.includes('app.asar');
 
 // List of required environment variables
-const REQUIRED_ENV_VARS = [
-	'PROJECTS_ROOT',
-	'DATABASE_PATH',
-	'SERVER_PORT',
-	'WEBSOCKET_PORT',
-];
-
-// Load .env.example defaults
-const loadExampleEnv = (): Record<string, string> => {
-	if (!fs.existsSync(ENV_EXAMPLE_PATH)) return {};
-
-	const exampleEnv = fs.readFileSync(ENV_EXAMPLE_PATH, 'utf-8');
-	const defaults: Record<string, string> = {};
-
-	exampleEnv.split('\n').forEach((line) => {
-		const [key, value] = line.split('=');
-		if (key && value) {
-			defaults[key.trim()] = value.trim();
-		}
-	});
-
-	return defaults;
-};
-
-const exampleDefaults = loadExampleEnv();
+const REQUIRED_ENV_VARS = ['PROJECTS_ROOT', 'SERVER_PORT', 'WEBSOCKET_PORT'];
 
 // Setup CLI input
 const rl = readline.createInterface({
@@ -62,8 +37,7 @@ const ensureEnvVars = async () => {
 
 	for (const key of REQUIRED_ENV_VARS) {
 		if (process.env[key]) continue;
-		const defaultValue = exampleDefaults[key];
-		const value = await askQuestion(`Enter value for ${key}`, defaultValue);
+		const value = await askQuestion(`Enter value for ${key}`);
 		missingVars[key] = value;
 		process.env[key] = value;
 	}
@@ -74,6 +48,12 @@ const ensureEnvVars = async () => {
 			.map(([key, value]) => `${key}=${value}`)
 			.join('\n');
 
+		let base = [__dirname, '..'];
+		if (isElectron) {
+			const { app } = await import('electron');
+			base = [app.getPath('userData')];
+		}
+		const ENV_PATH = path.resolve(...base, '.env');
 		fs.appendFileSync(ENV_PATH, `\n${envContents}\n`);
 		console.log('Updated .env file with missing variables.');
 		console.log('Please re-run the server.');

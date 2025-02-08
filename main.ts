@@ -1,91 +1,92 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
-import fs from 'fs';
+import fs from 'fs/promises';
 import path from 'path';
 import dotenv from 'dotenv';
-import { spawn } from 'child_process';
 import * as url from 'url';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
-const ENV_PATH = path.resolve(__dirname, '.env');
+const ENV_PATH = path.resolve(app.getPath('userData'), '.env');
 
 dotenv.config({ path: ENV_PATH });
 
 let mainWindow: BrowserWindow | null = null;
 let envSetupWindow: BrowserWindow | null = null;
-let backendProcess: any = null;
 
-const REQUIRED_ENV_VARS = [
-	'PROJECTS_ROOT',
-	'DATABASE_PATH',
-	'SERVER_PORT',
-	'WEBSOCKET_PORT',
-];
+const REQUIRED_ENV_VARS = ['PROJECTS_ROOT', 'SERVER_PORT', 'WEBSOCKET_PORT'];
 
 function isEnvComplete() {
 	return REQUIRED_ENV_VARS.every((key) => process.env[key]);
 }
 
-const createMainWindow = () => {
+async function writePreloadScript(content: string) {
+	await fs.writeFile(path.resolve(__dirname, '../../preload.js'), content);
+}
+
+const createMainWindow = async () => {
+	await writePreloadScript(`
+			console.log('Preload ran');
+			const { contextBridge, ipcRenderer } = require('electron');
+			contextBridge.exposeInMainWorld('electron', {
+					SERVER_PORT: ${process.env.SERVER_PORT},
+					WEBSOCKET_PORT: ${process.env.WEBSOCKET_PORT}
+			});
+	`);
+
 	mainWindow = new BrowserWindow({
 		width: 1200,
 		height: 800,
-		webPreferences: { nodeIntegration: false, contextIsolation: true },
+		webPreferences: {
+			nodeIntegration: false,
+			contextIsolation: true,
+			preload: path.resolve(__dirname, '../../preload.js'),
+		},
 	});
 
-	mainWindow.loadURL('http://localhost:8080');
-	mainWindow.on('closed', () => {
-		mainWindow = null;
-		if (backendProcess) {
-			backendProcess.kill();
-		}
-	});
+	// TODO env value validation
+	mainWindow.loadURL('http://localhost:' + process.env.SERVER_PORT);
 };
 
-const createEnvSetupWindow = () => {
+const createEnvSetupWindow = async () => {
+	await writePreloadScript(`
+			console.log('Preload ran');
+			const { contextBridge, ipcRenderer } = require('electron');
+			contextBridge.exposeInMainWorld('electron', {
+					saveEnv: (data) => ipcRenderer.send('save-env', data)
+			});
+	`);
+
 	envSetupWindow = new BrowserWindow({
 		width: 600,
-		height: 400,
+		height: 500,
 		resizable: false,
 		webPreferences: {
 			nodeIntegration: false,
 			contextIsolation: true,
-			preload: path.join(__dirname, 'preload.js')
-		 },
+			preload: path.resolve(__dirname, '../../preload.js'),
+		},
 	});
 
 	envSetupWindow.loadFile(path.join(__dirname, './env-setup.html'));
 	envSetupWindow.on('closed', () => (envSetupWindow = null));
 };
 
-ipcMain.on('save-env', (_, envData) => {
+ipcMain.on('save-env', async (_, envData) => {
 	const envContent = Object.entries(envData)
 		.map(([key, value]) => `${key}=${value}`)
 		.join('\n');
 
 	console.log(envContent);
-	fs.writeFileSync(ENV_PATH, envContent, { flag: 'w' });
+	await fs.writeFile(ENV_PATH, envContent, { flag: 'w' });
 	// app.relaunch();
 	app.quit();
 });
 
-
 app.on('ready', async () => {
-	const preloadScript = `
-			const { contextBridge, ipcRenderer } = require('electron');
-			contextBridge.exposeInMainWorld('electron', {
-					saveEnv: (data) => ipcRenderer.send('save-env', data)
-			});
-	`;
-	fs.writeFileSync(path.join(__dirname, 'preload.js'), preloadScript);
-
 	if (!isEnvComplete()) {
 		createEnvSetupWindow();
 	} else {
-		// Start the backend server
-		backendProcess = spawn('node', ['dist/backend/index.js'], {
-			stdio: 'inherit',
-			shell: true,
-		});
+		console.log('Starting backend', path.resolve(__dirname, 'backend'));
+		await import('file://' + path.resolve(__dirname, 'backend/index.js'));
 		createMainWindow();
 	}
 });

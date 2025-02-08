@@ -11,6 +11,9 @@ import { fileExists, isDirectory } from './fs-utils.js';
 import { shouldIgnorePath, getProjectPath } from './path-utils.js';
 import { DefaultIgnoreFiles } from '../shared/const.js';
 
+// TODO make this feature into an option which you can enable,
+//   rather than as a snippet (i never look at it)
+
 export async function generateFolderStructure(
 	projectId: string,
 	projectName: string,
