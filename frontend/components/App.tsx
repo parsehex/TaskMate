@@ -44,6 +44,8 @@ export const App: React.FC = () => {
 		setIncludedPromptParts,
 		setReadOnly,
 	} = useStore((state) => state);
+	const isChatEnabled = (window as any).electron?.IS_CHAT_ENABLED || false;
+	console.log(isChatEnabled);
 
 	const setReadOnlyValue = () => {
 		let readOnly = false;
@@ -163,8 +165,10 @@ export const App: React.FC = () => {
 									</Button>
 									<Editor />
 								</>
-							) : (
+							) : isChatEnabled ? (
 								<ChatPanel />
+							) : (
+								<span></span>
 							)}
 						</div>
 					</ResizablePanel>

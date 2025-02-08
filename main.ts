@@ -28,7 +28,8 @@ const createMainWindow = async () => {
 			const { contextBridge, ipcRenderer } = require('electron');
 			contextBridge.exposeInMainWorld('electron', {
 					SERVER_PORT: ${process.env.SERVER_PORT},
-					WEBSOCKET_PORT: ${process.env.WEBSOCKET_PORT}
+					WEBSOCKET_PORT: ${process.env.WEBSOCKET_PORT},
+					IS_CHAT_ENABLED: ${!!process.env.OPENAI_API_KEY}
 			});
 	`);
 
