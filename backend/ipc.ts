@@ -1,4 +1,3 @@
-import { ipcMain } from 'electron';
 import { MessageHandlers } from '../shared/types/ws/index.js';
 import filesHandlers from './ws/files.js';
 import snippetsHandlers from './ws/snippets.js';
@@ -12,7 +11,9 @@ const allHandlers = {
 	...utilsHandlers,
 } as MessageHandlers;
 
-export function setupIpcHandlers() {
+export async function setupIpcHandlers() {
+	const { ipcMain } = await import('electron');
+
 	ipcMain.on('ws-message', async (event, message) => {
 		const data = JSON.parse(message);
 		const endpoint = data.endpoint as keyof MessageHandlers;

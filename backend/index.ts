@@ -10,10 +10,8 @@ import { setupIpcHandlers } from './ipc.js';
 	await scanProjectsRoot();
 
 	if (process.env.IS_ELECTRON === 'true') {
-		console.log(
-			'Running in Electron - skipping server start, setting up IPC...'
-		);
-		setupIpcHandlers();
+		console.log('Running in Electron - setting up IPC...');
+		await setupIpcHandlers();
 	}
 
 	startServer();
