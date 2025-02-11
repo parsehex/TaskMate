@@ -37,6 +37,7 @@ wss.on('connection', (ws) => {
 					);
 				})
 				.catch((error) => {
+					console.error(data.endpoint, 'error', error);
 					ws.send(
 						JSON.stringify({
 							id: data.id,
