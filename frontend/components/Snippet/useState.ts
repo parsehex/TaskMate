@@ -77,7 +77,16 @@ export const useSnippetState = ({
 
 	const handleCheckboxChange = async (event: ChangeEvent<HTMLInputElement>) => {
 		const included = event.target.checked;
-		const updatedFile = await updateSnippet(snippet.id, { included });
+		const data = { included } as any;
+		const isFileSnippet = snippet.id.startsWith('file-backed:');
+		if (isFileSnippet) {
+			// set this data so that it's returned back to us
+			data.project_id = snippet.project_id;
+			data.name = snippet.name;
+			data.use_title = snippet.use_title;
+			data.content = snippet.content;
+		}
+		const updatedFile = await updateSnippet(snippet.id, data);
 		setSnippet(updatedFile);
 		event.stopPropagation();
 	};

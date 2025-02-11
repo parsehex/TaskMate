@@ -2,6 +2,9 @@ import { v4 } from 'uuid';
 import { Snippet } from '../../../shared/types/index.js';
 import { db } from '../index.js';
 import { insertStatement, updateStatement } from '../sql-utils.js';
+import * as projectHelper from './projects.js';
+import { loadFileSnippets } from '../../file-snippets.js';
+import { getProjectPath } from '../../path-utils.js';
 
 export const getSnippets = async (
 	columns = '*',
@@ -26,7 +29,13 @@ export const getSnippetsByProjectId = async (
 	project_id: string,
 	columns = '*'
 ): Promise<Snippet[]> => {
-	return await getSnippets(columns, { project_id });
+	const dbSnippets = await getSnippets('*', { project_id });
+	const fileSnippets = await loadFileSnippets(
+		project_id,
+		await getProjectPath({ id: project_id })
+	);
+
+	return [...dbSnippets, ...fileSnippets];
 };
 
 export const getSnippetById = async (

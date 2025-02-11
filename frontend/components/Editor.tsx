@@ -97,16 +97,6 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 		};
 	}, [handleKeyPress]);
 
-	const handleNameChange = async (newName: string) => {
-		if (!promptPart || promptPart.id === '-1') return;
-		if (newName !== promptPart?.name) {
-			const setFunc = isSnippet(promptPart) ? setSnippet : setFile;
-			const updateFunc = isSnippet(promptPart) ? updateSnippet : updateFile;
-			const updatedPart = await updateFunc(promptPart.id, { name: newName });
-			setFunc(updatedPart as any);
-		}
-	};
-
 	const handleChange = (value: string | undefined, ev: any) => {
 		if (!value) return;
 		setContent(value);
@@ -125,6 +115,15 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 		const data: any = {};
 		if (activeTab === 'content') data.content = content;
 		else if (activeTab === 'summary') data.summary = summary;
+		const isFileSnippet = promptPart.id.startsWith('file-backed:');
+		if (isFileSnippet) {
+			// set this data so that it's returned back to us
+			data.name = promptPart.name;
+			data.project_id = promptPart.project_id;
+			data.included = promptPart.included;
+			data.use_title = promptPart.use_title;
+			if (data.content === undefined) data.content = promptPart.content;
+		}
 
 		const setFunc = isSnippet(promptPart) ? setSnippet : setFile;
 		const updateFunc = isSnippet(promptPart) ? updateSnippet : updateFile;
@@ -139,7 +138,15 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 	) => {
 		if (!promptPart || promptPart.id === '-1') return;
 		const data: any = {};
+		const isFileSnippet = promptPart.id.startsWith('file-backed:');
 		const dbType = type === 'useSummary' ? 'use_summary' : 'use_title';
+		if (isFileSnippet) {
+			data.name = promptPart.name;
+			data.project_id = promptPart.project_id;
+			data.included = promptPart.included;
+			if (dbType !== 'use_title') data.use_title = promptPart.use_title;
+			data.content = promptPart.content;
+		}
 		data[dbType] = value;
 		type === 'useSummary' ? setUseSummary(value) : setUseTitle(value);
 

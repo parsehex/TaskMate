@@ -36,6 +36,8 @@ export const DefaultIgnoreFiles = [
 	'**/.next/**',
 	'**/.nuxt',
 	'**/.nuxt/**',
+	'**/.snippets',
+	'**/.snippets/**',
 	'**/file-descriptions.json',
 
 	// temp
