@@ -1,9 +1,10 @@
 import React from 'react';
-import { FileNode } from '../../file-hierarchy';
-import { useStore } from '../../state';
-import File from '../File/File';
+import { FileNode } from '@/file-hierarchy';
+import { useStore } from '@/state';
+import File from '@/components/File/File';
 import { useDirectoryState } from './useState';
 import { Folder, FolderOpen } from 'lucide-react';
+import type { File as FileType } from '@shared/types';
 
 interface DirectoryProps {
 	node: FileNode;
@@ -64,7 +65,7 @@ const Directory: React.FC<DirectoryProps> = ({ node, index, path }) => {
 						>
 							{childNode.promptPart ? (
 								<File
-									file={childNode.promptPart}
+									file={childNode.promptPart as FileType}
 									index={thisIndex}
 									selected={selectedPromptPart?.id === childNode.promptPart.id}
 								/>

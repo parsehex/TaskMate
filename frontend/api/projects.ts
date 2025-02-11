@@ -1,5 +1,5 @@
-import { Project } from '../../shared/types';
-import ProjectsHandlers from '../ws/projects';
+import { Project } from '@shared/types';
+import ProjectsHandlers from '@/ws/projects';
 
 export const fetchProjects = async (): Promise<Project[]> => {
 	return await ProjectsHandlers.GET_PROJECTS();
@@ -12,7 +12,11 @@ export const updateProject = async (
 	await ProjectsHandlers.UPDATE_PROJECT(id, data);
 };
 
-export const createProject = async (name: string, path: string, ignoredPaths?: string[] | string): Promise<Project> => {
+export const createProject = async (
+	name: string,
+	path: string,
+	ignoredPaths?: string[] | string
+): Promise<Project> => {
 	return await ProjectsHandlers.CREATE_PROJECT(name, path, ignoredPaths);
 };
 

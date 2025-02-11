@@ -1,11 +1,15 @@
-import { Project } from '../../shared/types';
-import { ProjectsMessageHandlers } from '../../shared/types/ws';
+import { Project } from '@shared/types';
+import { ProjectsMessageHandlers } from '@shared/types/ws';
 import { call } from '.';
 
 async function GET_PROJECTS() {
 	return (await call('GET_PROJECTS', [])) as Project[];
 }
-async function CREATE_PROJECT(name: string, path: string, ignoredPaths: string[]) {
+async function CREATE_PROJECT(
+	name: string,
+	path: string,
+	ignoredPaths: string[]
+) {
 	return (await call('CREATE_PROJECT', [name, path, ignoredPaths])) as Project;
 }
 async function UPDATE_PROJECT(id: string, project: Partial<Project>) {

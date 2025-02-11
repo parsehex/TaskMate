@@ -1,5 +1,5 @@
-import { Snippet } from '../../shared/types';
-import { SnippetsMessageHandlers } from '../../shared/types/ws';
+import { Snippet } from '@shared/types';
+import { SnippetsMessageHandlers } from '@shared/types/ws';
 import { call } from '.';
 
 async function GET_SNIPPET(snippetId: string) {

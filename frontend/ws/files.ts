@@ -1,5 +1,5 @@
-import { File } from '../../shared/types';
-import { FilesMessageHandlers } from '../../shared/types/ws';
+import { File } from '@shared/types';
+import { FilesMessageHandlers } from '@shared/types/ws';
 import { call } from '.';
 
 async function GET_FILE(fileId: string) {

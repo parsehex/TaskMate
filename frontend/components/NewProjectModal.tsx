@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { DefaultIgnoreFiles } from 'shared/const';
+import { DefaultIgnoreFiles } from '@shared/const';
 
 interface NewProjectModalProps {
 	isOpen: boolean;

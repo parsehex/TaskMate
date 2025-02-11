@@ -1,5 +1,5 @@
-import { File } from '../../shared/types';
-import FilesHandlers from '../ws/files';
+import { File } from '@shared/types';
+import FilesHandlers from '@/ws/files';
 import { convertBooleans } from './utils';
 
 export const FileBooleanColumns = ['included', 'use_title', 'use_summary'];

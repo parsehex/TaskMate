@@ -1,11 +1,11 @@
 import React, { useRef } from 'react';
-import { Snippet } from '../../../shared/types';
-import EditableName, { EditableNameRef } from '../EditableName';
-import CopyPromptButton from '../CopyPromptButton';
-import TokenCountDisplay from '../TokenCountDisplay';
+import { Snippet } from '@shared/types';
+import EditableName, { EditableNameRef } from '@/components/EditableName';
+import CopyPromptButton from '@/components/CopyPromptButton';
+import TokenCountDisplay from '@/components/TokenCountDisplay';
 import { useSnippetState } from './useState';
 import { ContextMenu } from './ContextMenu';
-import { Checkbox } from '../Checkbox';
+import { Checkbox } from '@/components/Checkbox';
 import { Indicators } from './Indicators';
 import clsx from 'clsx';
 
@@ -90,7 +90,7 @@ const Snippet: React.FC<SnippetProps> = ({
 			</div>
 
 			<span className="mr-2 flex items-center gap-2">
-				<Indicators file={snippet} />
+				<Indicators file={snippet as any} />
 				<CopyPromptButton promptParts={[snippet]} label="" />
 			</span>
 

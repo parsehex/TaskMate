@@ -3,7 +3,7 @@ import {
 	GenerateSummaryMessage,
 	GetTokenCountMessage,
 	UtilsMessageHandlers,
-} from '../../shared/types/ws';
+} from '@shared/types/ws';
 
 async function GET_TOKEN_COUNT(payload: GetTokenCountMessage) {
 	return (await call('GET_TOKEN_COUNT', [payload])) as number;

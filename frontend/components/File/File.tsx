@@ -1,12 +1,11 @@
 import React, { useRef } from 'react';
-import { File } from '../../../shared/types';
-import CopyPromptButton from '../CopyPromptButton';
-import TokenCountDisplay from '../TokenCountDisplay';
+import { File } from '@shared/types';
+import CopyPromptButton from '@/components/CopyPromptButton';
+import TokenCountDisplay from '@/components/TokenCountDisplay';
 import { useFileState } from './useState';
 import { ContextMenu } from './ContextMenu';
-import { Checkbox } from '../Checkbox';
+import { Checkbox } from '@/components/Checkbox';
 import { Indicators } from './Indicators';
-import { FileText } from 'lucide-react';
 import clsx from 'clsx';
 
 interface FileProps {

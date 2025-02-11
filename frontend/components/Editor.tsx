@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import MonacoEditor from '@monaco-editor/react';
-import { isSnippet } from '../../shared/types';
+import { isSnippet } from '@shared/types';
 import { updateFile } from '../api/files';
 import { updateSnippet } from '../api/snippets';
 import { getTokenCount } from '../api/utils';

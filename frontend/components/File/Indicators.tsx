@@ -2,7 +2,7 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFile, faBookOpen } from '@fortawesome/free-solid-svg-icons';
 
-import { File } from '../../../shared/types';
+import { File } from '@shared/types';
 
 interface IndicatorsProps {
 	file: File;

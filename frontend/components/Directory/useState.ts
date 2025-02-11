@@ -1,10 +1,7 @@
-import { useState, useEffect, useRef, ChangeEvent, MouseEvent } from 'react';
-import { useDrag, useDrop } from 'react-dnd';
-import { File } from '../../../shared/types';
-import { updateFile, updateFiles } from '../../api/files';
-import { useStore } from '../../state';
-import { getTokenCount } from '../../api/utils';
-import { FileNode } from '../../file-hierarchy';
+import { useState, useEffect } from 'react';
+import { updateFiles } from '@/api/files';
+import { useStore } from '@/state';
+import { FileNode } from '@/file-hierarchy';
 
 interface UseFileStateProps {
 	path: string;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Prompt_Part } from '../../shared/types';
+import { Prompt_Part } from '@shared/types';
 import { makePrompt } from '../utils';
 import { fetchFiles } from '../api/files';
 import { fetchSnippets } from '../api/snippets';

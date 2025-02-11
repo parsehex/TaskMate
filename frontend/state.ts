@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Project, Prompt_Part, Snippet, File } from '../shared/types';
+import { Project, Prompt_Part, Snippet, File } from '@shared/types';
 
 interface State {
 	projects: Project[];
@@ -41,8 +41,9 @@ export const useStore = create<State>((set) => ({
 	isConnected: false,
 	chatVisible: false,
 	chatMessages: [],
-  setChatVisible: (visible: boolean) => set({ chatVisible: visible }),
-  addChatMessage: (message) => set((state) => ({ chatMessages: [...state.chatMessages, message] })),
+	setChatVisible: (visible: boolean) => set({ chatVisible: visible }),
+	addChatMessage: (message) =>
+		set((state) => ({ chatMessages: [...state.chatMessages, message] })),
 
 	setProjects: (projects) => set({ projects }),
 	setSelectedProjectId: (projectId) => set({ selectedProjectId: projectId }),
@@ -60,7 +61,8 @@ export const useStore = create<State>((set) => ({
 		snippets[index] = snippet;
 		set({ snippets });
 	},
-	setSelectedPromptPart: (part) => set({ selectedPromptPart: part, chatVisible: part ? false : true }),
+	setSelectedPromptPart: (part) =>
+		set({ selectedPromptPart: part, chatVisible: part ? false : true }),
 	setIncludedPromptParts: (promptParts) =>
 		set({ includedPromptParts: promptParts }),
 	setPromptTokenCount: (tokenCount) => set({ promptTokenCount: tokenCount }),

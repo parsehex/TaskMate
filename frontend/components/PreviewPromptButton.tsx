@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Eye } from 'lucide-react';
-import { Prompt_Part } from '../../shared/types';
+import { Prompt_Part } from '@shared/types';
 import { makePrompt } from '../utils';
 import { useStore } from '../state';
 import { fetchFiles } from '../api/files';

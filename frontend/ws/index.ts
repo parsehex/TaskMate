@@ -1,4 +1,3 @@
-import { File } from '../../shared/types/index.js';
 import { FileBooleanColumns } from '../api/files';
 import { convertBooleans } from '../api/utils';
 import { useStore } from '../state';

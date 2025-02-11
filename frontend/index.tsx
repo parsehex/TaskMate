@@ -8,6 +8,7 @@ import 'react-tooltip/dist/react-tooltip.css';
 import './globals.css';
 import { App } from './components/App';
 import { initWebsocket } from './ws';
+console.log('test');
 
 (async () => {
 	await initWebsocket();
