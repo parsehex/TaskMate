@@ -7,7 +7,7 @@ import * as url from 'url';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 const dbPath = path.join(
 	process.env.PROJECTS_ROOT || `${__dirname}/..`,
-	'query-craft_db.sqlite3'
+	'query-crafter_db.sqlite3'
 );
 
 export let db: AsyncDatabase;
