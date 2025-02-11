@@ -4,9 +4,18 @@ import { convertBooleans } from '../api/utils';
 import { useStore } from '../state';
 
 let socket: WebSocket;
+let isElectron = (window as any).electron !== undefined;
+let replyChannels = {};
 
 export function initWebsocket() {
 	return new Promise((resolve) => {
+		const { setIsConnected } = useStore.getState();
+		if (isElectron) {
+			console.log('Running in Electron - using IPC');
+			setIsConnected(true);
+			resolve(true);
+			return;
+		}
 		const port =
 			(window as any).electron?.WEBSOCKET_PORT ||
 			(process.env.WEBSOCKET_PORT as string) ||
@@ -17,7 +26,6 @@ export function initWebsocket() {
 
 		socket.onopen = () => {
 			console.log('Connection opened!');
-			const { setIsConnected } = useStore.getState();
 			setIsConnected(true);
 			resolve(true);
 		};
@@ -57,15 +65,36 @@ export function initWebsocket() {
 }
 
 export function call(endpoint: string, args: any[]): Promise<any> {
-	return new Promise((resolve, reject) => {
+	return new Promise(async (resolve, reject) => {
 		const id = Math.random().toString(36).substr(2, 9);
-		socket.send(
-			JSON.stringify({
-				id,
-				endpoint,
-				args,
-			})
-		);
+		const message = JSON.stringify({
+			id,
+			endpoint,
+			args,
+		});
+
+		if (isElectron && (window as any).electron) {
+			const { ipcRendererSend, ipcRendererRemoveListener, ipcRendererOn } = (
+				window as any
+			).electron;
+			ipcRendererSend('ws-message', message);
+			replyChannels[id] = (event, reply) => {
+				const data = JSON.parse(reply);
+				if (data.id === id) {
+					if (data.error) {
+						reject(new Error(data.error));
+					} else {
+						resolve(data.result);
+					}
+					ipcRendererRemoveListener('ws-reply', replyChannels[id]);
+					delete replyChannels[id];
+				}
+			};
+			ipcRendererOn('ws-reply', replyChannels[id]);
+			return;
+		}
+
+		socket.send(message);
 
 		const handleMessage = (event: MessageEvent) => {
 			const data = JSON.parse(event.data);

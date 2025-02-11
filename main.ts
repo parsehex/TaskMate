@@ -29,10 +29,14 @@ const createMainWindow = async () => {
 			contextBridge.exposeInMainWorld('electron', {
 					SERVER_PORT: ${process.env.SERVER_PORT},
 					WEBSOCKET_PORT: ${process.env.WEBSOCKET_PORT},
-					IS_CHAT_ENABLED: ${!!process.env.OPENAI_API_KEY}
+					IS_CHAT_ENABLED: ${!!process.env.OPENAI_API_KEY},
+					ipcRendererSend: ipcRenderer.send.bind(ipcRenderer),
+					ipcRendererOn: ipcRenderer.on.bind(ipcRenderer),
+					ipcRendererRemoveListener: ipcRenderer.removeListener.bind(ipcRenderer),
 			});
 	`);
 
+	process.env.IS_ELECTRON = 'true';
 	mainWindow = new BrowserWindow({
 		width: 1200,
 		height: 800,
