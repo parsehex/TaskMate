@@ -29,7 +29,7 @@
 		"reset": "npm run f:reset && npm run b:reset",
 		"build": "npm run f:build && npm run b:build",
 		"start": "concurrently \"npm run f:dev\" \"npm run b:dev\"",
-		"e:dev": "pnpm run build && cp env-setup.html ./.dist/ && electron .",
+		"e:dev": "pnpm run build && cp env-setup.html package.json schema.sql ./.dist/ && electron ./.dist",
 		"e:build": "npm run build && cp env-setup.html package.json schema.sql ./.dist/ && node build.js"
 	},
 	"dependencies": {
