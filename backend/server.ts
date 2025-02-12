@@ -27,11 +27,11 @@ export const startServer = async () => {
 		app.use(cors());
 		app.use(express.json());
 
-		const staticPath = path.join(__dirname, '../frontend');
+		const staticPath = path.join(__dirname, '../public');
 		app.use(express.static(staticPath));
 
 		app.get('/', (req, res) => {
-			res.sendFile(path.join(staticPath, 'index.html'));
+			res.sendFile(path.join(staticPath, 'frontend/index.html'));
 		});
 		app.post('/rescan-projects', async (req, res) => {
 			try {
