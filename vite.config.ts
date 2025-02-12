@@ -8,6 +8,9 @@ export default defineConfig({
 	},
 	build: {
 		outDir: '.dist/frontend',
+		rollupOptions: {
+			input: './frontend/index.html'
+		}
 	},
 	resolve: {
 		alias: {
