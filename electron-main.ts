@@ -37,7 +37,9 @@ const createMainWindow = async () => {
 	process.env.IS_ELECTRON = 'true';
 	mainWindow = new BrowserWindow({
 		width: 1200,
+		minWidth: 600,
 		height: 800,
+		minHeight: 400,
 		webPreferences: {
 			nodeIntegration: false,
 			contextIsolation: true,
