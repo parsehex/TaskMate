@@ -27,21 +27,23 @@ const NewProjectModal: React.FC<NewProjectModalProps> = ({
 	const [ignoredPaths, setIgnoredPaths] = useState(
 		JSON.stringify(DefaultIgnoreFiles, null, 2)
 	);
-	console.log(JSON.stringify(DefaultIgnoreFiles));
 	const setProjects = useStore((state) => state.setProjects);
 	const setSelectedProjectId = useStore((state) => state.setSelectedProjectId);
 
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		if (!path.trim()) return;
-		if (!name.trim()) {
+		const hasName = !!name.trim();
+		const hasPath = !!path.trim();
+		if (!hasName) {
+			if (!hasPath) return;
+			// try to extract name from path
 			let p = path.trim();
 			const slash = p.includes('/') ? '/' : '\\';
 			if (p.lastIndexOf(slash) === p.length - 1) p = p.slice(0, p.length - 1);
 			const lastSlash = p.lastIndexOf(slash);
 			const n = p.slice(lastSlash);
 			if (n) setName(n);
-			else return;
+			else return; // extracted name was blank
 		}
 
 		try {
@@ -69,7 +71,7 @@ const NewProjectModal: React.FC<NewProjectModalProps> = ({
 			const slash = p.includes('/') ? '/' : '\\';
 			if (p.lastIndexOf(slash) === p.length - 1) p = p.slice(0, p.length - 1);
 			const lastSlash = p.lastIndexOf(slash);
-			const n = p.slice(lastSlash + 1);
+			const n = p.slice(lastSlash);
 			if (n) setName(n);
 			else return;
 		}

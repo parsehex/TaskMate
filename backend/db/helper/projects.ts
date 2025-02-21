@@ -31,17 +31,20 @@ export const getProjectById = async (id: string, columns = '*') => {
 	);
 	return project;
 };
-export const createProject = async ({ name, path, ...project }: Partial<Project> & {path:string}) => {
+export const createProject = async ({ name, path, ...project }: Partial<Project> & { path: string }) => {
 	if (!name) throw new Error('Project name is required');
-	if (!path) throw new Error('Project path is required');
-	try {
-		const stat = await fs.stat(path);
-		if (!stat.isDirectory()) throw new Error('Project path must be directory');
-	} catch(e) {
-		throw new Error('Project path must exist');
-	}
 	const projectPath = p.join(process.env.PROJECTS_ROOT as string, name);
-	fs.createSymlink(path, projectPath);
+	try {
+		if (!path) {
+			await fs.mkdir(projectPath);
+		} else {
+			const stat = await fs.stat(path);
+			if (!stat.isDirectory()) throw new Error('Project path must be directory');
+			await fs.createSymlink(path, projectPath);
+		}
+	} catch (e: any) {
+		throw new Error('Could not create project:' + e.message);
+	}
 	const id = v4();
 	project.description = project.description || '';
 	if (!project.ignore_files?.length) {
