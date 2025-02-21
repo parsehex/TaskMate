@@ -33,6 +33,9 @@ const options = {
 
 		app: '.dist',
 	},
+	extraResources: [
+		'.dist/frontend/**/*'
+	],
 
 	win: {
 		artifactName: '${productName}-Setup-${version}.${ext}',
