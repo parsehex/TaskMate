@@ -11,6 +11,7 @@ export interface FilesMessageHandlers {
 
 export interface ProjectsMessageHandlers {
 	GET_PROJECTS: () => Promise<Project[]>;
+	RESCAN_PROJECTS: () => Promise<void>;
 	CREATE_PROJECT: (name: string, path: string, ignoredPaths?: string[] | string) => Promise<Project>;
 	UPDATE_PROJECT: (id: string, project: Partial<Project>) => Promise<Project>;
 	DELETE_PROJECT: (id: string) => Promise<void>;
@@ -26,6 +27,10 @@ export interface SnippetsMessageHandlers {
 	UPDATE_SNIPPET: (id: string, snippet: Partial<Snippet>) => Promise<Snippet>;
 	UPDATE_SNIPPETS: (snippets: Partial<Snippet>[]) => Promise<Snippet[]>;
 	DELETE_SNIPPET: (id: string) => Promise<void>;
+}
+
+export interface ChatMessageHadlers {
+	MESSAGES_COMPLETION: (prompt: string) => Promise<string | null>;
 }
 
 export interface GetTokenCountMessage {

@@ -11,7 +11,7 @@ const wss = new WebSocketServer({ port });
 
 const clients: { [id: string]: WebSocket } = {};
 
-const allHandlers = {
+export const allHandlers = {
 	...filesHandlers,
 	...snippetsHandlers,
 	...projectsHandlers,

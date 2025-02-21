@@ -5,6 +5,9 @@ import { call } from '.';
 async function GET_PROJECTS() {
 	return (await call('GET_PROJECTS', [])) as Project[];
 }
+async function RESCAN_PROJECTS() {
+	return (await call('RESCAN_PROJECTS', [])) as void;
+}
 async function CREATE_PROJECT(
 	name: string,
 	path: string,
@@ -21,6 +24,7 @@ async function DELETE_PROJECT(id: string) {
 
 const ProjectsHandlers: ProjectsMessageHandlers = {
 	GET_PROJECTS,
+	RESCAN_PROJECTS,
 	CREATE_PROJECT,
 	UPDATE_PROJECT,
 	DELETE_PROJECT,

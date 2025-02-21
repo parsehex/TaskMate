@@ -1,15 +1,5 @@
-import { MessageHandlers } from '../shared/types/ws/index.js';
-import filesHandlers from './api/files.js';
-import snippetsHandlers from './api/snippets.js';
-import projectsHandlers from './api/projects.js';
-import utilsHandlers from './api/utils.js';
-
-const allHandlers = {
-	...filesHandlers,
-	...snippetsHandlers,
-	...projectsHandlers,
-	...utilsHandlers,
-} as MessageHandlers;
+import type { MessageHandlers } from '../shared/types/ws/index.js';
+import { allHandlers } from './api/index.js';
 
 export async function setupIpcHandlers() {
 	const { ipcMain } = await import('electron');

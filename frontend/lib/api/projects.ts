@@ -5,6 +5,10 @@ export const fetchProjects = async (): Promise<Project[]> => {
 	return await ProjectsHandlers.GET_PROJECTS();
 };
 
+export const rescanProjects = async (): Promise<void> => {
+	return await ProjectsHandlers.RESCAN_PROJECTS();
+};
+
 export const updateProject = async (
 	id: string,
 	data: Partial<Project>

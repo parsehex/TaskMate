@@ -1,9 +1,10 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { rescanProjects } from '@/lib/api/projects';
 
 const ScanProjectsButton: React.FC = () => {
 	const handlePreviewClick = async () => {
-		await fetch('/rescan-projects', { method: 'POST' });
+		await rescanProjects();
 	};
 
 	return (

@@ -1,14 +1,10 @@
+import ChatHandlers from '../ws/llm';
+
 export const sendPrompt = async (prompt: string) => {
   try {
-    const response = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt }),
-    });
-    const data = await response.json();
-    return data.response;
+    return await ChatHandlers.MESSAGES_COMPLETION(prompt);
   } catch (error) {
-    console.error('Error sending prompt:', error);
+    console.error('Error running prompt:', error);
     return null;
   }
 };

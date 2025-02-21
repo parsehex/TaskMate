@@ -1,6 +1,7 @@
 import { Project } from '../../shared/types/index.js';
 import { ProjectsMessageHandlers } from '../../shared/types/ws/index.js';
 import * as helper from '../db/helper/projects.js';
+import { scanProjectsRoot } from '../project-scanner.js';
 
 async function GET_PROJECTS() {
 	return await helper.getProjects();
@@ -20,8 +21,13 @@ async function DELETE_PROJECT(id: string) {
 	await helper.deleteProject(id);
 }
 
+async function RESCAN_PROJECTS() {
+	await scanProjectsRoot();
+}
+
 const handlers: ProjectsMessageHandlers = {
 	GET_PROJECTS,
+	RESCAN_PROJECTS,
 	CREATE_PROJECT,
 	UPDATE_PROJECT,
 	DELETE_PROJECT,

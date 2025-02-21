@@ -12,7 +12,7 @@ dotenv.config({ path: ENV_PATH });
 let mainWindow: BrowserWindow | null = null;
 let envSetupWindow: BrowserWindow | null = null;
 
-const REQUIRED_ENV_VARS = ['PROJECTS_ROOT', 'SERVER_PORT', 'WEBSOCKET_PORT'];
+const REQUIRED_ENV_VARS = ['PROJECTS_ROOT'];
 
 function isEnvComplete() {
 	return REQUIRED_ENV_VARS.every((key) => process.env[key]);
@@ -27,8 +27,6 @@ const createMainWindow = async () => {
 			console.log('Preload ran');
 			const { contextBridge, ipcRenderer } = require('electron');
 			contextBridge.exposeInMainWorld('electron', {
-					SERVER_PORT: ${process.env.SERVER_PORT},
-					WEBSOCKET_PORT: ${process.env.WEBSOCKET_PORT},
 					IS_CHAT_ENABLED: ${!!process.env.OPENAI_API_KEY},
 					ipcRendererSend: ipcRenderer.send.bind(ipcRenderer),
 					ipcRendererOn: ipcRenderer.on.bind(ipcRenderer),
@@ -47,8 +45,7 @@ const createMainWindow = async () => {
 		},
 	});
 
-	// TODO env value validation
-	mainWindow.loadURL('http://localhost:' + process.env.SERVER_PORT);
+	mainWindow.loadFile(path.join(__dirname, 'frontend/index.html'));
 };
 
 const createEnvSetupWindow = async () => {
