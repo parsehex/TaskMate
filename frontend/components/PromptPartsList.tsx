@@ -1,5 +1,5 @@
 import React from 'react';
-import { createSnippet, updateSnippets } from '../api/snippets';
+import { createSnippet, updateSnippets } from '@/lib/api/snippets';
 import { useStore } from '../state';
 import SnippetPart from './Snippet/Snippet';
 import FilePart from './File/File';
@@ -13,7 +13,7 @@ import {
 	ResizablePanel,
 	ResizableHandle,
 } from '@/components/ui/resizable';
-import { updateFiles } from '@/api/files';
+import { updateFiles } from '@/lib/api/files';
 
 const PromptPartsList: React.FC = () => {
 	const [

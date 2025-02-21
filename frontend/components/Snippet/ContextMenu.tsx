@@ -1,7 +1,11 @@
 import React from 'react';
 import { ControlledMenu, MenuItem, ClickEvent } from '@szhsin/react-menu';
 import { File, Snippet } from '@shared/types';
-import { deleteSnippet, updateSnippet, createSnippet } from '@/api/snippets';
+import {
+	deleteSnippet,
+	updateSnippet,
+	createSnippet,
+} from '@/lib/api/snippets';
 import { useStore } from '@/state';
 import { EditableNameRef } from '@/components/EditableName';
 

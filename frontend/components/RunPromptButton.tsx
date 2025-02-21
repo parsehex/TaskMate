@@ -3,7 +3,7 @@ import { Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { makePrompt } from '../utils';
 import { useStore } from '../state';
-import { sendPrompt } from '../api/llm';
+import { sendPrompt } from '@/lib/api/llm';
 
 const RunPromptButton: React.FC = () => {
 	const { includedPromptParts, addChatMessage } = useStore((state) => state);

@@ -1,5 +1,5 @@
 import { Snippet } from '@shared/types';
-import SnippetsHandlers from '@/ws/snippets';
+import SnippetsHandlers from '../ws/snippets';
 import { convertBooleans } from './utils';
 
 const SnippetBooleanColumns = ['included', 'use_title', 'use_summary'];

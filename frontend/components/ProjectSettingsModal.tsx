@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { updateProject } from '../api/projects';
+import { updateProject } from '@/lib/api/projects';
 import { useStore } from '../state';
 import {
 	Dialog,

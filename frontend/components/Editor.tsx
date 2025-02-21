@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import MonacoEditor from '@monaco-editor/react';
 import { isSnippet } from '@shared/types';
-import { updateFile } from '../api/files';
-import { updateSnippet } from '../api/snippets';
-import { getTokenCount } from '../api/utils';
+import { updateFile } from '@/lib/api/files';
+import { updateSnippet } from '@/lib/api/snippets';
+import { getTokenCount } from '@/lib/api/utils';
 import { useStore } from '../state';
 import { detectFileLanguage } from '../utils';
 import TokenCountDisplay from './TokenCountDisplay';

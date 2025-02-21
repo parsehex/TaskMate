@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { fetchProjects, createProject } from '../api/projects';
+import { fetchProjects, createProject } from '@/lib/api/projects';
 import { useStore } from '../state';
 import {
 	Dialog,

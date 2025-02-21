@@ -1,4 +1,4 @@
-import UtilsHandlers from '@/ws/utils';
+import UtilsHandlers from '../ws/utils';
 
 interface GetTokenCountOptions {
 	text?: string;

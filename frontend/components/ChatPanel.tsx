@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useStore } from '../state';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { sendPrompt } from '../api/llm';
+import { sendPrompt } from '@/lib/api/llm';
 
 const ChatPanel: React.FC = () => {
 	const {

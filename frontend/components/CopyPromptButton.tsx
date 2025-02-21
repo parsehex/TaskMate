@@ -3,8 +3,8 @@ import { Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Prompt_Part } from '@shared/types';
 import { makePrompt } from '../utils';
-import { fetchFiles } from '../api/files';
-import { fetchSnippets } from '../api/snippets';
+import { fetchFiles } from '@/lib/api/files';
+import { fetchSnippets } from '@/lib/api/snippets';
 import { useStore } from '../state';
 
 interface CopyPromptButtonProps {

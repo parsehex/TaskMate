@@ -1,6 +1,6 @@
 import { FileBooleanColumns } from '../api/files';
 import { convertBooleans } from '../api/utils';
-import { useStore } from '../state';
+import { useStore } from '@/state';
 
 let socket: WebSocket;
 let isElectron = (window as any).electron !== undefined;

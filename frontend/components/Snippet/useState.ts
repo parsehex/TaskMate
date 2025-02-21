@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef, ChangeEvent, MouseEvent } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { Snippet } from '@shared/types';
-import { updateSnippet } from '@/api/snippets';
+import { updateSnippet } from '@/lib/api/snippets';
 import { useStore } from '@/state';
-import { getTokenCount } from '@/api/utils';
+import { getTokenCount } from '@/lib/api/utils';
 
 interface UseSnippetStateProps {
 	snippet: Snippet;

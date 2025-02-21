@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef, ChangeEvent, MouseEvent } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { File } from '@shared/types';
-import { updateFile } from '@/api/files';
+import { updateFile } from '@/lib/api/files';
 import { useStore } from '@/state';
-import { getTokenCount } from '@/api/utils';
+import { getTokenCount } from '@/lib/api/utils';
 
 interface UseFileStateProps {
 	file: File;

@@ -7,7 +7,7 @@ import 'react-tooltip/dist/react-tooltip.css';
 // import './scss/style.scss';
 import './globals.css';
 import { App } from './components/App';
-import { initWebsocket } from './ws';
+import { initWebsocket } from '@/lib/ws';
 console.log('test');
 
 (async () => {

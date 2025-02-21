@@ -4,8 +4,8 @@ import { Eye } from 'lucide-react';
 import { Prompt_Part } from '@shared/types';
 import { makePrompt } from '../utils';
 import { useStore } from '../state';
-import { fetchFiles } from '../api/files';
-import { fetchSnippets } from '../api/snippets';
+import { fetchFiles } from '@/lib/api/files';
+import { fetchSnippets } from '@/lib/api/snippets';
 
 const PreviewPromptButton: React.FC = () => {
 	const [

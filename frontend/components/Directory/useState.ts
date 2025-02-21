@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { updateFiles } from '@/api/files';
+import { updateFiles } from '@/lib/api/files';
 import { useStore } from '@/state';
 import { FileNode } from '@/file-hierarchy';
 

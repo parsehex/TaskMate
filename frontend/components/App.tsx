@@ -3,7 +3,7 @@ import { Tooltip } from 'react-tooltip';
 import { X } from 'lucide-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClose } from '@fortawesome/free-solid-svg-icons';
-import { fetchProjects } from '../api/projects';
+import { fetchProjects } from '@/lib/api/projects';
 import { useStore } from '../state';
 import { makePrompt } from '../utils';
 import CopyPromptButton from './CopyPromptButton';
@@ -12,9 +12,9 @@ import ProjectSelector from './ProjectSelector';
 import PromptPartsList from './PromptPartsList';
 import PreviewPromptButton from './PreviewPromptButton';
 import TokenCountDisplay from './TokenCountDisplay';
-import { fetchSnippets } from '../api/snippets';
-import { fetchFiles } from '../api/files';
-import { getTokenCount } from '../api/utils';
+import { fetchSnippets } from '@/lib/api/snippets';
+import { fetchFiles } from '@/lib/api/files';
+import { getTokenCount } from '@/lib/api/utils';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
 	ResizablePanelGroup,

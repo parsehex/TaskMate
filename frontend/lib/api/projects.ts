@@ -1,5 +1,5 @@
 import { Project } from '@shared/types';
-import ProjectsHandlers from '@/ws/projects';
+import ProjectsHandlers from '../ws/projects';
 
 export const fetchProjects = async (): Promise<Project[]> => {
 	return await ProjectsHandlers.GET_PROJECTS();
