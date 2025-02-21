@@ -4,7 +4,7 @@ import path from 'path';
 import chokidar from 'chokidar';
 import * as fileHelper from './db/helper/files.js';
 import * as projectHelper from './db/helper/projects.js';
-import { sendToAll } from './ws/index.js';
+import { sendToAll } from './api/index.js';
 import { fileExists as fileExistsFunc, isDirectory } from './fs-utils.js';
 import { shouldIgnorePath, getProjectPath } from './path-utils.js';
 import { DefaultIgnoreFiles } from '../shared/const.js';
@@ -32,7 +32,7 @@ async function createFilesForProject(
 	projectName: string,
 	folderPath = ''
 ) {
-	const projectPath = await getProjectPath({name: projectName}, folderPath);
+	const projectPath = await getProjectPath({ name: projectName }, folderPath);
 
 	const project = await projectHelper.getProjectById(projectId, 'ignore_files');
 	const ignoreFiles = project
@@ -70,7 +70,7 @@ async function createFilesForProject(
 }
 
 async function watchProjectFolder(projectId: string, projectName: string) {
-	const projectPath = await getProjectPath({name: projectName});
+	const projectPath = await getProjectPath({ name: projectName });
 	const project = await projectHelper.getProjectById(
 		projectId,
 		'id,name,ignore_files'

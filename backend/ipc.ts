@@ -1,8 +1,8 @@
 import { MessageHandlers } from '../shared/types/ws/index.js';
-import filesHandlers from './ws/files.js';
-import snippetsHandlers from './ws/snippets.js';
-import projectsHandlers from './ws/projects.js';
-import utilsHandlers from './ws/utils.js';
+import filesHandlers from './api/files.js';
+import snippetsHandlers from './api/snippets.js';
+import projectsHandlers from './api/projects.js';
+import utilsHandlers from './api/utils.js';
 
 const allHandlers = {
 	...filesHandlers,
@@ -32,4 +32,3 @@ export async function setupIpcHandlers() {
 		}
 	});
 }
-

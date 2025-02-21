@@ -3,7 +3,7 @@ import cors from 'cors';
 import path from 'path';
 import * as url from 'url';
 import { initializeDatabase } from './db/index.js';
-import './ws/index.js';
+import './api/index.js';
 import { scanProjectsRoot } from './project-scanner.js';
 import { generateResponse } from './openai/index.js';
 
