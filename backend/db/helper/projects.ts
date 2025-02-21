@@ -22,6 +22,7 @@ export const getProjects = async (
 			})
 			.join(' AND ');
 	}
+	sql += ' ORDER BY name ASC';
 	return await db.all(sql, values);
 };
 export const getProjectById = async (id: string, columns = '*') => {
