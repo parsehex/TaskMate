@@ -48,6 +48,8 @@ const createMainWindow = async () => {
 	});
 
 	mainWindow.loadFile(path.join(__dirname, 'frontend/index.html'));
+
+	return mainWindow;
 };
 
 const createEnvSetupWindow = async () => {
@@ -90,8 +92,10 @@ app.on('ready', async () => {
 		createEnvSetupWindow();
 	} else {
 		console.log('Starting backend', path.resolve(__dirname, 'backend'));
-		await import('file://' + path.resolve(__dirname, 'backend/index.js'));
-		createMainWindow();
+		const window = await createMainWindow();
+		const backendProcess = await import('file://' + path.resolve(__dirname, 'backend/index.js'));
+		await backendProcess.waitUntilStarted();
+		window?.reload();
 	}
 });
 

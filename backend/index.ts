@@ -4,6 +4,19 @@ import { initializeDatabase } from './db/index.js';
 import { scanProjectsRoot } from './project-scanner.js';
 import { setupIpcHandlers } from './ipc.js';
 
+let isDone = false;
+
+export function waitUntilStarted() {
+	return new Promise((resolve) => {
+		if (isDone) resolve(true);
+		const id = setInterval(() => {
+			if (!isDone) return;
+			clearInterval(id);
+			resolve(true);
+		}, 250);
+	})
+}
+
 (async () => {
 	await ensureEnvVars();
 	await initializeDatabase();
@@ -18,4 +31,5 @@ import { setupIpcHandlers } from './ipc.js';
 		console.log('Starting server');
 		startServer();
 	}
+	isDone = true;
 })();
