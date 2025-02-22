@@ -28,6 +28,7 @@ const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
 		(project) => project.id === selectedProjectId
 	);
 
+	const [name, setName] = useState(selectedProject?.name || '');
 	const [description, setDescription] = useState(
 		selectedProject?.description || ''
 	);
@@ -41,6 +42,7 @@ const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
 
 	useEffect(() => {
 		if (selectedProject) {
+			setName(selectedProject.name || '');
 			setDescription(selectedProject.description || '');
 			setIgnoredPaths(
 				JSON.stringify(
@@ -57,6 +59,7 @@ const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
 		if (!selectedProject) return;
 
 		await updateProject(selectedProject.id, {
+			name,
 			description,
 			ignore_files: ignoredPaths,
 		});
@@ -70,6 +73,18 @@ const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
 					<DialogTitle>Edit Project</DialogTitle>
 				</DialogHeader>
 				<form onSubmit={handleSubmit} className="space-y-4">
+					<div className="space-y-2">
+						<label htmlFor="name" className="text-sm font-medium">
+							Project Name
+						</label>
+						<input
+							id="name"
+							value={name}
+							onChange={(e) => setName(e.target.value)}
+							placeholder="Enter project name..."
+							className="w-full"
+						/>
+					</div>
 					<div className="space-y-2">
 						<label htmlFor="description" className="text-sm font-medium">
 							Description

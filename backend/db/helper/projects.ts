@@ -64,7 +64,14 @@ export const createProject = async ({ name, path, ...project }: Partial<Project>
 };
 export const updateProject = async (id: string, project: Partial<Project>) => {
 	const fieldsObj: Partial<Project> = {};
-	if (project.name) fieldsObj.name = project.name;
+	if (project.name) {
+		// rename the project folder if renaming (this isn't the original folder)
+		const dbProject = await getProjectById(id);
+		const origProjectPath = p.join(process.env.PROJECTS_ROOT as string, dbProject.name);
+		const newProjectPath = p.join(process.env.PROJECTS_ROOT as string, project.name);
+		fieldsObj.name = project.name;
+		await fs.move(origProjectPath, newProjectPath);
+	}
 	if (project.description) fieldsObj.description = project.description;
 	if (project.ignore_files !== undefined)
 		fieldsObj.ignore_files = project.ignore_files;
