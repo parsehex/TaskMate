@@ -22,12 +22,14 @@ import {
 	ResizableHandle,
 } from '@/components/ui/resizable';
 import { Button } from '@/components/ui/button';
-import ScanProjectsButton from './ScanProjectsButton';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import ChatPanel from './ChatPanel';
+import GuidePanel from './GuidePanel';
 import RunPromptButton from './RunPromptButton';
 
 export const App: React.FC = () => {
 	const {
+		activeTab,
 		selectedProjectId,
 		snippets,
 		files,
@@ -35,6 +37,7 @@ export const App: React.FC = () => {
 		includedPromptParts,
 		promptTokenCount,
 		isConnected,
+		setActiveTab,
 		setProjects,
 		setFiles,
 		setSnippets,
@@ -151,25 +154,33 @@ export const App: React.FC = () => {
 					<ResizableHandle withHandle />
 
 					<ResizablePanel>
-						<div className="h-full relative">
-							{selectedPromptPart ? (
-								<>
-									<Button
-										variant="ghost"
-										size="icon"
-										className="absolute top-2 right-2 z-10"
-										onClick={() => setSelectedPromptPart(null)}
-									>
-										<X className="h-4 w-4" />
-									</Button>
+						<Tabs
+							value={activeTab}
+							onValueChange={setActiveTab}
+							className="h-full"
+						>
+							<TabsList className="flex">
+								<TabsTrigger value="editor">Editor</TabsTrigger>
+								<TabsTrigger value="chat">Chat</TabsTrigger>
+								<TabsTrigger value="guide">Guide</TabsTrigger>
+							</TabsList>
+
+							<TabsContent value="editor">
+								{selectedPromptPart ? (
 									<Editor />
-								</>
-							) : isChatEnabled ? (
-								<ChatPanel />
-							) : (
-								<span></span>
-							)}
-						</div>
+								) : (
+									<span>Select a prompt part</span>
+								)}
+							</TabsContent>
+
+							<TabsContent value="chat">
+								{isChatEnabled ? <ChatPanel /> : <span>Chat is disabled</span>}
+							</TabsContent>
+
+							<TabsContent value="guide">
+								<GuidePanel />
+							</TabsContent>
+						</Tabs>
 					</ResizablePanel>
 				</ResizablePanelGroup>
 			</main>

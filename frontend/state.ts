@@ -1,7 +1,8 @@
 import { create } from 'zustand';
-import { Project, Prompt_Part, Snippet, File } from '@shared/types';
+import { Project, Prompt_Part, Snippet, File, TabName } from '@shared/types';
 
 interface State {
+	activeTab: TabName;
 	projects: Project[];
 	selectedProjectId: string | null;
 	files: File[];
@@ -14,6 +15,7 @@ interface State {
 	chatVisible: boolean;
 	chatMessages: any[];
 
+	setActiveTab: (tab: TabName) => void;
 	setChatVisible: (visible: boolean) => void;
 	addChatMessage: (message: any) => void;
 	setProjects: (projects: Project[]) => void;
@@ -30,6 +32,7 @@ interface State {
 }
 
 export const useStore = create<State>((set) => ({
+	activeTab: 'editor',
 	projects: [],
 	selectedProjectId: null,
 	files: [],
@@ -41,10 +44,11 @@ export const useStore = create<State>((set) => ({
 	isConnected: false,
 	chatVisible: false,
 	chatMessages: [],
+
+	setActiveTab: (tab: TabName) => set({ activeTab: tab }),
 	setChatVisible: (visible: boolean) => set({ chatVisible: visible }),
 	addChatMessage: (message) =>
 		set((state) => ({ chatMessages: [...state.chatMessages, message] })),
-
 	setProjects: (projects) => set({ projects }),
 	setSelectedProjectId: (projectId) => set({ selectedProjectId: projectId }),
 	setFiles: (files) => set({ files }),

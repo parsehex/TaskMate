@@ -36,6 +36,8 @@ export interface File {
 	updated_at: string;
 }
 
+export type TabName = 'editor' | 'chat' | 'guide';
+
 export function isSnippet(part: Prompt_Part): part is Snippet {
 	return 'type' in part && 'content' in part;
 }

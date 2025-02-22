@@ -159,8 +159,9 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 	return (
 		<div className="editor h-[80vh]">
 			<h2>
-				{readOnly ? '' : 'Editing: '}
-				<span className="font-mono">{promptPart?.name || ''}</span>
+				<span className={'font-mono' + (readOnly ? ' italic select-none' : '')}>
+					{promptPart?.name || ''}
+				</span>
 				{isSaved || readOnly ? '' : '*'}
 			</h2>
 			<div className="flex items-center gap-4 mb-2">
