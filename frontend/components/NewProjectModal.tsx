@@ -34,17 +34,7 @@ const NewProjectModal: React.FC<NewProjectModalProps> = ({
 		event.preventDefault();
 		const hasName = !!name.trim();
 		const hasPath = !!path.trim();
-		if (!hasName) {
-			if (!hasPath) return;
-			// try to extract name from path
-			let p = path.trim();
-			const slash = p.includes('/') ? '/' : '\\';
-			if (p.lastIndexOf(slash) === p.length - 1) p = p.slice(0, p.length - 1);
-			const lastSlash = p.lastIndexOf(slash);
-			const n = p.slice(lastSlash);
-			if (n) setName(n);
-			else return; // extracted name was blank
-		}
+		if (!hasName && !hasPath) return;
 
 		try {
 			const paths = JSON.stringify(JSON.parse(ignoredPaths));
@@ -66,15 +56,22 @@ const NewProjectModal: React.FC<NewProjectModalProps> = ({
 	const handleSetPath = (str: string) => {
 		if (!str) return;
 		setPath(str);
-		if (!name.trim()) {
-			let p = str.trim();
-			const slash = p.includes('/') ? '/' : '\\';
-			if (p.lastIndexOf(slash) === p.length - 1) p = p.slice(0, p.length - 1);
-			const lastSlash = p.lastIndexOf(slash);
-			const n = p.slice(lastSlash);
-			if (n) setName(n);
-			else return;
-		}
+
+		// attempt to parse out the project name
+		// TODO rethink. maybe have this as part of expanding to use a Browse button to choose folder
+		//   (to fix issue with typing the path)
+		// if (!name.trim()) {
+		// 	let p = str.trim();
+		// 	const slash = p.includes('/') ? '/' : '\\';
+		// 	const firstIsSlash = p.indexOf(slash) === 0;
+		// 	const lastIsSlash = p.lastIndexOf(slash) === p.length - 1;
+		// 	if (firstIsSlash) p = p.slice(1);
+		// 	if (lastIsSlash) p = p.slice(0, p.length - 1);
+		// 	const lastSlash = p.lastIndexOf(slash);
+		// 	const n = p.slice(lastSlash);
+		// 	if (n) setName(n);
+		// 	else return;
+		// }
 	};
 
 	return (
