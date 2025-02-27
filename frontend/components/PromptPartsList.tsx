@@ -101,7 +101,11 @@ const PromptPartsList: React.FC = () => {
 
 	return (
 		<div className="flex flex-col h-full">
-			<ResizablePanelGroup direction="vertical" className="flex-1">
+			<ResizablePanelGroup
+				direction="vertical"
+				className="flex-1"
+				autoSaveId="prompt-part-list"
+			>
 				<ResizablePanel defaultSize={50} minSize={30} maxSize={70}>
 					<ScrollArea className="border rounded-md h-full">
 						<div className="sticky top-0 bg-neutral-300 flex justify-between items-center px-2 mb-1 border-b">

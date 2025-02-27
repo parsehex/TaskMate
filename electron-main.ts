@@ -1,4 +1,7 @@
 import { app, BrowserWindow, ipcMain, dialog } from 'electron';
+import rememberWindowState, {
+	loadWindowState,
+} from './electron-window-state.js';
 import fs from 'fs/promises';
 import path from 'path';
 import * as url from 'url';
@@ -34,10 +37,14 @@ const createMainWindow = async () => {
 	// Flag that we’re running in Electron.
 	process.env.IS_ELECTRON = 'true';
 
-	mainWindow = new BrowserWindow({
+	const windowState = loadWindowState({
 		width: 1200,
-		minWidth: 600,
 		height: 800,
+	});
+	mainWindow = new BrowserWindow({
+		width: windowState.width,
+		minWidth: 600,
+		height: windowState.height,
 		minHeight: 400,
 		webPreferences: {
 			nodeIntegration: false,
@@ -72,6 +79,7 @@ ipcMain.on('restart-app', () => {
 app.on('ready', async () => {
 	console.log('Starting backend', path.resolve(__dirname, 'backend'));
 	const win = await createMainWindow();
+	rememberWindowState(win);
 	// Dynamically load backend after creating window.
 	const backendProcess = await import(
 		'file://' + path.resolve(__dirname, 'backend/index.js')

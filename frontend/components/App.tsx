@@ -123,7 +123,11 @@ export const App: React.FC = () => {
 				</Alert>
 			)}
 			<main className="flex-1 overflow-hidden">
-				<ResizablePanelGroup direction="horizontal" className="h-full">
+				<ResizablePanelGroup
+					direction="horizontal"
+					className="h-full"
+					autoSaveId="app-panels"
+				>
 					<ResizablePanel defaultSize={30} minSize={35} maxSize={50}>
 						<div className="h-full flex flex-col p-1">
 							<ProjectSelector />
