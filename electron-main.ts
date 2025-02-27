@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, dialog } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, Menu } from 'electron';
 import rememberWindowState, {
 	loadWindowState,
 } from './electron-window-state.js';
@@ -52,7 +52,6 @@ const createMainWindow = async () => {
 			preload: path.resolve(__dirname, '../../preload.js'),
 		},
 	});
-	mainWindow.removeMenu();
 
 	mainWindow.loadFile(path.join(__dirname, 'frontend/index.html'));
 
