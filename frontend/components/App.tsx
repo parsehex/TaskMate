@@ -168,7 +168,7 @@ export const App: React.FC = () => {
 								<TabsTrigger value="editor">Editor</TabsTrigger>
 								{isChatEnabled && <TabsTrigger value="chat">Chat</TabsTrigger>}
 
-								<TabsTrigger value="guide">Guide</TabsTrigger>
+								{/* <TabsTrigger value="guide">Guide</TabsTrigger> */}
 								<TabsTrigger value="settings">Settings</TabsTrigger>
 							</TabsList>
 
