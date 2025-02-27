@@ -136,7 +136,7 @@ export const App: React.FC = () => {
 								<div className="text-xs select-none">Prompt</div>
 								<div className="grow flex items-center justify-around w-full gap-1">
 									<CopyPromptButton label="" />
-									<RunPromptButton />
+									{isChatEnabled && <RunPromptButton />}
 									<PreviewPromptButton />
 									<span
 										className="ml-auto"
