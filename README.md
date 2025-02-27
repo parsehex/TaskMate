@@ -1,4 +1,4 @@
-# Query Crafter (Work in Progress)
+# TaskMate (Work in Progress)
 
 This is a web / Electron app to assist with my own usage of LLMs to pair program on projects.
 

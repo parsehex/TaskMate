@@ -12,7 +12,7 @@ async function getDbPath() {
 	}
 	return path.join(
 		process.env.PROJECTS_ROOT || base, // TODO FIX will always start with CWD
-		'query-crafter_db.sqlite3'
+		'taskmate_db.sqlite3'
 	);
 }
 

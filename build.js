@@ -18,8 +18,8 @@ console.time(`build (${compression} compression-level)`);
  * @type {import('electron-builder').Configuration}
  */
 const options = {
-	appId: 'com.mindofthomas.query-crafter',
-	productName: 'Query Crafter',
+	appId: 'com.mindofthomas.taskmate',
+	productName: 'TaskMate',
 
 	// "store" | "normal" | "maximum" - For testing builds, use 'store' to reduce build time significantly.
 	compression,
