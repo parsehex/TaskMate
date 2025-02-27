@@ -12,7 +12,11 @@ export interface FilesMessageHandlers {
 export interface ProjectsMessageHandlers {
 	GET_PROJECTS: () => Promise<Project[]>;
 	RESCAN_PROJECTS: () => Promise<void>;
-	CREATE_PROJECT: (name: string, path: string, ignoredPaths?: string[] | string) => Promise<Project>;
+	CREATE_PROJECT: (
+		name: string,
+		path: string,
+		ignoredPaths?: string[] | string
+	) => Promise<Project>;
 	UPDATE_PROJECT: (id: string, project: Partial<Project>) => Promise<Project>;
 	DELETE_PROJECT: (id: string) => Promise<void>;
 }
@@ -29,7 +33,14 @@ export interface SnippetsMessageHandlers {
 	DELETE_SNIPPET: (id: string) => Promise<void>;
 }
 
-export interface ChatMessageHadlers {
+export interface ConfigMessageHandlers {
+	GET_CONFIG: () => Promise<Record<string, string>>;
+	UPDATE_CONFIG: (
+		newCfg: Record<string, string>
+	) => Promise<Record<string, string>>;
+}
+
+export interface ChatMessageHandlers {
 	MESSAGES_COMPLETION: (prompt: string) => Promise<string | null>;
 }
 

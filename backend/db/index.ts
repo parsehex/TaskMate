@@ -2,22 +2,34 @@ import { AsyncDatabase } from 'promised-sqlite3';
 import path from 'path';
 import fs from 'fs-extra';
 import { updateSchema } from './schema/index.js';
-import * as url from 'url';
+import sqlite from 'sqlite3';
 
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
-const dbPath = path.join(
-	process.env.PROJECTS_ROOT || `${__dirname}/..`,
-	'query-crafter_db.sqlite3'
-);
+async function getDbPath() {
+	let base = process.cwd();
+	if (process.env.IS_ELECTRON === 'true') {
+		const { app } = await import('electron');
+		base = app.getPath('userData');
+	}
+	return path.join(
+		process.env.PROJECTS_ROOT || base, // TODO FIX will always start with CWD
+		'query-crafter_db.sqlite3'
+	);
+}
 
 export let db: AsyncDatabase;
 
 export const initializeDatabase = async () => {
-	db = await AsyncDatabase.open(dbPath);
+	const dbPath = await getDbPath();
+	console.log('DB path:', dbPath);
+	db = await AsyncDatabase.open(
+		dbPath,
+		sqlite.OPEN_READWRITE | sqlite.OPEN_CREATE
+	);
 	await updateSchema(db);
 };
 
 export const backupDatabase = async () => {
+	const dbPath = await getDbPath();
 	const base = path.dirname(dbPath);
 	const backupDir = path.join(base, 'backups');
 	const timestamp = new Date().toISOString().replace(/[-:.]/g, '');

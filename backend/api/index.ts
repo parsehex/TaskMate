@@ -4,11 +4,10 @@ import filesHandlers from './files.js';
 import snippetsHandlers from './snippets.js';
 import projectsHandlers from './projects.js';
 import utilsHandlers from './utils.js';
+import configHandlers from './config.js';
 import { MessageHandlers, WSMessage } from '../../shared/types/ws/index.js';
 
-const port = +(process.env.WEBSOCKET_PORT as string) || 8585;
-const wss = new WebSocketServer({ port });
-
+let wss: WebSocketServer;
 const clients: { [id: string]: WebSocket } = {};
 
 export const allHandlers = {
@@ -16,9 +15,25 @@ export const allHandlers = {
 	...snippetsHandlers,
 	...projectsHandlers,
 	...utilsHandlers,
+	...configHandlers,
 } as MessageHandlers;
 
-wss.on('connection', (ws) => {
+export function initializeWebSocket() {
+	const port = +(process.env.WEBSOCKET_PORT as string) || 8585;
+	wss = new WebSocketServer({ port });
+
+	wss.on('connection', onConnect);
+}
+
+export function sendToAll(topic: string, args: any[]) {
+	Object.values(clients).forEach((client) => {
+		if (client.readyState === WebSocket.OPEN) {
+			client.send(JSON.stringify({ topic, args }));
+		}
+	});
+}
+
+function onConnect(ws: WebSocket) {
 	const clientId = uuidv4();
 	clients[clientId] = ws;
 
@@ -50,13 +65,5 @@ wss.on('connection', (ws) => {
 
 	ws.on('close', () => {
 		delete clients[clientId];
-	});
-});
-
-export function sendToAll(topic: string, args: any[]) {
-	Object.values(clients).forEach((client) => {
-		if (client.readyState === WebSocket.OPEN) {
-			client.send(JSON.stringify({ topic, args }));
-		}
 	});
 }

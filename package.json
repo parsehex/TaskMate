@@ -23,15 +23,15 @@
 		"f:build": "vite build",
 		"b:reset": "rimraf .dist/backend",
 		"b:dev": "tsc -p backend --watch",
-		"b:watch": "nodemon -r dotenv/config --watch .dist/backend .dist/backend/index.js",
+		"b:watch": "nodemon --watch .dist/backend .dist/backend/index.js",
 		"b:build": "tsc -p backend",
-		"server": "node -r dotenv/config .dist/backend/index.js",
+		"server": "node .dist/backend/index.js",
 		"reset": "npm run f:reset && npm run b:reset",
 		"build": "npm run f:build && npm run b:build",
 		"start": "concurrently \"npm run f:dev\" \"npm run b:dev\"",
 		"dev": "npm run start",
-		"e:dev": "pnpm run build && cp env-setup.html package.json schema.sql ./.dist/ && electron ./.dist",
-		"e:build": "npm run build && cp env-setup.html package.json pnpm-lock.yaml schema.sql ./.dist/ && pnpm install --prefix ./.dist && node build.js"
+		"e:dev": "pnpm run build && cp package.json schema.sql ./.dist/ && electron ./.dist",
+		"e:build": "npm run build && cp package.json pnpm-lock.yaml schema.sql ./.dist/ && pnpm install --prefix ./.dist && node build.js"
 	},
 	"dependencies": {
 		"@fortawesome/fontawesome-svg-core": "^6.4.0",

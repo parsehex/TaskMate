@@ -26,6 +26,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import ChatPanel from './ChatPanel';
 import GuidePanel from './GuidePanel';
 import RunPromptButton from './RunPromptButton';
+import Settings from './Settings';
 
 export const App: React.FC = () => {
 	const {
@@ -161,8 +162,10 @@ export const App: React.FC = () => {
 						>
 							<TabsList className="flex">
 								<TabsTrigger value="editor">Editor</TabsTrigger>
-								<TabsTrigger value="chat">Chat</TabsTrigger>
+								{isChatEnabled && <TabsTrigger value="chat">Chat</TabsTrigger>}
+
 								<TabsTrigger value="guide">Guide</TabsTrigger>
+								<TabsTrigger value="settings">Settings</TabsTrigger>
 							</TabsList>
 
 							<TabsContent value="editor">
@@ -179,6 +182,10 @@ export const App: React.FC = () => {
 
 							<TabsContent value="guide">
 								<GuidePanel />
+							</TabsContent>
+
+							<TabsContent value="settings">
+								<Settings />
 							</TabsContent>
 						</Tabs>
 					</ResizablePanel>
