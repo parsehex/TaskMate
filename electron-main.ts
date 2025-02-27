@@ -52,6 +52,7 @@ const createMainWindow = async () => {
 			preload: path.resolve(__dirname, '../../preload.js'),
 		},
 	});
+	mainWindow.removeMenu();
 
 	mainWindow.loadFile(path.join(__dirname, 'frontend/index.html'));
 
