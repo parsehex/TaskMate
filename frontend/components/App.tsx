@@ -162,7 +162,7 @@ export const App: React.FC = () => {
 						<Tabs
 							value={activeTab}
 							onValueChange={setActiveTab}
-							className="h-full"
+							className="h-screen gap-0"
 						>
 							<TabsList className="flex">
 								<TabsTrigger value="editor">Editor</TabsTrigger>
