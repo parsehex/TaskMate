@@ -31,7 +31,7 @@
 		"start": "concurrently \"npm run f:dev\" \"npm run b:dev\"",
 		"dev": "npm run start",
 		"e:dev": "pnpm run build && cp package.json schema.sql ./.dist/ && electron ./.dist",
-		"e:build": "npm run build && cp package.json pnpm-lock.yaml schema.sql ./.dist/ && pnpm install --prefix ./.dist && node build.js"
+		"e:build": "npm run build && cp package.json pnpm-lock.yaml schema.sql ./.dist/ && node build.js"
 	},
 	"dependencies": {
 		"@fortawesome/fontawesome-svg-core": "^6.4.0",
