@@ -95,7 +95,7 @@ const NewProjectModal: React.FC<NewProjectModalProps> = ({
 					</div>
 					<div>
 						<label htmlFor="projectPath" className="text-sm font-medium">
-							Project Path
+							Existing Project Path (optional)
 						</label>
 						<Input
 							type="text"

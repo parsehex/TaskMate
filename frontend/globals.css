@@ -67,3 +67,8 @@
 .hover\:bg-accent:hover {
 	background-color: var(--accent);
 }
+
+.editor section .monaco-editor,
+.editor section .monaco-editor > .overflow-guard {
+	@apply rounded-md;
+}
