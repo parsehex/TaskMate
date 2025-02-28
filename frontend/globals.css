@@ -72,3 +72,7 @@
 .editor section .monaco-editor > .overflow-guard {
 	@apply rounded-md;
 }
+
+div[data-resize-handle] > div {
+	@apply bg-gray-200;
+}

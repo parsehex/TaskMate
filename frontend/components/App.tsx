@@ -158,7 +158,7 @@ export const App: React.FC = () => {
 
 					<ResizableHandle withHandle />
 
-					<ResizablePanel className="ml-2">
+					<ResizablePanel>
 						<Tabs
 							value={activeTab}
 							onValueChange={setActiveTab}
