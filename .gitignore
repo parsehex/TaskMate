@@ -7,3 +7,4 @@ node_modules
 crossbar/.crossbar/*
 !crossbar/.crossbar/config.json
 config.json
+/projects
