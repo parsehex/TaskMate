@@ -208,6 +208,9 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
 				options={{
 					readOnly,
 					wordWrap: 'on',
+					minimap: {
+						enabled: false,
+					},
 					folding: false,
 					lineNumbersMinChars: 3,
 				}}

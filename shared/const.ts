@@ -11,6 +11,7 @@ export const DefaultIgnoreFiles = [
 	'**/*.lockb',
 	'**/*-lock.*',
 	'**/*.ico',
+	'**/*.gif',
 	'**/*.jpg',
 	'**/*.jpeg',
 	'**/*.png',
