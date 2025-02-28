@@ -3,7 +3,7 @@ import { FileNode } from '@/file-hierarchy';
 import { useStore } from '@/state';
 import File from '@/components/File/File';
 import { useDirectoryState } from './useState';
-import { Folder, FolderOpen } from 'lucide-react';
+import { Folder, FolderOpen, Minus, Plus } from 'lucide-react';
 import type { File as FileType } from '@shared/types';
 
 interface DirectoryProps {
@@ -25,6 +25,10 @@ const Directory: React.FC<DirectoryProps> = ({ node, index, path }) => {
 		path,
 	});
 
+	const selectButtonClasses = selectAll
+		? 'p-1 border rounded bg-rose-100 text-black hover:bg-rose-200 transition-colors'
+		: 'p-1 border rounded bg-blue-100 text-black hover:bg-blue-200 transition-colors';
+
 	return (
 		<>
 			<div
@@ -45,11 +49,18 @@ const Directory: React.FC<DirectoryProps> = ({ node, index, path }) => {
 				)}
 
 				<button
-					className="text-xs px-1 border rounded hover:bg-secondary"
-					onClick={handleSelectAllChange}
+					className={selectButtonClasses}
+					onClick={(e) => {
+						e.stopPropagation();
+						handleSelectAllChange(e);
+					}}
 					title={selectAll ? 'Deselect All' : 'Select All'}
 				>
-					{selectAll ? '−' : '+'}
+					{selectAll ? (
+						<Minus className="h-2 w-2" />
+					) : (
+						<Plus className="h-2 w-2" />
+					)}
 				</button>
 			</div>
 
