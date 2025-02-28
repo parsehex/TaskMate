@@ -57,7 +57,6 @@ const options = {
 
 	win: {
 		artifactName: '${productName}-Setup-${version}.${ext}',
-		icon: './build/icon.ico',
 		target: [
 			{
 				target: 'nsis',
