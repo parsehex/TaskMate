@@ -165,6 +165,8 @@ export async function scanProjectsRoot() {
 
 		for (const dir of directories) {
 			const projectName = dir.name;
+			if (!projectName || projectName === 'backups') continue;
+
 			const existingProject = await projectHelper.getProjects('id,name', {
 				name: projectName,
 			});
