@@ -21,6 +21,9 @@ export interface Snippet {
 	position: number;
 	created_at: string | number;
 	updated_at: string | number;
+
+	// on-the-fly props
+	token_count?: number;
 }
 
 export interface File {
@@ -34,6 +37,9 @@ export interface File {
 	use_summary: boolean;
 	created_at: string;
 	updated_at: string;
+
+	// on-the-fly props
+	token_count?: number;
 }
 
 export type TabName = 'editor' | 'chat' | 'guide' | 'settings';

@@ -4,12 +4,14 @@ import { FilesMessageHandlers } from '../../shared/types/ws/index.js';
 import * as helper from '../db/helper/files.js';
 import { getProjectPathLookup } from '../path-utils.js';
 import path from 'path';
+import { GET_TOKEN_COUNT } from './utils.js';
 
 async function resolveFileContent(file: File) {
 	const p = await getProjectPathLookup(file.project_id, file.name);
 	if (!(await fs.pathExists(p))) return { drop: true };
 	const content = await fs.readFile(p, 'utf-8');
-	return { ...file, content };
+	const token_count = await GET_TOKEN_COUNT({ fileId: file.id });
+	return { ...file, content, token_count };
 }
 
 async function GET_FILE(id: string): Promise<File> {
@@ -26,8 +28,8 @@ async function GET_FILE(id: string): Promise<File> {
 
 async function GET_FILES(project_id: string | undefined): Promise<File[]> {
 	const files = project_id
-			? await helper.getFilesByProjectId(project_id)
-			: await helper.getFiles();
+		? await helper.getFilesByProjectId(project_id)
+		: await helper.getFiles();
 	return Promise.all(files.map(resolveFileContent)).then((files) =>
 		files.filter((file) => !file.drop)
 	) as Promise<File[]>;

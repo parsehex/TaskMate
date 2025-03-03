@@ -1,10 +1,22 @@
 import { Snippet } from '../../shared/types/index.js';
 import { SnippetsMessageHandlers } from '../../shared/types/ws/index.js';
 import * as helper from '../db/helper/snippets.js';
-import * as projectHelper from '../db/helper/projects.js';
 import path from 'path';
 import fs from 'fs-extra';
 import { getProjectPath } from '../path-utils.js';
+import { GET_TOKEN_COUNT } from './utils.js';
+
+/** Update DB Snippets' token counts to reflect their current content */
+export async function syncSnippetTokenCounts() {
+	const snippets = await GET_SNIPPETS(undefined);
+	for (const s of snippets) {
+		if (s.id.startsWith('file-backed:')) continue;
+
+		const token_count = await GET_TOKEN_COUNT({ snippetId: s.id });
+		const data = { token_count };
+		if (s.token_count !== token_count) await UPDATE_SNIPPET(s.id, data, true);
+	}
+}
 
 async function GET_SNIPPET(id: string) {
 	return await helper.getSnippetById(id);
@@ -20,7 +32,11 @@ async function CREATE_SNIPPET(project_id: string, snippet: Partial<Snippet>) {
 	return await helper.createSnippet(project_id, snippet);
 }
 
-async function UPDATE_SNIPPET(id: string, snippet: Partial<Snippet>) {
+async function UPDATE_SNIPPET(
+	id: string,
+	snippet: Partial<Snippet>,
+	skipTokenCount = false
+) {
 	if (id.startsWith('file-backed:')) {
 		const project_id = snippet.project_id;
 		const filePath = path.join(
@@ -37,6 +53,14 @@ async function UPDATE_SNIPPET(id: string, snippet: Partial<Snippet>) {
 		}
 		console.error('File-backed snippet not found');
 		return {} as any;
+	}
+
+	if (!skipTokenCount) {
+		const tokens = await GET_TOKEN_COUNT({
+			snippetId: snippet.id,
+			text: snippet.content, // use updated instead of saved content
+		});
+		snippet.token_count = tokens;
 	}
 
 	return await helper.updateSnippet(id, snippet);

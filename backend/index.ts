@@ -5,6 +5,7 @@ import { setupIpcHandlers } from './ipc.js';
 import { loadConfig } from './config-manager.js';
 import { initializeWebSocket } from './api/index.js';
 import { initOpenAI } from './openai/index.js';
+import { syncSnippetTokenCounts } from './api/snippets.js';
 
 let isDone = false;
 
@@ -22,12 +23,13 @@ export function waitUntilStarted() {
 (async () => {
 	await loadConfig();
 
-	console.log(process.env);
 	await initializeDatabase();
 	console.log('Initialized database');
 	initOpenAI();
 	await scanProjectsRoot();
 	console.log('Scanned projects root');
+	await syncSnippetTokenCounts();
+	console.log('Synced token counts');
 
 	if (process.env.IS_ELECTRON === 'true') {
 		console.log('Running in Electron - setting up IPC...');

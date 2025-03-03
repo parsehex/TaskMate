@@ -1,4 +1,5 @@
 import UtilsHandlers from '../ws/utils';
+import memoizeOne from 'memoize-one';
 
 interface GetTokenCountOptions {
 	text?: string;
@@ -8,16 +9,17 @@ interface GetTokenCountOptions {
 interface GetTokenCountResponse {
 	token_count: number;
 }
-export const getTokenCount = async (
-	options: GetTokenCountOptions
-): Promise<GetTokenCountResponse> => {
-	if (Object.keys(options).every((key) => options[key] === undefined)) {
-		return { token_count: 0 };
-	} else {
-		const token_count = await UtilsHandlers.GET_TOKEN_COUNT(options);
-		return { token_count };
+export const getTokenCount = memoizeOne(
+	async (options: GetTokenCountOptions): Promise<GetTokenCountResponse> => {
+		if (options.text !== undefined && !options.text) return { token_count: 0 };
+		if (Object.keys(options).every((key) => options[key] === undefined)) {
+			return { token_count: 0 };
+		} else {
+			const token_count = await UtilsHandlers.GET_TOKEN_COUNT(options);
+			return { token_count };
+		}
 	}
-};
+);
 
 interface GenerateSummaryOptions {
 	fileId?: string;

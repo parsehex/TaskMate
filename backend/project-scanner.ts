@@ -59,7 +59,7 @@ async function createFilesForProject(
 
 			if (!existingFiles.length) {
 				const file = await fileHelper.createFile(projectId, { name: itemPath });
-				console.log(`Added file: ${itemPath} to project: ${projectName}`);
+				// console.log(`Added file: ${itemPath} to project: ${projectName}`);
 
 				sendToAll('file.added', [projectId, file]);
 			}
@@ -120,7 +120,7 @@ async function watchProjectFolder(projectId: string, projectName: string) {
 
 		if (!existingFiles.length) {
 			const file = await fileHelper.createFile(projectId, { name: fileName });
-			console.log(`Added file: ${fileName} to project: ${projectName}`);
+			// console.log(`Added file: ${fileName} to project: ${projectName}`);
 
 			sendToAll('file.added', [projectId, file]);
 		}
@@ -181,16 +181,16 @@ export async function scanProjectsRoot() {
 				});
 				projectId = project.id;
 				existingProject.push(project);
-				console.log(`Added project: ${projectName}`);
+				// console.log(`Added project: ${projectName}`);
 			} else {
 				projectId = existingProject[0].id;
-				console.log('Found existing project:', projectName);
+				// console.log('Found existing project:', projectName);
 			}
 
 			await CreateProjectFilesSnippet(existingProject[0]);
 			await watchProjectFolder(projectId, projectName);
 			await createFilesForProject(projectId, projectName);
-			console.log('Scanned project:', projectName);
+			// console.log('Scanned project:', projectName);
 		}
 	} catch (error) {
 		console.error('Error scanning PROJECTS_ROOT:', error);

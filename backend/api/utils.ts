@@ -11,18 +11,21 @@ import { summarize } from '../openai/index.js';
 import { getProjectPathLookup } from '../path-utils.js';
 import { getTokenCount } from '../tokenizer.js';
 
-async function GET_TOKEN_COUNT(payload: GetTokenCountMessage) {
+export async function GET_TOKEN_COUNT(payload: GetTokenCountMessage) {
 	// data.payload is an object containing either a text prop or a promptPartId prop
 	let content = '';
-	if (payload.text !== undefined) {
-		content = payload.text;
-	} else if (payload.snippetId !== undefined) {
+	if (payload.snippetId !== undefined) {
 		const snippet = await getSnippetById(payload.snippetId);
 		if (snippet) {
 			content += snippet.use_title
 				? snippet.name + (snippet.use_summary ? ' (summary)' : '') + ':\n'
 				: '';
-			content += snippet.use_summary ? snippet.summary : snippet.content;
+			if (payload.text) {
+				// allow setting snippet content by passing snippetId && text props
+				content += payload.text;
+			} else {
+				content += snippet.use_summary ? snippet.summary : snippet.content;
+			}
 		}
 	} else if (payload.fileId !== undefined) {
 		const file = await getFileById(payload.fileId);
@@ -32,6 +35,8 @@ async function GET_TOKEN_COUNT(payload: GetTokenCountMessage) {
 			const p = await getProjectPathLookup(file.project_id, file.name);
 			content = await readFileContents(p);
 		}
+	} else if (payload.text !== undefined) {
+		content = payload.text;
 	}
 
 	return getTokenCount(content);

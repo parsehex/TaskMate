@@ -1,9 +1,7 @@
-import { useState, useEffect, useRef, ChangeEvent, MouseEvent } from 'react';
-import { useDrag, useDrop } from 'react-dnd';
+import { useState, useEffect, ChangeEvent, MouseEvent } from 'react';
 import { File } from '@shared/types';
 import { updateFile } from '@/lib/api/files';
 import { useStore } from '@/state';
-import { getTokenCount } from '@/lib/api/utils';
 
 interface UseFileStateProps {
 	file: File;
@@ -18,10 +16,7 @@ export const useFileState = ({ file }: UseFileStateProps) => {
 	const [tokenCount, setTokenCount] = useState(0);
 
 	useEffect(() => {
-		getTokenCount({ fileId: file.id }).then((data) => {
-			if (!data) return;
-			setTokenCount(data.token_count);
-		});
+		if (file.token_count) setTokenCount(file.token_count);
 	}, [file]);
 
 	const handleContextMenu = (e: MouseEvent) => {

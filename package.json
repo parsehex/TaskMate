@@ -67,6 +67,7 @@
 		"gray-matter": "^4.0.3",
 		"langchain": "^0.0.72",
 		"lucide-react": "^0.474.0",
+		"memoize-one": "^6.0.0",
 		"minimatch": "^9.0.1",
 		"monaco-editor": "^0.38.0",
 		"openai": "^4.83.0",

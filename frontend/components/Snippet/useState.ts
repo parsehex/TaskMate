@@ -1,9 +1,8 @@
-import { useState, useEffect, useRef, ChangeEvent, MouseEvent } from 'react';
+import { useState, useEffect, ChangeEvent, MouseEvent } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { Snippet } from '@shared/types';
 import { updateSnippet } from '@/lib/api/snippets';
 import { useStore } from '@/state';
-import { getTokenCount } from '@/lib/api/utils';
 
 interface UseSnippetStateProps {
 	snippet: Snippet;
@@ -52,10 +51,7 @@ export const useSnippetState = ({
 	drag(drop(ref));
 
 	useEffect(() => {
-		getTokenCount({ snippetId: snippet.id }).then((data) => {
-			if (!data) return;
-			setTokenCount(data.token_count);
-		});
+		if (snippet.token_count) setTokenCount(snippet.token_count);
 	}, [snippet]);
 
 	const handleContextMenu = (e: MouseEvent) => {
