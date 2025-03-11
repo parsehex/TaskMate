@@ -18,17 +18,17 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          run_install: false
+
       # 2. Setup Node.js and cache pnpm dependencies
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
-
-      - uses: pnpm/action-setup@v4
-        name: Install pnpm
-        with:
-          run_install: false
 
       # 3. Install dependencies
       - name: Install Dependencies
