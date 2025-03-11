@@ -53,7 +53,7 @@ jobs:
 
       # 8. Archive the Electron build as an artifact
       - name: Upload Electron Build Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: electron-package
           path: .electron-dist/
