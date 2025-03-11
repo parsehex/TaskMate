@@ -47,6 +47,13 @@ jobs:
         run: |
           cp package.json pnpm-lock.yaml schema.sql ./.dist/
 
+      # Install Wine for Windows packaging on Linux
+      - name: Install Wine
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install -y wine
+
       # 7. Build Electron Package
       - name: Build Electron Package
         run: pnpm run e:build
