@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"description": "",
 	"type": "module",
-	"main": "electron-main.js",
+	"main": "electron/main.js",
 	"source": [
 		"frontend/index.html"
 	],

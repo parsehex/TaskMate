@@ -10,6 +10,6 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["./**/*.ts", "../electron-main.ts"],
+  "include": ["./**/*.ts", "../electron/main.ts"],
   "exclude": ["node_modules", "**/prompt_parts.ts"]
 }

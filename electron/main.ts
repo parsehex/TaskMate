@@ -1,7 +1,5 @@
 import { app, BrowserWindow, ipcMain, dialog, Menu } from 'electron';
-import rememberWindowState, {
-	loadWindowState,
-} from './electron-window-state.js';
+import rememberWindowState, { loadWindowState } from './window-state.js';
 import fs from 'fs/promises';
 import path from 'path';
 import * as url from 'url';
@@ -12,7 +10,7 @@ let mainWindow: BrowserWindow | null = null;
 
 // Writes a preload script that exposes an electron API
 async function writePreloadScript(content: string) {
-	await fs.writeFile(path.resolve(__dirname, '../../preload.js'), content);
+	await fs.writeFile(path.resolve(__dirname, '../../../preload.js'), content);
 }
 
 const createMainWindow = async () => {
@@ -49,11 +47,11 @@ const createMainWindow = async () => {
 		webPreferences: {
 			nodeIntegration: false,
 			contextIsolation: true,
-			preload: path.resolve(__dirname, '../../preload.js'),
+			preload: path.resolve(__dirname, '../../../preload.js'),
 		},
 	});
 
-	mainWindow.loadFile(path.join(__dirname, 'frontend/index.html'));
+	mainWindow.loadFile(path.resolve(__dirname, '../frontend/index.html'));
 
 	return mainWindow;
 };
@@ -77,12 +75,12 @@ ipcMain.on('restart-app', () => {
 });
 
 app.on('ready', async () => {
-	console.log('Starting backend', path.resolve(__dirname, 'backend'));
+	console.log('Starting backend', path.resolve(__dirname, '../backend'));
 	const win = await createMainWindow();
 	rememberWindowState(win);
 	// Dynamically load backend after creating window.
 	const backendProcess = await import(
-		'file://' + path.resolve(__dirname, 'backend/index.js')
+		'file://' + path.resolve(__dirname, '../backend/index.js')
 	);
 	await backendProcess.waitUntilStarted();
 	win?.reload();
