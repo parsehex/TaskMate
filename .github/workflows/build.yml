@@ -1,0 +1,58 @@
+name: Build and Package TaskMate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+    steps:
+      # 1. Check out the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # 2. Setup Node.js and cache pnpm dependencies
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9.15.1
+
+      # 3. Install dependencies
+      - name: Install Dependencies
+        run: pnpm install
+
+      # 4. Build Frontend with Vite
+      - name: Build Frontend
+        run: pnpm run f:build
+
+      # 5. Build Backend TypeScript sources
+      - name: Build Backend
+        run: pnpm run b:build
+
+      # 6. Prepare distribution files
+      - name: Copy Distribution Assets
+        run: |
+          cp package.json pnpm-lock.yaml schema.sql ./.dist/
+
+      # 7. Build Electron Package
+      - name: Build Electron Package
+        run: pnpm run e:build
+
+      # 8. Archive the Electron build as an artifact
+      - name: Upload Electron Build Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: electron-package
+          path: .electron-dist/
