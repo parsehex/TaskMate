@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS snippets (
 	included BOOLEAN DEFAULT 1,
 	use_title BOOLEAN DEFAULT 1,
 	use_summary BOOLEAN DEFAULT 0,
+	token_count INTEGER,
 	type VARCHAR(25),
 	position INTEGER,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
