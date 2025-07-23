@@ -30,8 +30,8 @@
 		"w:build": "npm run f:build && npm run b:build",
 		"start": "concurrently \"npm run f:dev\" \"npm run b:dev\"",
 		"dev": "npm run start",
-		"e:dev": "npm run w:build && cp package.json schema.sql ./.dist/ && electron ./.dist",
-		"e:build": "npm run w:build && cp package.json pnpm-lock.yaml schema.sql ./.dist/ && node build.js",
+		"e:dev": "shx cp package.json schema.sql ./.dist/ && concurrently \"npm run dev\" \"electron ./.dist\"",
+		"e:build": "npm run w:build && shx cp package.json pnpm-lock.yaml schema.sql ./.dist/ && node build.js",
 		"docs:dev": "vitepress dev docs",
 		"docs:build": "vitepress build docs",
 		"docs:serve": "vitepress serve docs"
@@ -119,6 +119,7 @@
 		"querystring-es3": "^0.2.1",
 		"react-tooltip": "^5.11.2",
 		"sass": "^1.84.0",
+		"shx": "^0.4.0",
 		"stream-browserify": "^3.0.0",
 		"stream-http": "^3.2.0",
 		"tailwindcss": "4.0.x",
