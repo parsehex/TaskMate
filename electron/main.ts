@@ -1,8 +1,12 @@
-import { app, BrowserWindow, ipcMain, dialog, Menu } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 import rememberWindowState, { loadWindowState } from './window-state.js';
 import fs from 'fs/promises';
 import path from 'path';
 import * as url from 'url';
+import {
+	installExtension,
+	REACT_DEVELOPER_TOOLS,
+} from 'electron-devtools-installer';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -53,6 +57,10 @@ const createMainWindow = async () => {
 
 	mainWindow.loadFile(path.resolve(__dirname, '../frontend/index.html'));
 
+	if (process.env.NODE_ENV !== 'production') {
+		mainWindow.webContents.openDevTools();
+	}
+
 	return mainWindow;
 };
 
@@ -75,6 +83,15 @@ ipcMain.on('restart-app', () => {
 });
 
 app.on('ready', async () => {
+	if (process.env.NODE_ENV !== 'production') {
+		try {
+			const name = await installExtension(REACT_DEVELOPER_TOOLS);
+			console.log(`Added Extension:  ${name}`);
+		} catch (err) {
+			console.log('An error occurred installing devtools: ', err);
+		}
+	}
+
 	console.log('Starting backend', path.resolve(__dirname, '../backend'));
 	const win = await createMainWindow();
 	rememberWindowState(win);
