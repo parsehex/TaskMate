@@ -1,5 +1,10 @@
 # TaskMate
 
+> [!NOTE]
+> **See any potential here? Let me know / Spread the word!**
+>
+> I've been restoring + refurbishing my projects but I need users and feedback. If you have any interest in using this project, please get in touch via the _**Issues**_ tab or one of the links under _**Sponsor this project**_ to the right. [My profile](https://github.com/parsehex) may have updated contact info.
+
 TaskMate is a work-in-progress computer app designed to help you harness the power of LLMs to solve tasks. It lets you construct prompts by combining reusable text snippets with project file contents. The design encourages you to stay in control—even when using AI as a mind-replacement.
 
 If you know what [RAG](https://en.wikipedia.org/wiki/Retrieval-augmented_generation) is, this is kind of like a manual RAG system.
