@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { Project, Source, ProjectMetadata } from './types';
+import type { Project, PromptPart, ProjectMetadata } from './types';
 
 export const useProjectStore = defineStore('project', () => {
 	// State
@@ -22,7 +22,7 @@ export const useProjectStore = defineStore('project', () => {
 		// Update metadata
 		const index = projects.value.findIndex(p => p.id === currentProject.value!.id);
 		if (index !== -1) {
-			projects.value[index].sourceCount = currentProject.value.sources.length;
+			projects.value[index].partCount = currentProject.value.promptParts.length;
 			projects.value[index].updatedAt = Date.now();
 			saveProjectsList();
 		}
@@ -39,6 +39,11 @@ export const useProjectStore = defineStore('project', () => {
 		const raw = localStorage.getItem(STORAGE_KEY_PREFIX + projectId);
 		if (raw) {
 			currentProject.value = JSON.parse(raw);
+			// Migration check (basic)
+			if ((currentProject.value as any).sources && !currentProject.value?.promptParts) {
+				currentProject.value!.promptParts = (currentProject.value as any).sources;
+				delete (currentProject.value as any).sources;
+			}
 		}
 	}
 
@@ -47,14 +52,14 @@ export const useProjectStore = defineStore('project', () => {
 		const newProject: Project = {
 			id: crypto.randomUUID(),
 			name,
-			sources: [],
+			promptParts: [],
 			options: { includeProjectFiles: true }
 		};
 
 		const metadata: ProjectMetadata = {
 			id: newProject.id,
 			name: newProject.name,
-			sourceCount: 0,
+			partCount: 0,
 			updatedAt: Date.now()
 		};
 
@@ -75,34 +80,33 @@ export const useProjectStore = defineStore('project', () => {
 		}
 	}
 
-	// Source Actions
-	const activeSources = computed(() => {
-		return currentProject.value?.sources.filter(s => s.enabled) || [];
+	// Prompt Part Actions
+	const activePromptParts = computed(() => {
+		return currentProject.value?.promptParts.filter(s => s.enabled) || [];
 	});
 
 	const promptContent = computed(() => {
 		if (!currentProject.value) return '';
-		let content = '';
 
-		// Add project files context if enabled
-		if (currentProject.value.options.includeProjectFiles && currentProject.value.fileTree) {
-			content += `### Project Files\n\`\`\`\n${currentProject.value.fileTree}\n\`\`\`\n\n`;
+		const parts: string[] = [];
+
+		// Add active prompt parts
+		// We use a clean loop to ensure all parts are processed
+		for (const part of activePromptParts.value) {
+			let partContent = '';
+			if (part.meta?.isProjectFiles) {
+				// Special handling for Project Files title/formatting if needed, or just standard
+				partContent += `Project Files:\n\`\`\`\n${part.content}\n\`\`\``;
+			} else if (part.options?.useTitle !== false) {
+				partContent += `\`${part.name}\`:\n`;
+				partContent += `\`\`\`\n${part.content}\n\`\`\``;
+			} else {
+				partContent += part.content;
+			}
+			parts.push(partContent);
 		}
 
-		// Add active sources
-		activeSources.value.forEach(source => {
-			if (source.options?.useTitle !== false) {
-				content += `### ${source.name}\n`;
-			}
-
-			if (source.options?.useTitle !== false) {
-				content += `\`\`\`\n${source.content}\n\`\`\`\n\n`;
-			} else {
-				content += `${source.content}\n\n`;
-			}
-		});
-
-		return content.trim();
+		return parts.join('\n\n');
 	});
 
 	function setProject(project: Project) {
@@ -110,34 +114,76 @@ export const useProjectStore = defineStore('project', () => {
 		saveCurrentProject();
 	}
 
-	function addSource(source: Source) {
+	function addPromptPart(part: PromptPart) {
 		if (!currentProject.value) return;
-		currentProject.value.sources.push(source);
+		currentProject.value.promptParts.push(part);
 		saveCurrentProject();
 	}
 
-	function removeSource(sourceId: string) {
+	function removePromptPart(partId: string) {
 		if (!currentProject.value) return;
-		currentProject.value.sources = currentProject.value.sources.filter(s => s.id !== sourceId);
+		currentProject.value.promptParts = currentProject.value.promptParts.filter(s => s.id !== partId);
 		saveCurrentProject();
 	}
 
-	function toggleSource(sourceId: string) {
+	function togglePromptPart(partId: string) {
 		if (!currentProject.value) return;
-		const source = currentProject.value.sources.find(s => s.id === sourceId);
-		if (source) {
-			source.enabled = !source.enabled;
+		const part = currentProject.value.promptParts.find(s => s.id === partId);
+		if (part) {
+			part.enabled = !part.enabled;
 			saveCurrentProject();
 		}
 	}
 
-	function updateSource(source: Source) {
+	function updatePromptPart(part: PromptPart) {
 		if (!currentProject.value) return;
-		const index = currentProject.value.sources.findIndex(s => s.id === source.id);
+		const index = currentProject.value.promptParts.findIndex(s => s.id === part.id);
 		if (index !== -1) {
-			currentProject.value.sources[index] = source;
+			currentProject.value.promptParts[index] = part;
 			saveCurrentProject();
 		}
+	}
+
+
+	function movePromptPart(fromIndex: number, toIndex: number) {
+		if (!currentProject.value) return;
+		const parts = currentProject.value.promptParts;
+		if (fromIndex < 0 || fromIndex >= parts.length || toIndex < 0 || toIndex >= parts.length) return;
+
+		const [movedPart] = parts.splice(fromIndex, 1);
+		parts.splice(toIndex, 0, movedPart);
+		saveCurrentProject();
+	}
+
+	function updateProject(updates: Partial<Project>) {
+		if (!currentProject.value) return;
+		Object.assign(currentProject.value, updates);
+
+		// If fileTree is updated, sync it to the Project Files part
+		if (updates.fileTree !== undefined) {
+			// Handle Project Files Snippet
+			// First, capture the state of any existing Project Files part
+			const existingPart = currentProject.value.promptParts.find(p => p.meta?.isProjectFiles);
+			const wasEnabled = existingPart ? existingPart.enabled : currentProject.value.options.includeProjectFiles;
+
+			// Remove ALL existing Project Files parts to prevent duplicates
+			currentProject.value.promptParts = currentProject.value.promptParts.filter(p => !p.meta?.isProjectFiles);
+
+			// If we have content, add the part back
+			if (updates.fileTree.trim()) {
+				currentProject.value.promptParts.push({
+					id: existingPart?.id || crypto.randomUUID(), // Keep ID if possible to preserve selection state in UI
+					type: 'snippet',
+					name: 'Project Files',
+					content: updates.fileTree,
+					enabled: wasEnabled,
+					meta: { isProjectFiles: true },
+					options: { useTitle: false } // Project Files usually have their own header in content
+				});
+			}
+		}
+
+		saveCurrentProject();
 	}
 
 	// Initialize
@@ -146,15 +192,17 @@ export const useProjectStore = defineStore('project', () => {
 	return {
 		projects,
 		currentProject,
-		activeSources,
+		activePromptParts,
 		promptContent,
 		createProject,
 		deleteProject,
 		loadProject,
 		setProject,
-		addSource,
-		removeSource,
-		toggleSource,
-		updateSource
+		updateProject,
+		addPromptPart,
+		removePromptPart,
+		togglePromptPart,
+		updatePromptPart,
+		movePromptPart
 	};
 });

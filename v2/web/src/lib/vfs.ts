@@ -63,7 +63,12 @@ export class LocalStorageAdapter implements FileSystemAdapter {
 		// Implementing proper directory listing for flat map:
 
 		const directChildren = keys.filter(k => {
-			const relative = k.slice(path.length === 1 && path === '/' ? 0 : path.length + 1); // remove prefix
+			let relative = '';
+			if (path === '/') {
+				relative = k.substring(1); // remove leading slash
+			} else {
+				relative = k.substring(path.length + 1); // remove path + stash
+			}
 			return !relative.includes('/'); // no more slashes means immediate child
 		});
 
@@ -88,5 +93,33 @@ export class LocalStorageAdapter implements FileSystemAdapter {
 	async exists(path: string): Promise<boolean> {
 		const data = this.loadData();
 		return !!data[path];
+	}
+
+	async rm(path: string): Promise<void> {
+		const data = this.loadData();
+		if (data[path]) {
+			// If directory, remove children
+			if (data[path].type === 'directory') {
+				Object.keys(data).forEach(p => {
+					if (p.startsWith(path + '/')) {
+						delete data[p];
+					}
+				});
+			}
+			delete data[path];
+			this.saveData(data);
+		}
+	}
+
+	async generateFileTree(): Promise<string> {
+		const data = this.loadData();
+		const paths = Object.keys(data).sort();
+		return paths.map(p => {
+			const depth = p.split('/').length - 1;
+			const indent = '  '.repeat(Math.max(0, depth - 1));
+			const name = p.split('/').pop() || '';
+			const isDir = data[p].type === 'directory';
+			return `${indent}${name}${isDir ? '/' : ''}`;
+		}).join('\n');
 	}
 }

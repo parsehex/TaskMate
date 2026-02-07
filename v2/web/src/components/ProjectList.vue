@@ -4,29 +4,41 @@ import { useProjectStore } from '@core/store';
 import { Button } from '@core/components/ui/button';
 import { Input } from '@core/components/ui/input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@core/components/ui/card';
+import { useRouter } from 'vue-router';
+import { PlusIcon, Trash2Icon } from 'lucide-vue-next';
+import ConfirmDialog from './ConfirmDialog.vue';
 
 const store = useProjectStore();
+const router = useRouter();
 const newProjectName = ref('');
+const deleteDialog = ref<InstanceType<typeof ConfirmDialog> | null>(null);
+const projectToDelete = ref<string | null>(null);
 
 const sortedProjects = computed(() => {
 	return [...store.projects].sort((a, b) => b.updatedAt - a.updatedAt);
 });
 
 function handleCreate() {
-	if (!newProjectName.value.trim()) return;
+	if (!newProjectName.value) return;
 	store.createProject(newProjectName.value);
 	newProjectName.value = '';
 }
 
-function handleDelete(id: string, event: Event) {
-	event.stopPropagation(); // Prevent card click
-	if (confirm('Are you sure you want to delete this project?')) {
-		store.deleteProject(id);
+function confirmDelete(id: string, event: Event) {
+	event.stopPropagation();
+	projectToDelete.value = id;
+	deleteDialog.value?.open();
+}
+
+function handleDelete() {
+	if (projectToDelete.value) {
+		store.deleteProject(projectToDelete.value);
+		projectToDelete.value = null;
 	}
 }
 
 function selectProject(id: string) {
-	store.loadProject(id);
+	router.push({ name: 'project', params: { id } });
 }
 </script>
 <template>
@@ -44,14 +56,17 @@ function selectProject(id: string) {
 					<CardDescription> Last updated: {{ new Date(project.updatedAt).toLocaleDateString() }} </CardDescription>
 				</CardHeader>
 				<CardContent>
-					<p class="text-sm text-gray-500">{{ project.sourceCount }} source(s)</p>
+					<span class="text-xs text-muted-foreground">{{ project.partCount }} parts</span>
 				</CardContent>
 				<CardFooter class="justify-end">
-					<Button variant="destructive" size="sm" @click="(e: Event) => handleDelete(project.id, e)"> Delete </Button>
+					<Button variant="destructive" size="sm" @click="(e: Event) => confirmDelete(project.id, e)"> Delete </Button>
 				</CardFooter>
 			</Card>
 		</div>
 		<div v-if="sortedProjects.length === 0" class="text-center py-12 text-gray-400"> No projects found. Create one to
 			get started! </div>
+		<ConfirmDialog ref="deleteDialog" title="Delete Project"
+			description="Are you sure you want to delete this project? This action cannot be undone." :destructive="true"
+			confirm-text="Delete" @confirm="handleDelete" />
 	</div>
 </template>

@@ -1,5 +1,4 @@
-
-export interface Source {
+export interface PromptPart {
   id: string;
   type: 'file' | 'snippet';
   name: string;
@@ -14,7 +13,7 @@ export interface Source {
 export interface Project {
   id: string;
   name: string;
-  sources: Source[];
+  promptParts: PromptPart[];
   options: {
     includeProjectFiles: boolean; // Toggle to include file tree context
   };
@@ -24,6 +23,6 @@ export interface Project {
 export interface ProjectMetadata {
   id: string;
   name: string;
-  sourceCount: number;
+  partCount: number;
   updatedAt: number;
 }
