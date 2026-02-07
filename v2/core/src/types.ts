@@ -20,3 +20,10 @@ export interface Project {
   };
   fileTree?: string; // The generated file tree string (if toggled)
 }
+
+export interface ProjectMetadata {
+  id: string;
+  name: string;
+  sourceCount: number;
+  updatedAt: number;
+}

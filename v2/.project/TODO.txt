@@ -1,0 +1,21 @@
+The following are things I've noticed while using the current version.
+
+Overall
+- Don't use the term Sources, it's ambiguous. When referring to them in general, they're Prompt Parts, and individually use their names Snippet or File.
+
+Future Consideration
+- Projects must have a list of paths to ignore, or else watching Files (in local) will break down. Previously I used a hardcoded ignorelist as the default which I'm fine with, though editing the list for an existing project was cumbersome. This will need to be configurable on creation.
+	- Since the web version is virtual (+ manual) files, this doesn't matter. But since the web version is essentially the main one we may need to take it into account.
+
+Home Page
+- List how many Snippets and how many Files
+
+Project Page
+- "Project Files" -> "Files"
+- "Active Sources" -> "Snippets" (drop the Sources shit)
+	- Put above Files
+	- This is where the "New Snippet" button should go, and rename to "+ Snippet"
+		- Modal only for name, use blank content
+	- Drag to sort
+- Selecting either kind should open it on the right side for editing
+- "Preview Prompt" button to render the prompt into the textarea editor, read-only

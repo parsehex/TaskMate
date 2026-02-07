@@ -7,7 +7,10 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "paths": {
+      "@taskmate/core/*": ["../core/src/*"]
+    }
   },
   "include": ["src/**/*"]
 }

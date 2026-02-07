@@ -12,3 +12,4 @@ config.json
 **/.vitepress/cache
 .DS_Store
 .pnpm-store
+dist
