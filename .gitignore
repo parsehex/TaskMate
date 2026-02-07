@@ -9,3 +9,4 @@ crossbar/.crossbar/*
 config.json
 /projects
 **/.vitepress/cache
+.DS_Store
