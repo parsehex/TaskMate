@@ -15,12 +15,20 @@ export const useProjectStore = defineStore('project', () => {
 
 		// Add project files context if enabled
 		if (currentProject.value.options.includeProjectFiles && currentProject.value.fileTree) {
-			content += `<project_files>\n${currentProject.value.fileTree}\n</project_files>\n\n`;
+			content += `### Project Files\n\`\`\`\n${currentProject.value.fileTree}\n\`\`\`\n\n`;
 		}
 
 		// Add active sources
 		activeSources.value.forEach(source => {
-			content += `<source type="${source.type}" name="${source.name}">\n${source.content}\n</source>\n\n`;
+			if (source.options?.useTitle !== false) {
+				content += `### ${source.name}\n`;
+			}
+
+			if (source.options?.useTitle !== false) {
+				content += `\`\`\`\n${source.content}\n\`\`\`\n\n`;
+			} else {
+				content += `${source.content}\n\n`;
+			}
 		});
 
 		return content.trim();

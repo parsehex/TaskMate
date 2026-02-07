@@ -6,6 +6,9 @@ export interface Source {
   content: string;
   enabled: boolean;
   meta?: Record<string, any>; // file paths, snippet tags, etc.
+  options?: {
+    useTitle?: boolean;
+  };
 }
 
 export interface Project {
