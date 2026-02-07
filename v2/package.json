@@ -1,0 +1,24 @@
+{
+  "name": "v2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "private": true,
+  "workspaces": [
+    "core",
+    "web",
+    "local"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=@taskmate/web",
+    "build": "npm run build --workspaces",
+    "shadcn-add": "npm exec --workspace=@taskmate/core shadcn-vue add"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^25.2.1"
+  }
+}
