@@ -22,6 +22,44 @@ export class LocalStorageAdapter implements FileSystemAdapter {
 		localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 	}
 
+	async rename(oldPath: string, newPath: string): Promise<void> {
+		const data = this.loadData();
+
+		// Check if source exists
+		if (!data[oldPath]) {
+			throw new Error(`Source path not found: ${oldPath}`);
+		}
+
+		// Check if destination exists
+		if (data[newPath]) {
+			throw new Error(`Destination path already exists: ${newPath}`);
+		}
+
+		// If it's a file, simple rename
+		if (data[oldPath].type === 'file') {
+			data[newPath] = data[oldPath];
+			delete data[oldPath];
+		}
+		// If it's a directory, we need to rename it AND all its children
+		else if (data[oldPath].type === 'directory') {
+			// Rename the directory itself
+			data[newPath] = data[oldPath];
+			delete data[oldPath];
+
+			// Find all children
+			const children = Object.keys(data).filter(k => k.startsWith(oldPath + '/'));
+
+			for (const childPath of children) {
+				const suffix = childPath.substring(oldPath.length);
+				const newChildPath = newPath + suffix;
+				data[newChildPath] = data[childPath];
+				delete data[childPath];
+			}
+		}
+
+		this.saveData(data);
+	}
+
 	async stat(path: string): Promise<FileStat | null> {
 		const data = this.loadData();
 		const node = data[path];

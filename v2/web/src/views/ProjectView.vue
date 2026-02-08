@@ -79,22 +79,37 @@ async function savePart() {
         // If it's a file part, also write to VFS
         if (selectedPart.value.type === 'file' && selectedPart.value.meta?.path) {
             await vfs.writeFile(selectedPart.value.meta.path, editorContent.value);
-            // Also refresh file tree/browser if needed?
         }
 
         store.updatePromptPart(updates);
     } else if (selectedPartId.value && typeof selectedPartId.value === 'string' && selectedPartId.value.startsWith('/')) {
         // Saving a File (Preview mode)
-        const path = selectedPartId.value;
+        let path = selectedPartId.value;
+
+        // Check for rename first
+        if (editorName.value && path.endsWith('/' + editorName.value) === false) {
+            const oldPath = path;
+            const parentPath = oldPath.substring(0, oldPath.lastIndexOf('/'));
+            const newPath = parentPath === '' ? `/${editorName.value}` : `${parentPath}/${editorName.value}`;
+
+            try {
+                await vfs.rename(oldPath, newPath);
+                path = newPath;
+                selectedPartId.value = newPath; // Update selection to new path
+                // Refresh file tree if needed, though FileBrowser might need a trigger
+                // We can forcefully trigger it by updating store project options or just relying on next mount
+                // But ideally we emit an event or call a method on FileBrowser ref?
+                // Since FileBrowser is a child, we can't easily call it.
+                // But we can update project file tree to force refresh?
+                const tree = await vfs.generateFileTree();
+                store.updateProject({ fileTree: tree });
+            } catch (e) {
+                console.error("Rename failed during save", e);
+                // Revert name in editor?
+            }
+        }
+
         await vfs.writeFile(path, editorContent.value);
-
-        // If this file is also an active part (though selectedPart would likely be set if it was matched by handleSelectFile...
-        // actually handleSelectFile prioritizes Part ID if found. So this block handles case where file is NOT yet a part.)
-        // But what if we want to update the part if it exists but we somehow selected by path?
-        // handleSelectFile logic prevents this mostly.
-
-        // Trigger a change event or refresh?
-        // We might need to refresh file tree if content affects it (unlikely) or just good practice.
     }
 }
 
@@ -138,11 +153,7 @@ function handleSelectPart(id: string) {
 
 function handleSelectFile(path: string) {
     const part = store.currentProject?.promptParts.find(p => p.meta?.path === path);
-    if (part) {
-        selectedPartId.value = part.id;
-    } else {
-        selectedPartId.value = path;
-    }
+    handleSelectPart(part?.id || path);
 }
 
 async function refreshFileTree() {
@@ -194,9 +205,6 @@ async function refreshFileTree() {
                 </div>
                 <!-- Bottom: Files -->
                 <div class="flex-1 flex flex-col min-h-0">
-                    <div class="p-3 border-b bg-white">
-                        <span class="font-semibold text-sm">Files</span>
-                    </div>
                     <FileBrowser :vfs="vfs" @select-file="handleSelectFile" @change="refreshFileTree"
                         class="flex-1 border-none rounded-none" />
                 </div>
@@ -217,7 +225,7 @@ async function refreshFileTree() {
                             <span v-else
                                 class="text-xs font-mono px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 uppercase">FILE
                                 PREVIEW</span>
-                            <Input v-if="selectedPart && !isReadOnly" v-model="editorName"
+                            <Input v-if="!isReadOnly && (selectedPart || selectedPartId)" v-model="editorName"
                                 class="h-8 w-48 font-medium bg-transparent border-transparent hover:border-input focus:border-input transition-colors"
                                 placeholder="Name" @blur="savePart" />
                             <span v-else class="font-medium text-sm px-3">{{ editorName }}</span>

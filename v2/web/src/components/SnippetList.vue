@@ -87,21 +87,19 @@ function onDrop(event: DragEvent, targetItem: PromptPart) {
 				snippets yet. </div>
 			<ul class="space-y-1 p-2">
 				<li v-for="snippet in snippets" :key="snippet.id"
-					class="flex items-center gap-2 p-2 rounded-md border bg-white hover:bg-gray-50 group transition-colors"
-					:class="{ 'cursor-move': !snippet.meta?.isProjectFiles, 'cursor-pointer': true }"
-					:draggable="!snippet.meta?.isProjectFiles" @dragstart="onDragStart($event, snippet)" @dragover="onDragOver"
+					class="flex items-center gap-2 p-2 rounded-md border bg-white hover:bg-gray-50 group transition-colors cursor-pointer"
+					draggable="true" @dragstart="onDragStart($event, snippet)" @dragover="onDragOver"
 					@drop="onDrop($event, snippet)" @click="emit('select', snippet.id)">
 					<!-- Drag Handle / Icon -->
-					<div class="text-gray-400 hover:text-gray-600">
-						<FolderTreeIcon v-if="snippet.meta?.isProjectFiles" class="w-4 h-4 text-indigo-500" />
-						<GripVerticalIcon v-else class="w-4 h-4 cursor-move" />
+					<div class="text-gray-400 hover:text-gray-600" @click.stop="">
+						<GripVerticalIcon class="w-4 h-4 cursor-move" />
 					</div>
 					<!-- Checkbox -->
 					<input type="checkbox" :checked="snippet.enabled" @change="store.togglePromptPart(snippet.id)" @click.stop=""
 						class="rounded text-primary focus:ring-primary h-4 w-4" />
 					<!-- Name -->
-					<span class="text-sm font-medium truncate flex-1 leading-none select-none"
-						:class="{ 'opacity-50': !snippet.enabled }"> {{ snippet.name }} </span>
+					<span class="text-sm font-medium truncate flex-1 leading-none select-none flex items-center gap-2"
+						:class="{ 'opacity-50': !snippet.enabled }">{{ snippet.name }} </span>
 					<!-- Delete Button (only for non-system snippets) -->
 					<Button v-if="!snippet.meta?.isProjectFiles" variant="ghost" size="icon"
 						class="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-destructive"

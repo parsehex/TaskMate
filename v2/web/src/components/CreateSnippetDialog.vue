@@ -40,6 +40,11 @@ function handleSubmit() {
 				<div class="space-y-2">
 					<Label for="name">Snippet Name</Label>
 					<Input id="name" v-model="name" placeholder="e.g. System Prompt" @keyup.enter="handleSubmit" />
+					<div class="flex gap-2 flex-wrap mt-2">
+						<span v-for="suggestion in ['Notes', 'Context', 'System Prompt', 'Todo']" :key="suggestion"
+							class="text-xs px-2 py-1 rounded-full bg-gray-100 hover:bg-gray-200 cursor-pointer text-gray-600 border"
+							@click="name = suggestion"> {{ suggestion }} </span>
+					</div>
 				</div>
 			</div>
 			<DialogFooter>
