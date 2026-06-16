@@ -128,7 +128,7 @@ export const App: React.FC = () => {
 					className="h-full"
 					autoSaveId="app-panels"
 				>
-					<ResizablePanel defaultSize={30} minSize={35} maxSize={50}>
+					<ResizablePanel defaultSize={30} minSize={20} maxSize={50}>
 						<div className="h-full flex flex-col p-1">
 							<ProjectSelector />
 
