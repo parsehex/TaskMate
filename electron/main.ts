@@ -17,6 +17,24 @@ async function writePreloadScript(content: string) {
 	await fs.writeFile(path.resolve(__dirname, '../../../preload.js'), content);
 }
 
+const waitForViteServer = (retries = 10, delay = 1000): Promise<void> => {
+	return new Promise((resolve, reject) => {
+		const attempt = (remaining: number) => {
+			fetch('http://localhost:3000')
+				.then(() => resolve())
+				.catch((err) => {
+					if (remaining === 0) {
+						reject(new Error('Vite dev server not available'));
+					} else {
+						console.log(`Waiting for Vite dev server... (${retries - remaining + 1}/${retries})`);
+						setTimeout(() => attempt(remaining - 1), delay);
+					}
+				});
+		};
+		attempt(retries);
+	});
+};
+
 const createMainWindow = async () => {
 	await writePreloadScript(`
     console.log('Preload ran');
@@ -43,6 +61,7 @@ const createMainWindow = async () => {
 		width: 1200,
 		height: 800,
 	});
+	console.log('env', process.env);	// Load from Vite dev server in development, otherwise load built files
 	mainWindow = new BrowserWindow({
 		width: windowState.width,
 		minWidth: 600,
@@ -55,10 +74,18 @@ const createMainWindow = async () => {
 		},
 	});
 
-	mainWindow.loadFile(path.resolve(__dirname, '../frontend/index.html'));
-
 	if (process.env.NODE_ENV !== 'production') {
+		try {
+			await waitForViteServer();
+			console.log('Vite dev server is ready, loading URL...');
+		} catch (err) {
+			console.error('Failed to connect to Vite dev server:', err);
+			console.log('Make sure to run "npm run f:dev" before starting Electron');
+		}
+		mainWindow.loadURL('http://localhost:3000/frontend/index.html');
 		mainWindow.webContents.openDevTools();
+	} else {
+		mainWindow.loadFile(path.resolve(__dirname, '../frontend/index.html'));
 	}
 
 	return mainWindow;
