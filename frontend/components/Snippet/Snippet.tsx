@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Snippet } from '@shared/types';
+import { Snippet as iSnippet } from '@shared/types';
 import EditableName, { EditableNameRef } from '@/components/EditableName';
 import CopyPromptButton from '@/components/CopyPromptButton';
 import TokenCountDisplay from '@/components/TokenCountDisplay';
@@ -10,7 +10,7 @@ import { Indicators } from './Indicators';
 import clsx from 'clsx';
 
 interface SnippetProps {
-	snippet: Snippet;
+	snippet: iSnippet;
 	move: (dragIndex: number, hoverIndex: number) => Promise<void>;
 	index: number;
 	selected: boolean;

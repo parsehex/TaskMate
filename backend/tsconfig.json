@@ -4,6 +4,7 @@
     "module": "NodeNext",
     "moduleResolution": "nodenext",
     "outDir": "../.dist/",
+    "rootDir": "../",
     "strict": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,

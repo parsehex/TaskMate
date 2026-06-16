@@ -7,7 +7,6 @@ const Settings = () => {
 		{}
 	);
 	const [hasChanges, setHasChanges] = useState(false);
-	// Check for electron—if window.electron exists then we're running in electron mode.
 	const isElectron = typeof (window as any).electron !== 'undefined';
 
 	useEffect(() => {
@@ -18,9 +17,7 @@ const Settings = () => {
 		})();
 	}, []);
 
-	// Check for changes whenever config is updated
 	useEffect(() => {
-		// Compare current config with original config
 		if (Object.keys(originalConfig).length === 0) return;
 
 		const configChanged = Object.keys(config).some(
@@ -37,16 +34,12 @@ const Settings = () => {
 	const handleSave = async () => {
 		if (!hasChanges) return;
 
-		// Save configuration via your API endpoint which broadcasts the changes.
 		await updateConfig(config);
-		// Update the original config after saving
 		setOriginalConfig({ ...config });
 	};
 
-	// New handler for selecting a folder for Projects Root (provided by Electron)
 	const handleSelectFolder = async () => {
 		if (isElectron) {
-			// We're assuming you have an IPC exposed method called selectFolder.
 			try {
 				const folderPath = await (window as any).electron.selectFolder();
 				if (folderPath) {
@@ -60,7 +53,6 @@ const Settings = () => {
 		}
 	};
 
-	// New handler to trigger app restart (provided by Electron)
 	const handleRestart = () => {
 		if (isElectron) {
 			(window as any).electron.restartApp();
@@ -73,7 +65,6 @@ const Settings = () => {
 		<div className="p-4">
 			<h2 className="text-2xl font-bold">Settings</h2>
 
-			{/* Always allow changing the project root */}
 			<div className="mt-4">
 				<label htmlFor="PROJECTS_ROOT">Projects Root</label>
 				<div className="flex gap-2">
@@ -96,7 +87,6 @@ const Settings = () => {
 				</div>
 			</div>
 
-			{/* Only show server-related fields if not running under Electron */}
 			{!isElectron && (
 				<>
 					<div className="mt-4">

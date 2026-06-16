@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { File } from '@shared/types';
+import { File as iFile } from '@shared/types';
 import CopyPromptButton from '@/components/CopyPromptButton';
 import TokenCountDisplay from '@/components/TokenCountDisplay';
 import { useFileState } from './useState';
@@ -9,7 +9,7 @@ import { Indicators } from './Indicators';
 import clsx from 'clsx';
 
 interface FileProps {
-	file: File;
+	file: iFile;
 	index: number;
 	selected: boolean;
 }

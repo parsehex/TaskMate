@@ -4,7 +4,7 @@ import { useStore } from '@/state';
 
 let socket: WebSocket;
 let isElectron = (window as any).electron !== undefined;
-let replyChannels = {};
+let replyChannels = {} as Record<string, (event: any, reply: any) => void>;
 
 export function initWebsocket() {
 	return new Promise((resolve) => {

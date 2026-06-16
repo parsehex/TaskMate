@@ -11,7 +11,7 @@ async function RESCAN_PROJECTS() {
 async function CREATE_PROJECT(
 	name: string,
 	path: string,
-	ignoredPaths: string[]
+	ignoredPaths?: string | string[]
 ) {
 	return (await call('CREATE_PROJECT', [name, path, ignoredPaths])) as Project;
 }
