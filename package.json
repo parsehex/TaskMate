@@ -28,7 +28,7 @@
 		"server": "node .dist/backend/index.js",
 		"reset": "npm run f:reset && npm run b:reset",
 		"w:build": "npm run f:build && npm run b:build",
-		"start": "concurrently \"npm run f:dev\" \"npm run b:dev\"",
+		"start": "concurrently \"npm run b:dev\" \"npm run f:dev\" \"npm run b:watch\"",
 		"dev": "npm run start",
 		"e:dev": "shx mkdir -p ./.dist && shx cp package.json schema.sql ./.dist/ && concurrently \"npm run dev\" \"electron ./.dist\"",
 		"e:build": "npm run w:build && shx cp package.json pnpm-lock.yaml schema.sql ./.dist/ && node build.js",
