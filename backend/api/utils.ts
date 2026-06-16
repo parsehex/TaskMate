@@ -62,7 +62,7 @@ async function GENERATE_SUMMARY(payload: GenerateSummaryMessage) {
 	if (!summary) {
 		return 'No summary generated';
 	}
-	return summary.text;
+	return summary.choices[0].message.content as string;
 }
 
 const handlers: UtilsMessageHandlers = {

@@ -1,22 +1,15 @@
 import path from 'path';
-import { ChatOpenAI } from 'langchain/chat_models/openai';
-import { HumanChatMessage, SystemChatMessage } from 'langchain/schema';
+import OpenAI from 'openai';
 import { Prompt_Part, isFile } from '../../shared/types/index.js';
 import { getProjectById } from '../db/helper/projects.js';
 import { getSummarizePrompt } from './prompts.js';
 
-let chat: ChatOpenAI;
+let openaiClient: OpenAI;
 
 export function initOpenAI() {
 	if (process.env.OPENAI_API_KEY) {
-		chat = new ChatOpenAI({
-			openAIApiKey: process.env.OPENAI_API_KEY as string,
-			modelName: 'gpt-3.5-turbo',
-			temperature: 0.5,
-			maxTokens: 750,
-			topP: 0.5,
-			frequencyPenalty: 0.85,
-			presencePenalty: 0.5,
+		openaiClient = new OpenAI({
+			apiKey: process.env.OPENAI_API_KEY as string,
 		});
 	} else {
 		console.log('No OpenAI API key found');
@@ -28,7 +21,7 @@ export const summarize = async (
 	content: string,
 	isSummary = false
 ) => {
-	if (!chat) {
+	if (!openaiClient) {
 		console.warn(
 			'Tried to summarize but server not started with an OpenAI key'
 		);
@@ -40,20 +33,32 @@ export const summarize = async (
 		const fileExtension = path.extname(name);
 		prompt = getSummarizePrompt(name, fileExtension);
 	}
-	const response = await chat.call([
-		new HumanChatMessage(
-			prompt + '\n\n' + name + (isSummary ? ' (summary)' : '') + ':' + content
-		),
-	]);
+	const response = await openaiClient.chat.completions.create({
+		model: 'gpt-3.5-turbo',
+		temperature: 0.5,
+		max_tokens: 750,
+		top_p: 0.5,
+		frequency_penalty: 0.85,
+		presence_penalty: 0.5,
+		messages: [
+			{
+				role: 'user',
+				content: prompt + '\n\n' + name + (isSummary ? ' (summary)' : '') + ':' + content,
+			},
+		],
+	});
 	console.log(response);
 	return response;
 };
 
-import OpenAI from 'openai';
-
 export const generateResponse = async (prompt: string) => {
-	const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-	const response = await openai.chat.completions.create({
+	if (!openaiClient) {
+		console.warn(
+			'Tried to generate response but server not started with an OpenAI key'
+		);
+		return;
+	}
+	const response = await openaiClient.chat.completions.create({
 		model: 'gpt-4-turbo',
 		messages: [{ role: 'user', content: prompt }],
 	});

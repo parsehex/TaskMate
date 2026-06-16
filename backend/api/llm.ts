@@ -6,7 +6,7 @@ import {
 import { generateResponse } from '../openai/index.js';
 
 async function MESSAGES_COMPLETION(prompt: string) {
-	return await generateResponse(prompt);
+	return await generateResponse(prompt) as string;
 }
 
 const handlers: ChatMessageHandlers = {
