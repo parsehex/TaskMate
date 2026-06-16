@@ -1,6 +1,6 @@
 import { AsyncDatabase } from 'promised-sqlite3';
 import path from 'path';
-import fs from 'fs-extra';
+import fs, { mkdirpSync } from 'fs-extra';
 import { updateSchema } from './schema/index.js';
 import sqlite from 'sqlite3';
 
@@ -21,6 +21,7 @@ export let db: AsyncDatabase;
 export const initializeDatabase = async () => {
 	const dbPath = await getDbPath();
 	console.log('DB path:', dbPath);
+	mkdirpSync(path.dirname(dbPath));
 	db = await AsyncDatabase.open(
 		dbPath,
 		sqlite.OPEN_READWRITE | sqlite.OPEN_CREATE
