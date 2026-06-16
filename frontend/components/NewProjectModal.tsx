@@ -13,6 +13,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { DefaultIgnoreFiles } from '@shared/const';
 
+const isElectron = !!(window as any).electron;
+
 interface NewProjectModalProps {
 	isOpen: boolean;
 	onClose: () => void;
@@ -56,22 +58,22 @@ const NewProjectModal: React.FC<NewProjectModalProps> = ({
 	const handleSetPath = (str: string) => {
 		if (!str) return;
 		setPath(str);
+	};
 
-		// attempt to parse out the project name
-		// TODO rethink. maybe have this as part of expanding to use a Browse button to choose folder
-		//   (to fix issue with typing the path)
-		// if (!name.trim()) {
-		// 	let p = str.trim();
-		// 	const slash = p.includes('/') ? '/' : '\\';
-		// 	const firstIsSlash = p.indexOf(slash) === 0;
-		// 	const lastIsSlash = p.lastIndexOf(slash) === p.length - 1;
-		// 	if (firstIsSlash) p = p.slice(1);
-		// 	if (lastIsSlash) p = p.slice(0, p.length - 1);
-		// 	const lastSlash = p.lastIndexOf(slash);
-		// 	const n = p.slice(lastSlash);
-		// 	if (n) setName(n);
-		// 	else return;
-		// }
+	const handleBrowseFolder = async () => {
+		try {
+			const selectedPath = await window.electron.selectFolder();
+			if (selectedPath) {
+				setPath(selectedPath);
+				// Auto-populate project name from folder name if not already set
+				if (!name.trim()) {
+					const folderName = selectedPath.split(/[/\\]/).pop() || '';
+					if (folderName) setName(folderName);
+				}
+			}
+		} catch (error) {
+			console.error('Failed to select folder:', error);
+		}
 	};
 
 	return (
@@ -97,14 +99,26 @@ const NewProjectModal: React.FC<NewProjectModalProps> = ({
 						<label htmlFor="projectPath" className="text-sm font-medium">
 							Existing Project Path (optional)
 						</label>
-						<Input
-							type="text"
-							id="projectPath"
-							value={path}
-							onChange={(e) => handleSetPath(e.target.value.replace(/"/g, ''))}
-							placeholder="Enter project path"
-							autoFocus
-						/>
+						<div className="flex gap-2">
+							<Input
+								type="text"
+								id="projectPath"
+								value={path}
+								onChange={(e) => handleSetPath(e.target.value.replace(/"/g, ''))}
+								placeholder="Enter project path"
+								autoFocus
+								className="flex-1"
+							/>
+							{ isElectron && (
+								<Button
+									type="button"
+									variant="secondary"
+									onClick={handleBrowseFolder}
+								>
+									Browse
+								</Button>
+							)}
+						</div>
 					</div>
 					<div className="space-y-2">
 						<label htmlFor="ignoredPaths" className="text-sm font-medium">

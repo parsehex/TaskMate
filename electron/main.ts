@@ -61,7 +61,6 @@ const createMainWindow = async () => {
 		width: 1200,
 		height: 800,
 	});
-	console.log('env', process.env);	// Load from Vite dev server in development, otherwise load built files
 	mainWindow = new BrowserWindow({
 		width: windowState.width,
 		minWidth: 600,
