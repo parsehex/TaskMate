@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { fetchProjects, createProject } from '@/lib/api/projects';
+import { filterIgnorePaths } from '@/lib/api/utils';
 import { useStore } from '../state';
 import {
 	Dialog,
@@ -11,7 +12,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Spinner } from '@/components/ui/spinner';
 import { DefaultIgnoreFiles } from '@shared/const';
+import { Description } from '@radix-ui/react-dialog';
+import { VisuallyHidden } from "radix-ui";
 
 const isElectron = !!(window as any).electron;
 
@@ -29,6 +33,8 @@ const NewProjectModal: React.FC<NewProjectModalProps> = ({
 	const [ignoredPaths, setIgnoredPaths] = useState(
 		JSON.stringify(DefaultIgnoreFiles, null, 2)
 	);
+	const [isFiltering, setIsFiltering] = useState(false);
+	const filterRequestRef = useRef(0);
 	const setProjects = useStore((state) => state.setProjects);
 	const setSelectedProjectId = useStore((state) => state.setSelectedProjectId);
 
@@ -55,16 +61,39 @@ const NewProjectModal: React.FC<NewProjectModalProps> = ({
 		}
 	};
 
+	const filterPaths = async (pathToFilter: string) => {
+		const requestId = ++filterRequestRef.current;
+		setIsFiltering(true);
+		try {
+			const filtered = await filterIgnorePaths(pathToFilter);
+			// Only update state if this is still the latest request
+			if (requestId === filterRequestRef.current) {
+				setIgnoredPaths(JSON.stringify(filtered, null, 2));
+			}
+		} catch (error) {
+			console.error('Failed to filter ignore paths:', error);
+		} finally {
+			// Only stop filtering spinner if this is still the latest request
+			if (requestId === filterRequestRef.current) {
+				setIsFiltering(false);
+			}
+		}
+	};
+
 	const handleSetPath = (str: string) => {
 		if (!str) return;
 		setPath(str);
+		// Filter ignore paths based on what exists in the project
+		filterPaths(str);
 	};
 
 	const handleBrowseFolder = async () => {
 		try {
-			const selectedPath = await window.electron.selectFolder();
+			const selectedPath = await (window as any).electron.selectFolder();
 			if (selectedPath) {
 				setPath(selectedPath);
+				// Filter ignore paths based on what exists in the project
+				await filterPaths(selectedPath);
 				// Auto-populate project name from folder name if not already set
 				if (!name.trim()) {
 					const folderName = selectedPath.split(/[/\\]/).pop() || '';
@@ -79,9 +108,14 @@ const NewProjectModal: React.FC<NewProjectModalProps> = ({
 	return (
 		<Dialog open={isOpen} onOpenChange={onClose}>
 			<DialogContent className="max-w-md bg-gray-200">
-				<DialogHeader>
-					<DialogTitle>Add a Project</DialogTitle>
-				</DialogHeader>
+				<Description className="mb-4 text-lg">
+					Add a project
+				</Description>
+				<VisuallyHidden.Root>
+					<DialogTitle className="mb-4 text-lg">
+						Add a project
+					</DialogTitle>
+				</VisuallyHidden.Root>
 				<form onSubmit={handleSubmit} className="space-y-4">
 					<div>
 						<label htmlFor="projectName" className="text-sm font-medium">
@@ -124,13 +158,21 @@ const NewProjectModal: React.FC<NewProjectModalProps> = ({
 						<label htmlFor="ignoredPaths" className="text-sm font-medium">
 							Ignored Paths
 						</label>
-						<Textarea
-							id="ignoredPaths"
-							value={ignoredPaths}
-							onChange={(e) => setIgnoredPaths(e.target.value)}
-							placeholder='e.g., ["node_modules/", "dist/", ".git/"]'
-							className="w-full min-h-28"
-						/>
+						<div className="relative">
+							<Textarea
+								id="ignoredPaths"
+								value={ignoredPaths}
+								onChange={(e) => setIgnoredPaths(e.target.value)}
+								placeholder='e.g., ["node_modules/", "dist/", ".git/"]'
+								className="w-full min-h-28"
+								disabled={isFiltering}
+							/>
+							{isFiltering && (
+								<div className="absolute inset-0 flex items-center justify-center bg-gray-200/80 rounded">
+									<Spinner className="size-6" />
+								</div>
+							)}
+						</div>
 					</div>
 					<DialogFooter className="flex justify-end space-x-2">
 						<Button type="button" variant="ghost" onClick={onClose}>

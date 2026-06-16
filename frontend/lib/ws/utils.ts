@@ -11,10 +11,14 @@ async function GET_TOKEN_COUNT(payload: GetTokenCountMessage) {
 async function GENERATE_SUMMARY(payload: GenerateSummaryMessage) {
 	return (await call('GENERATE_SUMMARY', [payload])) as string;
 }
+async function FILTER_IGNORE_PATHS(projectPath: string) {
+	return (await call('FILTER_IGNORE_PATHS', [projectPath])) as string[];
+}
 
 const UtilsHandlers: UtilsMessageHandlers = {
 	GET_TOKEN_COUNT,
 	GENERATE_SUMMARY,
+	FILTER_IGNORE_PATHS,
 };
 
 export default UtilsHandlers;

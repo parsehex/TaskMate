@@ -1,4 +1,5 @@
 import UtilsHandlers from '../ws/utils';
+import { DefaultIgnoreFiles } from '@shared/const';
 import memoizeOne from 'memoize-one';
 
 interface GetTokenCountOptions {
@@ -28,6 +29,17 @@ interface GenerateSummaryOptions {
 interface GenerateSummaryResponse {
 	data: { text: string };
 }
+
+export const filterIgnorePaths = async (projectPath: string): Promise<string[]> => {
+	if (!projectPath) return DefaultIgnoreFiles;
+	try {
+		const filtered = await UtilsHandlers.FILTER_IGNORE_PATHS(projectPath);
+		return filtered.length > 0 ? filtered : DefaultIgnoreFiles;
+	} catch (error) {
+		console.error('Failed to filter ignore paths:', error);
+		return DefaultIgnoreFiles;
+	}
+};
 export const generateSummary = async (
 	options: GenerateSummaryOptions
 ): Promise<GenerateSummaryResponse> => {

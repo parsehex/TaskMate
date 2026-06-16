@@ -9,9 +9,26 @@ export function shouldIgnorePath(
 	itemPath: string
 ): boolean {
 	// Check if any of the ignore patterns match the itemPath
-	const shouldIgnore = ignoreFiles.some((ignorePattern) =>
-		minimatch(itemPath, ignorePattern, { dot: true })
-	);
+	const shouldIgnore = ignoreFiles.some((ignorePattern) => {
+		// First check if the pattern matches directly
+		if (minimatch(itemPath, ignorePattern, { dot: true })) {
+			return true;
+		}
+
+		// If the pattern matches a directory, also ignore contents
+		// e.g., "**/.git" should also match "**/.git/**"
+		// Check if itemPath is inside a directory matched by the pattern
+		const dirPattern = ignorePattern.endsWith('/**')
+			? ignorePattern.slice(0, -3)
+			: ignorePattern;
+
+		// Try matching the itemPath against pattern/**
+		if (minimatch(itemPath, `${dirPattern}/**`, { dot: true })) {
+			return true;
+		}
+
+		return false;
+	});
 	return shouldIgnore;
 }
 

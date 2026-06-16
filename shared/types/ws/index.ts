@@ -57,6 +57,7 @@ export interface GenerateSummaryMessage {
 export interface UtilsMessageHandlers {
 	GET_TOKEN_COUNT: (payload: GetTokenCountMessage) => Promise<number>;
 	GENERATE_SUMMARY: (payload: GenerateSummaryMessage) => Promise<string>;
+	FILTER_IGNORE_PATHS: (projectPath: string) => Promise<string[]>;
 }
 
 export type MessageHandlers = FilesMessageHandlers &

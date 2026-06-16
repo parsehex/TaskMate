@@ -1,3 +1,6 @@
+import fs from 'fs-extra';
+import path from 'path';
+import { minimatch } from 'minimatch';
 import { Prompt_Part } from '../../shared/types/index.js';
 import {
 	GenerateSummaryMessage,
@@ -10,6 +13,7 @@ import { readFileContents } from '../fs-utils.js';
 import { summarize } from '../openai/index.js';
 import { getProjectPathLookup } from '../path-utils.js';
 import { getTokenCount } from '../tokenizer.js';
+import { DefaultIgnoreFiles } from '../../shared/const.js';
 
 export async function GET_TOKEN_COUNT(payload: GetTokenCountMessage) {
 	// data.payload is an object containing either a text prop or a promptPartId prop
@@ -65,9 +69,51 @@ async function GENERATE_SUMMARY(payload: GenerateSummaryMessage) {
 	return summary.choices[0].message.content as string;
 }
 
+async function FILTER_IGNORE_PATHS(projectPath: string): Promise<string[]> {
+	if (!projectPath || !(await fs.pathExists(projectPath))) {
+		return [];
+	}
+
+	const allItems: string[] = [];
+
+	try {
+		// Recursively get all items in the project path
+		const collectItems = async (dir: string, relativePath = '') => {
+			const items = await fs.readdir(dir, { withFileTypes: true });
+			for (const item of items) {
+				const itemRelativePath = relativePath ? `${relativePath}/${item.name}` : item.name;
+				allItems.push(itemRelativePath);
+				if (item.isDirectory()) {
+					await collectItems(path.join(dir, item.name), itemRelativePath);
+				}
+			}
+		};
+
+		await collectItems(projectPath);
+	} catch (error) {
+		console.error('Error scanning project path:', error);
+		return [];
+	}
+
+	// Filter DefaultIgnoreFiles to only include patterns that match at least one item
+	const matchingPatterns = DefaultIgnoreFiles.filter((pattern) => {
+		// Handle patterns like **/.git, **/node_modules, etc.
+		return allItems.some((item) => {
+			try {
+				return minimatch(item, pattern, { dot: true }) || minimatch(`${item}/`, pattern, { dot: true });
+			} catch {
+				return false;
+			}
+		});
+	});
+
+	return matchingPatterns;
+}
+
 const handlers: UtilsMessageHandlers = {
 	GET_TOKEN_COUNT,
 	GENERATE_SUMMARY,
+	FILTER_IGNORE_PATHS,
 };
 
 export default handlers;
