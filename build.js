@@ -74,7 +74,7 @@ const options = {
 		target: [
 			{
 				target: 'default',
-				arch: ['x64', 'arm64'],
+				arch: ['arm64', ],
 			},
 		],
 	},
