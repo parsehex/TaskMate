@@ -85,6 +85,11 @@ const NewProjectModal: React.FC<NewProjectModalProps> = ({
 		setPath(str);
 		// Filter ignore paths based on what exists in the project
 		filterPaths(str);
+		// Auto-populate project name from folder name if not already set
+		if (!name.trim()) {
+			const folderName = str.split(/[/\\]/).pop() || '';
+			if (folderName) setName(folderName);
+		}
 	};
 
 	const handleBrowseFolder = async () => {
