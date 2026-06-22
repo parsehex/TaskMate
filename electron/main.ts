@@ -73,7 +73,7 @@ const createMainWindow = async () => {
 		},
 	});
 
-	if (process.env.NODE_ENV !== 'production') {
+	if (app.isPackaged !== true) {
 		try {
 			await waitForViteServer();
 			console.log('Vite dev server is ready, loading URL...');
